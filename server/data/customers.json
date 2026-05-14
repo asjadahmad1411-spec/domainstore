@@ -1,0 +1,22 @@
+[
+  {
+    "id": "04f100cf-4243-4cec-b3dd-59c59be52022",
+    "name": "Test User",
+    "email": "test@test.com",
+    "phone": "9876543210",
+    "orders": 1,
+    "totalSpent": 998,
+    "joinedAt": "2026-05-14T17:55:50.982Z",
+    "lastOrder": "2026-05-14T17:55:50.982Z"
+  },
+  {
+    "id": "3ab1550f-6a06-463e-b4cd-1632f25a4fc2",
+    "name": "vbv cvxv",
+    "email": "rahul@test.com",
+    "phone": "9876543210",
+    "orders": 1,
+    "totalSpent": 849,
+    "joinedAt": "2026-05-14T18:18:06.464Z",
+    "lastOrder": "2026-05-14T18:18:06.464Z"
+  }
+]

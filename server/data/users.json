@@ -1,0 +1,18 @@
+[
+  {
+    "id": "b9394ef9-5430-4d21-bc1f-0d748fff0237",
+    "name": "Rahul Sharma",
+    "email": "rahul@test.com",
+    "phone": "9876543210",
+    "password": "h_nix5eo_7",
+    "createdAt": "2026-05-14T18:14:20.020Z",
+    "profile": {
+      "company": "",
+      "address": "",
+      "city": "",
+      "state": "",
+      "pincode": "",
+      "country": "India"
+    }
+  }
+]

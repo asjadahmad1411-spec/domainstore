@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Login — DomainStore</title>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body style="margin-left:0;">
+<div class="login-page" style="background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(108,61,232,0.2) 0%,transparent 70%);">
+  <div class="login-card">
+    <div class="login-logo">🌐 DomainStore</div>
+    <div class="login-sub">Admin Panel — Secure Login</div>
+    <div id="loginError" style="display:none;" class="toast error show" style="position:relative;transform:none;max-width:100%;margin-bottom:16px;"></div>
+    <div class="form-group" style="margin-bottom:16px;text-align:left;">
+      <label class="form-label">Username</label>
+      <input type="text" class="form-control" id="adminUser" placeholder="admin" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="form-group" style="margin-bottom:24px;text-align:left;">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-control" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;" onclick="doLogin()" id="loginBtn">🔓 Login to Admin Panel</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:20px;">Default: admin / admin123</p>
+  </div>
+</div>
+<script src="/js/admin/auth.js"></script>
+</body>
+</html>

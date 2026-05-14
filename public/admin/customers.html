@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Customers — Admin | DomainStore</title>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <div class="nav-section">Management</div>
+    <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers.html" class="nav-item active"><span class="icon">👥</span> Customers</a>
+    <div class="nav-section">Settings</div>
+    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎟️</span> Promo Codes</a>
+    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2>Customers</h2><p>Manage all registered customers</p></div>
+    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
+  </div>
+  <div class="content">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">All Customers</span>
+        <input type="text" class="search-input" id="custSearch" placeholder="🔍 Search name/email..." oninput="renderCustomers()"/>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Total Spent</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="custBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/admin/auth.js"></script>
+<script src="/js/admin/customers.js"></script>
+</body>
+</html>

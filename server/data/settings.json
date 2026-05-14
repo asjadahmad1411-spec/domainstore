@@ -1,0 +1,19 @@
+{
+  "storeName": "DomainStore",
+  "tagline": "India's #1 Domain Registrar",
+  "supportEmail": "support@domainstore.in",
+  "supportPhone": "+91 98765 43210",
+  "gstNumber": "",
+  "upiId": "domainstore@upi",
+  "upiName": "DomainStore Payments",
+  "upiQrUrl": "",
+  "paymentMethods": {
+    "upi_manual": true,
+    "card": true,
+    "netbanking": true,
+    "cod": true
+  },
+  "codFee": 50,
+  "codLimit": 5000,
+  "maintenanceMode": false
+}

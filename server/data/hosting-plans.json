@@ -1,0 +1,68 @@
+[
+  {
+    "id": "starter",
+    "name": "Starter",
+    "category": "shared",
+    "price": 99,
+    "renewPrice": 299,
+    "period": "month",
+    "features": ["1 Website", "10 GB SSD Storage", "Free SSL", "5 Email Accounts", "99.9% Uptime", "24/7 Support"],
+    "highlighted": false,
+    "badge": ""
+  },
+  {
+    "id": "professional",
+    "name": "Professional",
+    "category": "shared",
+    "price": 199,
+    "renewPrice": 499,
+    "period": "month",
+    "features": ["Unlimited Websites", "50 GB SSD Storage", "Free SSL + Domain", "Unlimited Emails", "Free CDN", "Priority Support"],
+    "highlighted": true,
+    "badge": "Most Popular"
+  },
+  {
+    "id": "business",
+    "name": "Business",
+    "category": "shared",
+    "price": 399,
+    "renewPrice": 799,
+    "period": "month",
+    "features": ["Unlimited Websites", "200 GB NVMe Storage", "Free SSL + Domain", "Unlimited Emails", "Free CDN + Backup", "Dedicated Support"],
+    "highlighted": false,
+    "badge": "Best Value"
+  },
+  {
+    "id": "vps-basic",
+    "name": "VPS Basic",
+    "category": "vps",
+    "price": 799,
+    "renewPrice": 999,
+    "period": "month",
+    "features": ["2 vCPU Cores", "4 GB RAM", "80 GB NVMe SSD", "3 TB Bandwidth", "Full Root Access", "Free SSL"],
+    "highlighted": false,
+    "badge": ""
+  },
+  {
+    "id": "vps-pro",
+    "name": "VPS Pro",
+    "category": "vps",
+    "price": 1499,
+    "renewPrice": 1799,
+    "period": "month",
+    "features": ["4 vCPU Cores", "8 GB RAM", "160 GB NVMe SSD", "Unlimited Bandwidth", "Full Root Access", "Free SSL + Backup"],
+    "highlighted": true,
+    "badge": "Recommended"
+  },
+  {
+    "id": "dedicated",
+    "name": "Dedicated",
+    "category": "dedicated",
+    "price": 4999,
+    "renewPrice": 5999,
+    "period": "month",
+    "features": ["16 vCPU Cores", "32 GB RAM", "1 TB NVMe SSD", "Unlimited Bandwidth", "Full Root Access", "Managed Support"],
+    "highlighted": false,
+    "badge": "Enterprise"
+  }
+]

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Search Domain Names — DomainStore</title>
+<meta name="description" content="Search domain name availability. Register .com, .in, .io, .tech and more at best prices."/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html" style="color:var(--accent)">Domains</a></li>
+    <li><a href="/hosting.html">Hosting</a></li>
+    <li><a href="/offers.html">🎁 Offers</a></li>
+    <li><a href="/#contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Account</a><button class="cart-btn" onclick="location.href='/cart.html'">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<section style="padding-top:100px;min-height:100vh;">
+  <div class="container">
+    <div style="text-align:center;padding:48px 0 40px;">
+      <h1>Find Your <span class="grad">Perfect Domain</span></h1>
+      <p style="margin-top:12px;font-size:1.05rem;">Search from millions of available domains across 10+ TLDs</p>
+    </div>
+
+    <div class="search-box" style="max-width:700px;margin:0 auto 48px;">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="Enter domain name (e.g. mybusiness)" onkeydown="if(event.key==='Enter')runSearch()"/>
+      <button class="btn btn-primary" onclick="runSearch()">Check Availability</button>
+    </div>
+
+    <div id="searchResults"></div>
+
+    <div id="defaultView">
+      <div class="section-title" style="margin-bottom:32px;">
+        <h2>Popular <span class="grad">TLD Pricing</span></h2>
+        <p>Choose from the most popular domain extensions</p>
+      </div>
+      <div id="tldPricingGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;"></div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:24px;text-align:center;font-size:0.85rem;color:var(--text-muted);">© 2025 DomainStore — <a href="/" style="color:var(--accent)">Home</a></footer>
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script src="/js/domain-search.js"></script>
+</body>
+</html>

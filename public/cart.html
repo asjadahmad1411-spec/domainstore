@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Cart — DomainStore</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html">Domains</a></li>
+    <li><a href="/hosting.html">Hosting</a></li>
+    <li><a href="/offers.html">🎁 Offers</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Login</a>
+    <button class="cart-btn" style="background:rgba(108,61,232,0.3);">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+
+<div class="cart-page">
+  <div class="container">
+    <div style="margin-bottom:32px;">
+      <h1>Your <span class="grad">Cart</span></h1>
+      <p id="cartSubtitle"></p>
+    </div>
+
+    <div class="cart-grid" id="cartGrid">
+      <div>
+        <div class="cart-items" id="cartItemsList"></div>
+      </div>
+      <div class="order-summary">
+        <div class="card">
+          <h3 style="margin-bottom:20px;">Order Summary</h3>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.9rem;"><span style="color:var(--text-muted)">Subtotal</span><span id="subtotal">₹0</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:0.9rem;" id="discountRow" style="display:none;"><span style="color:var(--green)">Discount</span><span id="discountAmt" style="color:var(--green)">-₹0</span></div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;"/>
+          <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800;margin-bottom:24px;"><span>Total</span><span id="totalAmt" style="color:var(--accent)">₹0</span></div>
+
+          <div class="promo-row" style="margin-bottom:20px;">
+            <input type="text" id="promoInput" placeholder="Promo code" style="text-transform:uppercase;"/>
+            <button class="btn btn-outline btn-sm" onclick="applyPromo()">Apply</button>
+          </div>
+          <div id="promoMsg" style="font-size:0.82rem;margin-bottom:12px;"></div>
+
+          <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:14px;" onclick="proceedToCheckout()" id="checkoutBtn">Proceed to Checkout →</button>
+          <a href="/domains.html" style="display:block;text-align:center;margin-top:14px;font-size:0.85rem;color:var(--text-muted);">← Continue Shopping</a>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:1.3rem;">🔒</span><span style="font-size:0.85rem;font-weight:600;">Secure Checkout</span></div>
+          <p style="font-size:0.8rem;">Your payment info is encrypted. We accept UPI, Cards & Net Banking.</p>
+          <div style="display:flex;gap:8px;margin-top:14px;font-size:0.75rem;flex-wrap:wrap;">
+            <span style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;">💳 Visa</span>
+            <span style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;">💳 Mastercard</span>
+            <span style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;">📱 UPI</span>
+            <span style="background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;">🏦 NetBanking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="emptyCart" style="display:none;">
+      <div class="icon">🛒</div>
+      <h3>Your cart is empty</h3>
+      <p>Add a domain or hosting plan to get started</p>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:24px;flex-wrap:wrap;">
+        <a href="/domains.html" class="btn btn-primary">Search Domains</a>
+        <a href="/hosting.html" class="btn btn-outline">View Hosting</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script src="/js/cart.js"></script>
+</body>
+</html>

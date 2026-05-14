@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Settings — Admin | DomainStore</title>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <div class="nav-section">Management</div>
+    <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
+    <div class="nav-section">Settings</div>
+    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎟️</span> Promo Codes</a>
+    <a href="/admin/settings.html" class="nav-item active"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/" style="font-size:.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2>Settings</h2><p>Configure your store</p></div>
+    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <!-- Store Info -->
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">🏪 Store Information</span></div>
+        <div class="form-group"><label class="form-label">Store Name</label><input type="text" class="form-control" id="storeName"/></div>
+        <div class="form-group"><label class="form-label">Tagline</label><input type="text" class="form-control" id="tagline"/></div>
+        <div class="form-group"><label class="form-label">Support Email</label><input type="email" class="form-control" id="supportEmail"/></div>
+        <div class="form-group"><label class="form-label">Support Phone</label><input type="text" class="form-control" id="supportPhone"/></div>
+        <div class="form-group"><label class="form-label">GST Number</label><input type="text" class="form-control" id="gstNumber" placeholder="Optional"/></div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Changes</button>
+      </div>
+
+      <!-- UPI Settings -->
+      <div class="panel" style="border-color:rgba(0,212,255,.3);">
+        <div class="panel-header"><span class="panel-title">📲 UPI Payment Settings</span></div>
+        <div class="form-group"><label class="form-label">Your UPI ID *</label><input type="text" class="form-control" id="upiId" placeholder="yourname@paytm"/></div>
+        <div class="form-group"><label class="form-label">Display Name (shown to customers)</label><input type="text" class="form-control" id="upiName" placeholder="DomainStore Payments"/></div>
+        <div style="margin-bottom:16px;">
+          <div class="form-label">QR Code Preview</div>
+          <div id="qrPreview" style="width:140px;height:140px;background:rgba(255,255,255,.05);border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;cursor:pointer;" onclick="refreshQR()">📱</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:6px;">Auto-generated from UPI ID. Click to refresh.</div>
+        </div>
+        <div style="padding:12px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.2);border-radius:10px;margin-bottom:16px;font-size:.82rem;color:var(--text-muted);">
+          📋 <strong>How it works:</strong> Customers see your UPI ID and QR code at checkout, pay via any UPI app, then enter their UTR. You verify in the <a href="/admin/utr.html" style="color:var(--accent);">UTR Verify</a> section.
+        </div>
+        <button class="btn btn-primary" onclick="saveUpiSettings()">💾 Save UPI Settings</button>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">💳 Payment Methods</span></div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
+            <div><div style="font-weight:600;font-size:.9rem;">📲 UPI / QR Code</div><div style="font-size:.75rem;color:var(--text-muted);">Manual UTR verification</div></div>
+            <label class="toggle"><input type="checkbox" id="t-upi_manual" checked/><span class="toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
+            <div><div style="font-weight:600;font-size:.9rem;">💳 Credit/Debit Card</div><div style="font-size:.75rem;color:var(--text-muted);">Visa, Mastercard, Rupay</div></div>
+            <label class="toggle"><input type="checkbox" id="t-card" checked/><span class="toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
+            <div><div style="font-weight:600;font-size:.9rem;">🏦 Net Banking</div><div style="font-size:.75rem;color:var(--text-muted);">All major banks</div></div>
+            <label class="toggle"><input type="checkbox" id="t-netbanking" checked/><span class="toggle-slider"></span></label>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
+            <div><div style="font-weight:600;font-size:.9rem;">🚚 Cash on Delivery</div><div style="font-size:.75rem;color:var(--text-muted);">Orders up to ₹5,000 (₹50 fee)</div></div>
+            <label class="toggle"><input type="checkbox" id="t-cod" checked/><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="savePaymentMethods()">💾 Save Payment Settings</button>
+      </div>
+
+      <!-- Admin Password -->
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">🔐 Admin Password</span></div>
+        <div class="form-group"><label class="form-label">New Password</label><input type="password" class="form-control" id="newPwd" placeholder="Min 8 characters"/></div>
+        <div class="form-group"><label class="form-label">Confirm Password</label><input type="password" class="form-control" id="confPwd" placeholder="Repeat password"/></div>
+        <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        <div class="panel-header" style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;"><span class="panel-title">📊 Quick Stats</span></div>
+        <div id="quickStats"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/admin/auth.js"></script>
+<script>
+let currentSettings = {};
+
+async function loadSettingsPage() {
+  try {
+    currentSettings = await apiFetch('/api/admin/settings');
+    const fields = ['storeName','tagline','supportEmail','supportPhone','gstNumber','upiId','upiName'];
+    fields.forEach(f => { const el = document.getElementById(f); if (el && currentSettings[f]) el.value = currentSettings[f]; });
+    const pm = currentSettings.paymentMethods || {};
+    ['upi_manual','card','netbanking','cod'].forEach(k => {
+      const el = document.getElementById('t-' + k);
+      if (el) el.checked = pm[k] !== false;
+    });
+    refreshQR();
+  } catch(e) {}
+
+  // Quick stats
+  try {
+    const s = await apiFetch('/api/admin/stats');
+    document.getElementById('quickStats').innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Revenue</span><span style="font-weight:700;color:var(--accent);">₹${(s.totalRevenue||0).toLocaleString('en-IN')}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Orders</span><span style="font-weight:700;">${s.totalOrders}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Customers</span><span style="font-weight:700;">${s.totalCustomers}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:#f59e0b);">UTR Pending</span><span style="font-weight:700;color:#f59e0b;">${s.utrPending||0}</span></div>
+      </div>`;
+  } catch(e){}
+}
+
+function refreshQR() {
+  const upiId = document.getElementById('upiId')?.value || currentSettings.upiId || '';
+  const upiName = document.getElementById('upiName')?.value || currentSettings.upiName || 'DomainStore';
+  const qrDiv = document.getElementById('qrPreview');
+  if (!qrDiv || !upiId) return;
+  const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&cu=INR`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiLink)}`;
+  qrDiv.innerHTML = `<img src="${qrUrl}" style="width:130px;height:130px;border-radius:8px;" alt="QR"/>`;
+  qrDiv.style.background = '#fff'; qrDiv.style.padding = '6px';
+}
+
+async function saveSettings() {
+  const data = {
+    storeName:    document.getElementById('storeName')?.value,
+    tagline:      document.getElementById('tagline')?.value,
+    supportEmail: document.getElementById('supportEmail')?.value,
+    supportPhone: document.getElementById('supportPhone')?.value,
+    gstNumber:    document.getElementById('gstNumber')?.value
+  };
+  try {
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify(data) });
+    showToast('Store settings saved!', 'success');
+  } catch(e) { showToast('Failed to save', 'error'); }
+}
+
+async function saveUpiSettings() {
+  const upiId   = document.getElementById('upiId')?.value.trim();
+  const upiName = document.getElementById('upiName')?.value.trim();
+  if (!upiId) return showToast('UPI ID is required', 'error');
+  try {
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ upiId, upiName }) });
+    showToast('✅ UPI settings saved! Customers will now see your UPI ID at checkout.', 'success');
+    refreshQR();
+  } catch(e) { showToast('Failed to save UPI settings', 'error'); }
+}
+
+async function savePaymentMethods() {
+  const pm = {};
+  ['upi_manual','card','netbanking','cod'].forEach(k => {
+    const el = document.getElementById('t-' + k);
+    pm[k] = el ? el.checked : true;
+  });
+  try {
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ paymentMethods: pm }) });
+    showToast('Payment methods updated!', 'success');
+  } catch(e) { showToast('Failed to save', 'error'); }
+}
+
+function changePassword() {
+  const p1 = document.getElementById('newPwd')?.value;
+  const p2 = document.getElementById('confPwd')?.value;
+  if (!p1 || p1.length < 8) return showToast('Password must be at least 8 characters', 'error');
+  if (p1 !== p2) return showToast('Passwords do not match', 'error');
+  showToast('Password change requires server restart. Update .env file manually.', 'success');
+}
+
+document.addEventListener('DOMContentLoaded', loadSettingsPage);
+</script>
+</body>
+</html>

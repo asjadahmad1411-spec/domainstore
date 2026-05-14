@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DomainStore — Buy Domains & Hosting at Best Prices in India</title>
+<meta name="description" content="Search and register your perfect domain name. Get web hosting from ₹99/month. SSL, email, and 24/7 support included."/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<nav class="navbar" id="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html">Domains</a></li>
+    <li><a href="/hosting.html">Hosting</a></li>
+    <li><a href="/offers.html">🎁 Offers</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Login</a>
+    <button class="cart-btn" onclick="location.href='/cart.html'" id="cartBtn">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✨ India's #1 Domain Registrar</div>
+    <h1>Find Your Perfect<br/><span class="grad">Domain Name</span></h1>
+    <p>Search from 500M+ domain names. Get hosting, SSL & email — all in one place starting at ₹99/mo.</p>
+    <div class="search-box" id="heroSearch">
+      <span>🔍</span>
+      <input type="text" id="heroInput" placeholder="Search your domain name..." onkeydown="if(event.key==='Enter')searchDomain()"/>
+      <button class="btn btn-primary" onclick="searchDomain()">Search Domain</button>
+    </div>
+    <div class="tld-pills">
+      <div class="tld-pill">.com <span>₹799</span></div>
+      <div class="tld-pill">.in <span>₹399</span></div>
+      <div class="tld-pill">.tech <span>₹299</span></div>
+      <div class="tld-pill">.store <span>₹199</span></div>
+      <div class="tld-pill">.io <span>₹3,499</span></div>
+      <div class="tld-pill">.online <span>₹149</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="num">2M+</div><div class="lbl">Domains Registered</div></div>
+  <div class="stat-item"><div class="num">500K+</div><div class="lbl">Happy Customers</div></div>
+  <div class="stat-item"><div class="num">99.9%</div><div class="lbl">Uptime SLA</div></div>
+  <div class="stat-item"><div class="num">24/7</div><div class="lbl">Expert Support</div></div>
+  <div class="stat-item"><div class="num">₹99</div><div class="lbl">Hosting/Month</div></div>
+</div>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>Everything You Need to <span class="grad">Launch Online</span></h2>
+      <p>From domain registration to managed hosting — we've got you covered</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🌐</div>
+        <h3>Domain Registration</h3>
+        <p style="margin-top:8px;">Register .com, .in, .io, .tech and 50+ TLDs at the best prices. Free WHOIS privacy included.</p>
+      </div>
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">⚡</div>
+        <h3>NVMe Web Hosting</h3>
+        <p style="margin-top:8px;">Blazing fast NVMe SSD hosting with 99.9% uptime guarantee, free SSL and daily backups.</p>
+      </div>
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+        <h3>Free SSL Certificate</h3>
+        <p style="margin-top:8px;">Every plan includes free SSL certificates from Let's Encrypt. Secure your site in minutes.</p>
+      </div>
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">📧</div>
+        <h3>Business Email</h3>
+        <p style="margin-top:8px;">Get professional email @yourdomain.com with 5GB mailbox. Spam protection included.</p>
+      </div>
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🛡️</div>
+        <h3>DDoS Protection</h3>
+        <p style="margin-top:8px;">Enterprise-grade DDoS protection and Web Application Firewall to keep your site safe.</p>
+      </div>
+      <div class="card fade-up">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🚀</div>
+        <h3>One-Click Install</h3>
+        <p style="margin-top:8px;">Install WordPress, Joomla, Drupal and 100+ apps with a single click via Softaculous.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg2);">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>Popular <span class="grad">Hosting Plans</span></h2>
+      <p>Choose the plan that fits your needs. Upgrade anytime.</p>
+    </div>
+    <div class="hosting-grid" id="homePlanGrid"></div>
+    <div style="text-align:center;margin-top:36px;" class="fade-up">
+      <a href="/hosting.html" class="btn btn-outline btn-lg">View All Plans →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(135deg,rgba(108,61,232,0.15),rgba(0,212,255,0.05));border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container" style="text-align:center;">
+    <div class="fade-up">
+      <h2>Ready to Get Started?</h2>
+      <p style="margin:16px auto 32px;max-width:500px;font-size:1.05rem;">Search your domain and get online today. No hidden fees. Cancel anytime.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="/domains.html" class="btn btn-primary btn-lg">Search Domains</a>
+        <a href="/hosting.html" class="btn btn-accent btn-lg">Get Hosting</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-title fade-up">
+      <h2>What Our <span class="grad">Customers Say</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+      <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Got my domain and hosting set up in under 10 minutes! Amazing speed and support."</p><div style="margin-top:20px;font-weight:700;">— Rahul Sharma</div><div style="font-size:0.8rem;color:var(--text-muted);">E-commerce owner, Mumbai</div></div>
+      <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Best prices in India for .com domains. Their VPS hosting is incredibly fast!"</p><div style="margin-top:20px;font-weight:700;">— Priya Patel</div><div style="font-size:0.8rem;color:var(--text-muted);">Freelance Developer, Pune</div></div>
+      <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Migrated from GoDaddy and saved 60% on renewal costs. Support team is awesome."</p><div style="margin-top:20px;font-weight:700;">— Arjun Singh</div><div style="font-size:0.8rem;color:var(--text-muted);">Digital Agency, Bangalore</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">🌐 DomainStore</div>
+      <p>India's trusted domain registrar and web hosting provider since 2020.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;font-size:1.3rem;">
+        <span style="cursor:pointer;opacity:0.7;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">📘</span>
+        <span style="cursor:pointer;opacity:0.7;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">🐦</span>
+        <span style="cursor:pointer;opacity:0.7;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">📸</span>
+        <span style="cursor:pointer;opacity:0.7;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">💼</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Domains</h4>
+      <a href="/domains.html">.com Domains</a>
+      <a href="/domains.html">.in Domains</a>
+      <a href="/domains.html">.io Domains</a>
+      <a href="/domains.html">Domain Transfer</a>
+      <a href="/domains.html">Bulk Domains</a>
+    </div>
+    <div class="footer-col">
+      <h4>Hosting</h4>
+      <a href="/hosting.html">Shared Hosting</a>
+      <a href="/hosting.html">VPS Hosting</a>
+      <a href="/hosting.html">Dedicated Server</a>
+      <a href="/hosting.html">WordPress Hosting</a>
+      <a href="/hosting.html">Free SSL</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About Us</a>
+      <a href="#">Blog</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 DomainStore. All rights reserved. 🇮🇳 Made in India</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+</body>
+</html>

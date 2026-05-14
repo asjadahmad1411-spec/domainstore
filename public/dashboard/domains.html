@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Domains — DomainStore Dashboard</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/dashboard.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+</head>
+<body>
+<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
+<div class="dash-overlay" id="dashOverlay"></div>
+
+<aside class="dash-sidebar" id="dashSidebar">
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
+  <nav class="dash-nav">
+    <div class="dash-nav-section">Overview</div>
+    <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/dashboard/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
+    <div class="dash-nav-section">Services</div>
+    <a href="/dashboard/domains.html" class="dash-nav-item active"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <div class="dash-nav-section">Account</div>
+    <a href="/dashboard/profile.html" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+  </nav>
+  <div class="dash-footer">
+    <a href="/" class="dash-nav-item" style="margin-bottom:4px;"><span class="nav-icon">🛍️</span> Go to Store</a>
+    <button onclick="dsLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
+  </div>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-title"><h2>🌐 My Domains</h2><p>Manage nameservers, DNS, and domain settings</p></div>
+    <div class="dash-topbar-actions"><a href="/domains.html" class="btn btn-primary btn-sm">+ Register New Domain</a></div>
+  </div>
+  <div class="dash-content">
+
+    <!-- Search & Filter -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <input type="text" id="searchDomain" placeholder="🔍 Search domains..." oninput="filterDomains()" class="form-control" style="flex:1;min-width:200px;max-width:320px;"/>
+      <select id="filterStatus" onchange="filterDomains()" class="form-control" style="max-width:160px;">
+        <option value="">All Status</option>
+        <option value="Active">Active</option>
+        <option value="Pending">Pending</option>
+        <option value="UTR Pending">UTR Pending</option>
+      </select>
+    </div>
+
+    <div id="domainsContainer">
+      <div class="dash-panel"><div class="dash-panel-body" style="text-align:center;padding:60px;color:var(--text-muted);">⏳ Loading your domains...</div></div>
+    </div>
+
+    <div id="noDomains" style="display:none;">
+      <div class="dash-panel">
+        <div class="dash-panel-body" style="text-align:center;padding:60px;">
+          <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">🌐</div>
+          <h3>No domains yet</h3>
+          <p style="color:var(--text-muted);margin:12px 0;">Register your first domain and start building your online presence.</p>
+          <a href="/domains.html" class="btn btn-primary">🔍 Search Domains</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/dashboard.js"></script>
+<script>
+requireDsAuth();
+initDashSidebar();
+
+let allDomains = [];
+
+function statusBadge(s) { return getStatusBadge(s); }
+
+function renderDomains(list) {
+  const cont = document.getElementById('domainsContainer');
+  const none = document.getElementById('noDomains');
+  if (!list.length) {
+    cont.innerHTML = ''; none.style.display = 'block'; return;
+  }
+  none.style.display = 'none';
+  cont.innerHTML = list.map((d, i) => `
+    <div class="domain-card" id="dc-${i}">
+      <div class="domain-card-top">
+        <div class="domain-icon-wrap">🌐</div>
+        <div class="domain-info">
+          <div class="domain-name">${d.name}</div>
+          <div class="domain-meta-tags">
+            ${statusBadge(d.status)}
+            ${d.autoRenew ? '<span class="status-active">🔄 Auto-Renew ON</span>' : '<span class="status-cancelled">🔄 Auto-Renew OFF</span>'}
+            ${d.locked ? '<span style="background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.3);padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:700;">🔒 Locked</span>' : ''}
+            ${d.privacy ? '<span style="background:rgba(168,85,247,.1);color:#a855f7;border:1px solid rgba(168,85,247,.3);padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:700;">🛡️ Privacy On</span>' : ''}
+          </div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-top:6px;">
+            Registered: ${fmtDate(d.orderDate)} &nbsp;·&nbsp; Expires: ${fmtDate(d.expiry)} &nbsp;·&nbsp; Order: <span style="font-family:monospace;color:var(--accent);">${d.orderId}</span>
+          </div>
+        </div>
+        <div class="domain-actions">
+          <button class="btn btn-outline btn-sm" onclick="toggleExpand(${i})">⚙️ Manage</button>
+          <a href="/domains.html" class="btn btn-primary btn-sm">🔄 Renew</a>
+        </div>
+      </div>
+
+      <!-- Expandable settings -->
+      <div class="domain-expand" id="de-${i}">
+
+        <!-- Nameservers -->
+        <div style="margin-bottom:20px;">
+          <div style="font-weight:800;font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            🌐 Nameservers
+            <span style="font-size:.72rem;color:var(--text-muted);font-weight:400;">(Point your domain to the right server)</span>
+          </div>
+          <div style="background:rgba(108,61,232,.05);border:1px solid rgba(108,61,232,.15);border-radius:12px;padding:16px;margin-bottom:12px;">
+            <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:8px;">🏷️ <strong>Custom Nameservers</strong> — Enter your hosting provider's NS records</div>
+            <div class="ns-grid">
+              <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 1 *</label>
+                <input type="text" class="form-control" id="ns1-${i}" value="${(d.nameservers||[])[0]||'ns1.domainstore.in'}" placeholder="ns1.example.com"/></div>
+              <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 2 *</label>
+                <input type="text" class="form-control" id="ns2-${i}" value="${(d.nameservers||[])[1]||'ns2.domainstore.in'}" placeholder="ns2.example.com"/></div>
+              <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 3 (optional)</label>
+                <input type="text" class="form-control" id="ns3-${i}" value="${(d.nameservers||[])[2]||''}" placeholder="ns3.example.com"/></div>
+              <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 4 (optional)</label>
+                <input type="text" class="form-control" id="ns4-${i}" value="${(d.nameservers||[])[3]||''}" placeholder="ns4.example.com"/></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-sm" onclick="saveNameservers('${d.orderId}', ${i})">💾 Save Nameservers</button>
+              <button class="btn btn-outline btn-sm" onclick="useDefaultNS(${i})">🔄 Reset to Default NS</button>
+            </div>
+          </div>
+          <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;font-size:.8rem;">
+            <div style="color:var(--text-muted);margin-bottom:6px;">📌 <strong>Current Nameservers:</strong></div>
+            ${(d.nameservers||['ns1.domainstore.in','ns2.domainstore.in']).map(n=>`<div style="font-family:monospace;color:var(--accent);padding:2px 0;">${n}</div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Domain Settings -->
+        <div>
+          <div style="font-weight:800;font-size:.95rem;margin-bottom:12px;">⚙️ Domain Settings</div>
+          <div style="background:rgba(0,0,0,.15);border-radius:12px;padding:4px 16px;">
+            <div class="toggle-row">
+              <div class="toggle-row-info">
+                <div class="t-label">🔄 Auto-Renew</div>
+                <div class="t-desc">Automatically renew this domain before expiry</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="ar-${i}" ${d.autoRenew?'checked':''} onchange="saveSetting('${d.orderId}', 'autoRenew', this.checked)"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-row-info">
+                <div class="t-label">🔒 Domain Lock (Transfer Lock)</div>
+                <div class="t-desc">Prevents unauthorized transfer to another registrar</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="lk-${i}" ${d.locked?'checked':''} onchange="saveSetting('${d.orderId}', 'locked', this.checked)"/><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-row-info">
+                <div class="t-label">🛡️ WHOIS Privacy Protection</div>
+                <div class="t-desc">Hide your personal info from public WHOIS lookups</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="pv-${i}" ${d.privacy?'checked':''} onchange="saveSetting('${d.orderId}', 'privacy', this.checked)"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /expand -->
+    </div>
+  `).join('');
+}
+
+function toggleExpand(i) {
+  const el = document.getElementById('de-' + i);
+  el.classList.toggle('open');
+}
+
+function useDefaultNS(i) {
+  document.getElementById('ns1-' + i).value = 'ns1.domainstore.in';
+  document.getElementById('ns2-' + i).value = 'ns2.domainstore.in';
+  document.getElementById('ns3-' + i).value = '';
+  document.getElementById('ns4-' + i).value = '';
+}
+
+async function saveNameservers(orderId, i) {
+  const ns = [
+    document.getElementById('ns1-'+i).value.trim(),
+    document.getElementById('ns2-'+i).value.trim(),
+    document.getElementById('ns3-'+i).value.trim(),
+    document.getElementById('ns4-'+i).value.trim()
+  ].filter(Boolean);
+  if (ns.length < 2) return dsToast('Please enter at least 2 nameservers', 'error');
+  try {
+    await dsApi(`/api/user/domains/${orderId}/nameservers`, { method: 'PATCH', body: JSON.stringify({ nameservers: ns }) });
+    dsToast('✅ Nameservers updated! Changes take 24-48 hours to propagate.', 'success');
+    loadDomains();
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+async function saveSetting(orderId, key, val) {
+  try {
+    await dsApi(`/api/user/domains/${orderId}/settings`, { method: 'PATCH', body: JSON.stringify({ [key]: val }) });
+    dsToast('✅ Setting updated!', 'success');
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+function filterDomains() {
+  const q = document.getElementById('searchDomain').value.toLowerCase();
+  const s = document.getElementById('filterStatus').value;
+  renderDomains(allDomains.filter(d =>
+    (!q || d.name.toLowerCase().includes(q)) && (!s || d.status === s)
+  ));
+}
+
+async function loadDomains() {
+  try {
+    allDomains = await dsApi('/api/user/domains');
+    renderDomains(allDomains);
+  } catch(e) { dsToast('Failed to load domains', 'error'); }
+}
+
+loadDomains();
+</script>
+</body>
+</html>

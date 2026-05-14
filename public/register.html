@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Account — DomainStore</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+<style>
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;}
+.auth-card{width:100%;max-width:480px;background:var(--glass);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:24px;padding:40px;}
+.auth-logo{text-align:center;font-size:1.6rem;font-weight:900;margin-bottom:6px;}
+.auth-sub{text-align:center;font-size:.85rem;color:var(--text-muted);margin-bottom:32px;}
+.pass-wrap{position:relative;}
+.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;}
+.strength-bar{height:4px;border-radius:2px;margin-top:6px;transition:all .3s;background:var(--border);}
+.strength-text{font-size:.72rem;color:var(--text-muted);margin-top:4px;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <div class="nav-actions">
+    <a href="/login.html" class="btn btn-outline btn-sm">Login</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+    <div class="auth-logo">✨ Create Account</div>
+    <div class="auth-sub">Start managing your domains & hosting</div>
+
+    <div id="errMsg" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;"></div>
+
+    <form id="regForm" onsubmit="doRegister(event)">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="fname" placeholder="Rahul" required/></div>
+        <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lname" placeholder="Sharma" required/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com" required autocomplete="email"/></div>
+      <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210"/></div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div class="pass-wrap">
+          <input type="password" class="form-control" id="password" placeholder="Min 6 characters" required oninput="checkStrength(this.value)"/>
+          <button type="button" class="pass-toggle" onclick="togglePass('password')">👁️</button>
+        </div>
+        <div class="strength-bar" id="strengthBar"></div>
+        <div class="strength-text" id="strengthText"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password *</label>
+        <div class="pass-wrap">
+          <input type="password" class="form-control" id="confirm" placeholder="Repeat password" required/>
+          <button type="button" class="pass-toggle" onclick="togglePass('confirm')">👁️</button>
+        </div>
+      </div>
+      <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:16px;">
+        By creating an account you agree to our <a href="#" style="color:var(--accent);">Terms of Service</a> and <a href="#" style="color:var(--accent);">Privacy Policy</a>.
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="regBtn">
+        🚀 Create My Account
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted);">
+      Already have an account? <a href="/login.html" style="color:var(--accent);font-weight:700;">Login →</a>
+    </div>
+    <div style="text-align:center;margin-top:10px;"><a href="/" style="font-size:.82rem;color:var(--text-muted);">← Back to Store</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script>
+function togglePass(id) { const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+
+function checkStrength(val) {
+  const bar = document.getElementById('strengthBar');
+  const txt = document.getElementById('strengthText');
+  if (!val) { bar.style.width='0'; txt.textContent=''; return; }
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['','#ef4444','#f59e0b','#eab308','#22c55e','#16a34a'];
+  const labels = ['','Very Weak','Weak','Fair','Strong','Very Strong'];
+  bar.style.background = colors[score] || 'var(--border)';
+  bar.style.width = (score * 20) + '%';
+  txt.textContent = labels[score] || '';
+  txt.style.color = colors[score] || 'var(--text-muted)';
+}
+
+async function doRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('regBtn');
+  const err = document.getElementById('errMsg');
+  const pwd = document.getElementById('password').value;
+  const cnf = document.getElementById('confirm').value;
+  if (pwd !== cnf) { err.textContent='Passwords do not match'; err.style.display='block'; return; }
+  btn.textContent='⏳ Creating account...'; btn.disabled=true; err.style.display='none';
+  try {
+    const res = await fetch('/api/auth/register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name: document.getElementById('fname').value.trim() + ' ' + document.getElementById('lname').value.trim(),
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        password: pwd
+      })
+    }).then(r=>r.json());
+    if (res.error) throw new Error(res.error);
+    localStorage.setItem('ds_user_token', res.token);
+    localStorage.setItem('ds_user', JSON.stringify(res.user));
+    location.href = '/dashboard/';
+  } catch(e2) {
+    err.textContent=e2.message; err.style.display='block';
+    btn.textContent='🚀 Create My Account'; btn.disabled=false;
+  }
+}
+if (localStorage.getItem('ds_user_token')) location.href='/dashboard/';
+</script>
+</body>
+</html>

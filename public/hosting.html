@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Web Hosting Plans — DomainStore</title>
+<meta name="description" content="Affordable web hosting from ₹99/month. Shared, VPS and Dedicated servers with free SSL."/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html">Domains</a></li>
+    <li><a href="/hosting.html" style="color:var(--accent)">Hosting</a></li>
+    <li><a href="/offers.html">🎁 Offers</a></li>
+    <li><a href="/#contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Account</a><button class="cart-btn" onclick="location.href='/cart.html'">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<section style="padding-top:100px;min-height:100vh;">
+  <div class="container">
+    <div style="text-align:center;padding:48px 0 40px;">
+      <h1>Web <span class="grad">Hosting Plans</span></h1>
+      <p style="margin-top:12px;font-size:1.05rem;">Blazing fast NVMe hosting with 99.9% uptime. Starting at ₹99/month.</p>
+    </div>
+
+    <div class="tabs" id="categoryTabs">
+      <button class="tab active" onclick="filterCategory('all',this)">All Plans</button>
+      <button class="tab" onclick="filterCategory('shared',this)">Shared Hosting</button>
+      <button class="tab" onclick="filterCategory('vps',this)">VPS</button>
+      <button class="tab" onclick="filterCategory('dedicated',this)">Dedicated</button>
+    </div>
+
+    <div class="hosting-grid" id="plansGrid"></div>
+
+    <div class="section" style="margin-top:48px;padding:48px 0;">
+      <div class="section-title">
+        <h2>Why Choose <span class="grad">DomainStore Hosting?</span></h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+        <div class="card"><div style="font-size:2rem;margin-bottom:12px;">⚡</div><h3>NVMe SSD</h3><p style="margin-top:6px;font-size:0.9rem;">10x faster than regular SSD. Your site loads instantly.</p></div>
+        <div class="card"><div style="font-size:2rem;margin-bottom:12px;">🔒</div><h3>Free SSL</h3><p style="margin-top:6px;font-size:0.9rem;">Auto-renewed Let's Encrypt SSL on all plans.</p></div>
+        <div class="card"><div style="font-size:2rem;margin-bottom:12px;">💾</div><h3>Daily Backups</h3><p style="margin-top:6px;font-size:0.9rem;">Your data is backed up daily. Restore in 1 click.</p></div>
+        <div class="card"><div style="font-size:2rem;margin-bottom:12px;">🌐</div><h3>Free CDN</h3><p style="margin-top:6px;font-size:0.9rem;">Global CDN with 50+ PoPs for blazing fast delivery.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:24px;text-align:center;font-size:0.85rem;color:var(--text-muted);">© 2025 DomainStore — <a href="/" style="color:var(--accent)">Home</a></footer>
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script src="/js/hosting.js"></script>
+</body>
+</html>

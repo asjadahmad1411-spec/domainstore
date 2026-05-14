@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ORD-66AE968F",
+    "customer": {
+      "name": "Test User",
+      "email": "test@test.com",
+      "phone": "9876543210"
+    },
+    "items": [
+      {
+        "id": "hosting-professional",
+        "type": "hosting",
+        "name": "Professional Hosting",
+        "price": 199,
+        "period": "month"
+      },
+      {
+        "id": "domain-testdomain9876.com",
+        "type": "domain",
+        "name": "testdomain9876.com",
+        "price": 799
+      }
+    ],
+    "promoCode": null,
+    "discount": 0,
+    "codFee": 0,
+    "total": 998,
+    "paymentMethod": "upi_manual",
+    "status": "UTR Pending",
+    "createdAt": "2026-05-14T17:55:50.982Z",
+    "utr": "HDFC427891234567",
+    "utrSubmittedAt": "2026-05-14T17:55:50.986Z"
+  },
+  {
+    "id": "ORD-5FFFC14D",
+    "customer": {
+      "name": "vbv cvxv",
+      "email": "rahul@test.com",
+      "phone": "9876543210"
+    },
+    "items": [
+      {
+        "id": "domain-testdomain9876.com",
+        "type": "domain",
+        "name": "testdomain9876.com",
+        "price": 799
+      }
+    ],
+    "promoCode": null,
+    "discount": 0,
+    "codFee": 50,
+    "total": 849,
+    "paymentMethod": "cod",
+    "status": "Active",
+    "createdAt": "2026-05-14T18:18:06.464Z",
+    "updatedAt": "2026-05-14T18:21:22.663Z",
+    "nameservers": [
+      "ns1.domainstore.in",
+      "ns2.domainstore.in"
+    ]
+  }
+]

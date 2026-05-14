@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Hosting Plans — Admin | DomainStore</title>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <div class="nav-section">Management</div>
+    <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting.html" class="nav-item active"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
+    <div class="nav-section">Settings</div>
+    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎟️</span> Promo Codes</a>
+    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2>Hosting Plans</h2><p>Create, edit and delete hosting plans</p></div>
+    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
+  </div>
+  <div class="content">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">All Plans</span>
+        <button class="btn btn-primary" onclick="openPlanModal()">+ Add Plan</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price/mo</th><th>Renew</th><th>Featured</th><th>Badge</th><th>Actions</th></tr></thead>
+          <tbody id="plansBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="planModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="planModalTitle">Add Plan</span><button class="modal-close" onclick="closeModal('planModal')">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Plan ID (slug)</label><input type="text" class="form-control" id="planId" placeholder="starter-plus"/></div>
+      <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-control" id="planName" placeholder="Starter Plus"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Category</label>
+        <select class="form-control" id="planCat"><option value="shared">Shared</option><option value="vps">VPS</option><option value="dedicated">Dedicated</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Badge Text</label><input type="text" class="form-control" id="planBadge" placeholder="Most Popular"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Price/month (₹)</label><input type="number" class="form-control" id="planPrice" placeholder="199"/></div>
+      <div class="form-group"><label class="form-label">Renew Price (₹)</label><input type="number" class="form-control" id="planRenew" placeholder="499"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Features (one per line)</label><textarea class="form-control" id="planFeatures" rows="5" placeholder="Unlimited Websites&#10;50 GB SSD&#10;Free SSL"></textarea></div>
+    <label class="checkbox-row"><input type="checkbox" id="planFeatured"/> Mark as Featured</label>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button class="btn btn-primary" onclick="savePlan()" style="flex:1;justify-content:center;">Save Plan</button>
+      <button class="btn btn-outline" onclick="closeModal('planModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/admin/auth.js"></script>
+<script src="/js/admin/hosting.js"></script>
+</body>
+</html>

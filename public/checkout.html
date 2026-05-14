@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Checkout — DomainStore</title>
+<meta name="description" content="Complete your domain and hosting purchase securely."/>
+<link rel="stylesheet" href="/css/main.css"/>
+<style>
+.step-bar{display:flex;align-items:center;gap:0;margin-bottom:36px;flex-wrap:wrap;gap:8px;}
+.step-item{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+.step-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;}
+.step-line{flex:1;height:2px;background:var(--border);min-width:20px;}
+
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.pay-card{border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all .25s;text-align:center;}
+.pay-card:hover{border-color:var(--primary-light);}
+.pay-card.selected{border-color:var(--primary);background:rgba(108,61,232,.12);}
+.pay-card .p-icon{font-size:1.6rem;margin-bottom:6px;}
+.pay-card .p-name{font-size:.85rem;font-weight:700;}
+.pay-card .p-desc{font-size:.72rem;color:var(--text-muted);margin-top:2px;}
+
+.upi-box{background:linear-gradient(135deg,rgba(108,61,232,.1),rgba(0,212,255,.05));border:1px solid var(--primary);border-radius:16px;padding:24px;text-align:center;}
+.upi-id-display{font-size:1.2rem;font-weight:800;color:var(--accent);letter-spacing:.5px;padding:12px 20px;background:rgba(0,0,0,.3);border-radius:10px;margin:14px 0;word-break:break-all;}
+.qr-placeholder{width:160px;height:160px;margin:0 auto 14px;background:rgba(255,255,255,.08);border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.utr-input-row{display:flex;gap:10px;margin-top:14px;}
+.utr-input-row input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-size:1rem;font-family:monospace;letter-spacing:1px;text-transform:uppercase;outline:none;transition:border-color .3s;}
+.utr-input-row input:focus{border-color:var(--accent);}
+
+.checkout-layout{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;}
+.summary-sticky{position:sticky;top:100px;}
+
+@media(max-width:900px){
+  .checkout-layout{grid-template-columns:1fr;}
+  .summary-sticky{position:static;}
+  .pay-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .pay-grid{grid-template-columns:1fr 1fr;}
+  .utr-input-row{flex-direction:column;}
+}
+</style>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html">Domains</a></li>
+    <li><a href="/hosting.html">Hosting</a></li>
+    <li><a href="/offers.html">🎁 Offers</a></li>
+  </ul>
+  <div class="nav-actions">
+    <span style="font-size:.85rem;color:var(--text-muted);">🔒 Secure</span>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div style="padding-top:90px;min-height:100vh;padding-bottom:60px;">
+  <div class="container">
+    <div style="max-width:1000px;margin:0 auto;">
+
+      <!-- Step bar -->
+      <div class="step-bar">
+        <div class="step-item"><div class="step-circle" style="background:var(--green);color:#fff;">✓</div><span style="color:var(--green);font-weight:600;">Cart</span></div>
+        <div class="step-line"></div>
+        <div class="step-item"><div class="step-circle" style="background:var(--primary);color:#fff;">2</div><span style="font-weight:600;">Checkout</span></div>
+        <div class="step-line"></div>
+        <div class="step-item" style="opacity:.45;"><div class="step-circle" style="background:var(--border);">3</div><span>Done</span></div>
+      </div>
+
+      <div class="checkout-layout">
+        <!-- LEFT: Forms -->
+        <div>
+          <!-- Personal Info -->
+          <div class="card" style="margin-bottom:20px;">
+            <div class="form-section-title">👤 Personal Information</div>
+            <div class="form-row">
+              <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">First Name *</label><input type="text" class="form-control" id="firstName" placeholder="Rahul"/></div>
+              <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Last Name *</label><input type="text" class="form-control" id="lastName" placeholder="Sharma"/></div>
+            </div>
+            <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com"/></div>
+            <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Phone Number *</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210"/></div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="card">
+            <div class="form-section-title">💳 Payment Method</div>
+
+            <div class="pay-grid" id="payGrid">
+              <div class="pay-card selected" onclick="selectPayMethod(this,'upi_manual')" id="pm-upi_manual">
+                <div class="p-icon">📲</div>
+                <div class="p-name">UPI / QR</div>
+                <div class="p-desc">PhonePe, GPay, Paytm</div>
+              </div>
+              <div class="pay-card" onclick="selectPayMethod(this,'card')" id="pm-card">
+                <div class="p-icon">💳</div>
+                <div class="p-name">Card</div>
+                <div class="p-desc">Visa, Mastercard, Rupay</div>
+              </div>
+              <div class="pay-card" onclick="selectPayMethod(this,'netbanking')" id="pm-netbanking">
+                <div class="p-icon">🏦</div>
+                <div class="p-name">Net Banking</div>
+                <div class="p-desc">All major banks</div>
+              </div>
+              <div class="pay-card" onclick="selectPayMethod(this,'cod')" id="pm-cod">
+                <div class="p-icon">🚚</div>
+                <div class="p-name">Cash on Delivery</div>
+                <div class="p-desc">Pay on activation</div>
+              </div>
+            </div>
+
+            <!-- UPI Manual -->
+            <div id="field-upi_manual">
+              <div class="upi-box">
+                <div style="font-weight:700;font-size:1rem;margin-bottom:4px;">Pay to our UPI</div>
+                <div style="font-size:.82rem;color:var(--text-muted);">Scan QR or copy UPI ID below</div>
+                <div id="qrArea" class="qr-placeholder">📱</div>
+                <div id="upiIdDisplay" class="upi-id-display">Loading...</div>
+                <button onclick="copyUpiId()" class="btn btn-outline btn-sm" style="margin-bottom:16px;">📋 Copy UPI ID</button>
+                <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:16px 0;"/>
+                <div style="font-weight:700;font-size:.9rem;margin-bottom:8px;text-align:left;">✅ After paying, enter your UTR / Transaction ID:</div>
+                <div class="utr-input-row">
+                  <input type="text" id="utrInput" placeholder="e.g. 427891234567 or HDFC0001234" maxlength="25"/>
+                  <button class="btn btn-accent btn-sm" onclick="validateUTR()" style="white-space:nowrap;">Verify UTR</button>
+                </div>
+                <div id="utrMsg" style="font-size:.8rem;margin-top:8px;text-align:left;"></div>
+                <div class="alert" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#f59e0b;text-align:left;margin-top:12px;font-size:.82rem;padding:10px 14px;border-radius:10px;">
+                  ⚡ Orders are activated within <strong>30 minutes</strong> of UTR verification by admin.
+                </div>
+              </div>
+            </div>
+
+            <!-- Card -->
+            <div id="field-card" style="display:none;">
+              <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Card Number</label><input type="text" class="form-control" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+              <div class="form-row">
+                <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Expiry (MM/YY)</label><input type="text" class="form-control" id="cardExp" placeholder="MM/YY" maxlength="5"/></div>
+                <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">CVV</label><input type="text" class="form-control" id="cardCvv" placeholder="123" maxlength="3"/></div>
+              </div>
+              <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Name on Card</label><input type="text" class="form-control" id="cardName" placeholder="Rahul Sharma"/></div>
+            </div>
+
+            <!-- Net Banking -->
+            <div id="field-netbanking" style="display:none;">
+              <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Select Bank</label>
+                <select class="form-control" id="bankSelect">
+                  <option value="">Choose your bank</option>
+                  <option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Kotak Mahindra</option><option>Yes Bank</option><option>Punjab National Bank</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- COD -->
+            <div id="field-cod" style="display:none;">
+              <div class="alert" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);color:#f59e0b;border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start;">
+                <span style="font-size:1.3rem;">🚚</span>
+                <div>
+                  <div style="font-weight:700;margin-bottom:4px;">Cash on Delivery</div>
+                  <div style="font-size:.85rem;">Our team will contact you within 24 hours to confirm and activate your order. ₹50 handling fee applies.</div>
+                  <div style="font-size:.78rem;margin-top:6px;opacity:.8;">⚠️ COD available for orders up to ₹5,000 only.</div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /payment card -->
+        </div><!-- /left -->
+
+        <!-- RIGHT: Summary -->
+        <div class="summary-sticky">
+          <div class="card">
+            <h3 style="margin-bottom:16px;">🧾 Order Summary</h3>
+            <div id="coItems" style="margin-bottom:14px;"></div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;"/>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:.9rem;"><span style="color:var(--text-muted);">Subtotal</span><span id="coSubtotal">₹0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:.9rem;" id="coDiscRow"><span style="color:var(--green);">Discount</span><span id="coDisc" style="color:var(--green);">-₹0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:.9rem;" id="coCodRow" style="display:none;"><span style="color:#f59e0b;">COD Fee</span><span style="color:#f59e0b;">+₹50</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:1.15rem;font-weight:900;margin:14px 0 20px;">
+              <span>Total</span><span id="coTotal" style="color:var(--accent);">₹0</span>
+            </div>
+
+            <!-- Promo code in summary -->
+            <div style="margin-bottom:16px;">
+              <div style="font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">🎟️ Have a promo code?</div>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="coPromo" placeholder="Enter code" style="flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.85rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+                <button class="btn btn-outline btn-sm" onclick="applyPromoCode()">Apply</button>
+              </div>
+              <div id="coPromoMsg" style="font-size:.78rem;margin-top:6px;"></div>
+            </div>
+
+            <button class="btn btn-primary" id="placeOrderBtn" style="width:100%;justify-content:center;font-size:1rem;padding:15px;" onclick="placeOrder()">
+              🔒 Place Order
+            </button>
+            <p style="font-size:.72rem;text-align:center;margin-top:10px;color:var(--text-muted);">By placing you agree to our Terms of Service</p>
+
+            <!-- Trust badges -->
+            <div style="display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
+              <span style="font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">🔒 SSL Secure</span>
+              <span style="font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">✅ Safe Payments</span>
+              <span style="font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">💯 Trusted</span>
+            </div>
+          </div>
+        </div><!-- /right -->
+      </div><!-- /layout -->
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script src="/js/checkout.js"></script>
+</body>
+</html>

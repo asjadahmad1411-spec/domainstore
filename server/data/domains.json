@@ -1,0 +1,14 @@
+{
+  "tlds": [
+    { "extension": ".com", "price": 799, "renewPrice": 999, "popular": true },
+    { "extension": ".in", "price": 399, "renewPrice": 699, "popular": true },
+    { "extension": ".net", "price": 899, "renewPrice": 1099, "popular": false },
+    { "extension": ".org", "price": 699, "renewPrice": 899, "popular": false },
+    { "extension": ".io", "price": 3499, "renewPrice": 3999, "popular": true },
+    { "extension": ".co", "price": 1799, "renewPrice": 2099, "popular": false },
+    { "extension": ".tech", "price": 299, "renewPrice": 1299, "popular": true },
+    { "extension": ".store", "price": 199, "renewPrice": 1499, "popular": true },
+    { "extension": ".online", "price": 149, "renewPrice": 1299, "popular": false },
+    { "extension": ".info", "price": 499, "renewPrice": 799, "popular": false }
+  ]
+}

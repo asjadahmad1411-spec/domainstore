@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Profile & Security — DomainStore Dashboard</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/dashboard.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+</head>
+<body>
+<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
+<div class="dash-overlay" id="dashOverlay"></div>
+
+<aside class="dash-sidebar" id="dashSidebar">
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
+  <nav class="dash-nav">
+    <div class="dash-nav-section">Overview</div>
+    <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/dashboard/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
+    <div class="dash-nav-section">Services</div>
+    <a href="/dashboard/domains.html" class="dash-nav-item"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <div class="dash-nav-section">Account</div>
+    <a href="/dashboard/profile.html" class="dash-nav-item active"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+  </nav>
+  <div class="dash-footer">
+    <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> Go to Store</a>
+    <button onclick="dsLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
+  </div>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-title"><h2>👤 Profile & Security</h2><p>Manage your personal info and account security</p></div>
+  </div>
+  <div class="dash-content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <!-- Personal Info -->
+      <div class="dash-panel">
+        <div class="dash-panel-head"><span class="dash-panel-title">👤 Personal Information</span></div>
+        <div class="dash-panel-body">
+          <div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-control" id="profName" placeholder="Rahul Sharma"/></div>
+          <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" id="profEmail" disabled style="opacity:.6;cursor:not-allowed;"/><div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">Email cannot be changed. Contact support if needed.</div></div>
+          <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-control" id="profPhone" placeholder="+91 98765 43210"/></div>
+          <div class="form-group"><label class="form-label">Company (Optional)</label><input type="text" class="form-control" id="profCompany" placeholder="Your Company Name"/></div>
+          <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="dash-panel">
+        <div class="dash-panel-head"><span class="dash-panel-title">🔐 Change Password</span></div>
+        <div class="dash-panel-body">
+          <div class="form-group"><label class="form-label">Current Password *</label><input type="password" class="form-control" id="curPwd" placeholder="Your current password"/></div>
+          <div class="form-group"><label class="form-label">New Password *</label><input type="password" class="form-control" id="newPwd" placeholder="Min 6 characters" oninput="checkPwdStrength(this.value)"/>
+            <div style="height:4px;border-radius:2px;margin-top:6px;background:var(--border);"><div id="pwdBar" style="height:100%;border-radius:2px;transition:all .3s;width:0;"></div></div>
+            <div id="pwdTxt" style="font-size:.72rem;margin-top:4px;color:var(--text-muted);"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Confirm New Password *</label><input type="password" class="form-control" id="confPwd" placeholder="Repeat new password"/></div>
+          <button class="btn btn-primary" onclick="changePassword()">🔐 Update Password</button>
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div class="dash-panel">
+        <div class="dash-panel-head"><span class="dash-panel-title">🏠 Billing Address</span></div>
+        <div class="dash-panel-body">
+          <div class="form-group"><label class="form-label">Address</label><input type="text" class="form-control" id="profAddr" placeholder="Street address"/></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">City</label><input type="text" class="form-control" id="profCity" placeholder="Mumbai"/></div>
+            <div class="form-group"><label class="form-label">State</label><input type="text" class="form-control" id="profState" placeholder="Maharashtra"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Pincode</label><input type="text" class="form-control" id="profPin" placeholder="400001"/></div>
+            <div class="form-group"><label class="form-label">Country</label><select class="form-control" id="profCountry"><option>India</option><option>USA</option><option>UK</option><option>UAE</option></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">💾 Save Address</button>
+        </div>
+      </div>
+
+      <!-- Account Info -->
+      <div class="dash-panel">
+        <div class="dash-panel-head"><span class="dash-panel-title">ℹ️ Account Info</span></div>
+        <div class="dash-panel-body">
+          <div id="acctInfo" style="display:flex;flex-direction:column;gap:12px;">
+            <div class="hosting-info-item"><div class="h-lbl">Account ID</div><div class="h-val" id="acctId">-</div></div>
+            <div class="hosting-info-item"><div class="h-lbl">Member Since</div><div class="h-val" id="acctSince">-</div></div>
+            <div class="hosting-info-item"><div class="h-lbl">Account Email</div><div class="h-val" id="acctEmail">-</div></div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--dash-border);">
+            <div style="font-weight:700;margin-bottom:12px;font-size:.9rem;color:var(--text-muted);">🚪 Session</div>
+            <button onclick="dsLogout()" class="btn btn-outline" style="width:100%;justify-content:center;border-color:rgba(239,68,68,.3);color:#ef4444;">Logout from All Devices</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/dashboard.js"></script>
+<script>
+requireDsAuth();
+initDashSidebar();
+
+function checkPwdStrength(val) {
+  const bar = document.getElementById('pwdBar');
+  const txt = document.getElementById('pwdTxt');
+  let s = 0;
+  if (val.length >= 6) s++; if (val.length >= 10) s++;
+  if (/[A-Z]/.test(val)) s++; if (/[0-9]/.test(val)) s++; if (/[^A-Za-z0-9]/.test(val)) s++;
+  const colors = ['','#ef4444','#f59e0b','#eab308','#22c55e','#16a34a'];
+  const labels = ['','Very Weak','Weak','Fair','Strong','Very Strong'];
+  bar.style.background = colors[s] || 'var(--border)';
+  bar.style.width = (s*20)+'%';
+  txt.textContent = labels[s] || '';
+  txt.style.color = colors[s] || 'var(--text-muted)';
+}
+
+async function loadProfile() {
+  try {
+    const user = await dsApi('/api/auth/me');
+    localStorage.setItem('ds_user', JSON.stringify(user));
+    document.getElementById('profName').value    = user.name || '';
+    document.getElementById('profEmail').value   = user.email || '';
+    document.getElementById('profPhone').value   = user.phone || '';
+    document.getElementById('profCompany').value = user.profile?.company || '';
+    document.getElementById('profAddr').value    = user.profile?.address || '';
+    document.getElementById('profCity').value    = user.profile?.city || '';
+    document.getElementById('profState').value   = user.profile?.state || '';
+    document.getElementById('profPin').value     = user.profile?.pincode || '';
+    if (user.profile?.country) document.getElementById('profCountry').value = user.profile.country;
+    document.getElementById('acctId').textContent    = user.id?.slice(0, 16) + '...' || '-';
+    document.getElementById('acctSince').textContent = fmtDate(user.createdAt);
+    document.getElementById('acctEmail').textContent = user.email;
+  } catch(e) { dsToast('Failed to load profile', 'error'); }
+}
+
+async function saveProfile() {
+  try {
+    await dsApi('/api/user/profile', { method: 'PATCH', body: JSON.stringify({
+      name:  document.getElementById('profName').value.trim(),
+      phone: document.getElementById('profPhone').value.trim(),
+      profile: {
+        company: document.getElementById('profCompany').value.trim(),
+        address: document.getElementById('profAddr').value.trim(),
+        city:    document.getElementById('profCity').value.trim(),
+        state:   document.getElementById('profState').value.trim(),
+        pincode: document.getElementById('profPin').value.trim(),
+        country: document.getElementById('profCountry').value
+      }
+    })});
+    dsToast('✅ Profile saved successfully!', 'success');
+    loadProfile();
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+async function changePassword() {
+  const cur  = document.getElementById('curPwd').value;
+  const nw   = document.getElementById('newPwd').value;
+  const conf = document.getElementById('confPwd').value;
+  if (!cur || !nw) return dsToast('All password fields required', 'error');
+  if (nw.length < 6) return dsToast('New password must be at least 6 characters', 'error');
+  if (nw !== conf) return dsToast('Passwords do not match', 'error');
+  try {
+    await dsApi('/api/user/password', { method: 'PATCH', body: JSON.stringify({ currentPassword: cur, newPassword: nw }) });
+    dsToast('✅ Password changed! Please login again.', 'success');
+    document.getElementById('curPwd').value = '';
+    document.getElementById('newPwd').value = '';
+    document.getElementById('confPwd').value = '';
+    setTimeout(dsLogout, 2000);
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+loadProfile();
+</script>
+</body>
+</html>

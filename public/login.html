@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — DomainStore Account</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+<style>
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;}
+.auth-card{width:100%;max-width:440px;background:var(--glass);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:24px;padding:40px;}
+.auth-logo{text-align:center;font-size:1.6rem;font-weight:900;margin-bottom:6px;}
+.auth-sub{text-align:center;font-size:.85rem;color:var(--text-muted);margin-bottom:32px;}
+.social-divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-footer{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted);}
+.pass-wrap{position:relative;}
+.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <div class="nav-actions">
+    <a href="/register.html" class="btn btn-outline btn-sm">Create Account</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+    <div class="auth-logo">🔐 Welcome Back</div>
+    <div class="auth-sub">Login to manage your domains & hosting</div>
+
+    <div id="errMsg" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;"></div>
+
+    <form id="loginForm" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-control" id="email" placeholder="you@example.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="pass-wrap">
+          <input type="password" class="form-control" id="password" placeholder="Your password" required autocomplete="current-password"/>
+          <button type="button" class="pass-toggle" onclick="togglePass('password')">👁️</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;" id="loginBtn">
+        🔐 Login to Account
+      </button>
+    </form>
+
+    <div class="social-divider"><span style="font-size:.78rem;color:var(--text-muted);">New to DomainStore?</span></div>
+    <a href="/register.html" class="btn btn-outline" style="width:100%;justify-content:center;">✨ Create Free Account</a>
+    <div class="auth-footer">
+      <a href="/" style="color:var(--accent);">← Back to Store</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script>
+function togglePass(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('errMsg');
+  btn.textContent = '⏳ Logging in...'; btn.disabled = true;
+  err.style.display = 'none';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+    }).then(r => r.json());
+    if (res.error) throw new Error(res.error);
+    localStorage.setItem('ds_user_token', res.token);
+    localStorage.setItem('ds_user', JSON.stringify(res.user));
+    location.href = '/dashboard/';
+  } catch(e2) {
+    err.textContent = e2.message; err.style.display = 'block';
+    btn.textContent = '🔐 Login to Account'; btn.disabled = false;
+  }
+}
+
+// Already logged in?
+if (localStorage.getItem('ds_user_token')) location.href = '/dashboard/';
+</script>
+</body>
+</html>

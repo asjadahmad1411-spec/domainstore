@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Hosting — DomainStore Dashboard</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/dashboard.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+</head>
+<body>
+<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
+<div class="dash-overlay" id="dashOverlay"></div>
+
+<aside class="dash-sidebar" id="dashSidebar">
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
+  <nav class="dash-nav">
+    <div class="dash-nav-section">Overview</div>
+    <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/dashboard/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
+    <div class="dash-nav-section">Services</div>
+    <a href="/dashboard/domains.html" class="dash-nav-item"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting.html" class="dash-nav-item active"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <div class="dash-nav-section">Account</div>
+    <a href="/dashboard/profile.html" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+  </nav>
+  <div class="dash-footer">
+    <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> Go to Store</a>
+    <button onclick="dsLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
+  </div>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-title"><h2>⚡ My Hosting</h2><p>Server details, cPanel access, FTP, and email setup</p></div>
+    <div class="dash-topbar-actions"><a href="/hosting.html" class="btn btn-primary btn-sm">+ Get More Hosting</a></div>
+  </div>
+  <div class="dash-content" id="hostingContent">
+    <div class="dash-panel"><div class="dash-panel-body" style="text-align:center;padding:60px;color:var(--text-muted);">⏳ Loading hosting plans...</div></div>
+  </div>
+</div>
+
+<!-- Add Email Modal -->
+<div class="modal-overlay" id="emailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;display:none;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:420px;">
+    <div style="font-size:1.1rem;font-weight:800;margin-bottom:20px;">📧 Create Email Account</div>
+    <div class="form-group"><label class="form-label">Email Username *</label>
+      <input type="text" class="form-control" id="newEmailUser" placeholder="info, admin, support..."/>
+    </div>
+    <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px;">Your email will be: <strong id="emailPreview" style="color:var(--accent);">username@domain.com</strong></div>
+    <div class="form-group"><label class="form-label">Password *</label>
+      <input type="password" class="form-control" id="newEmailPwd" placeholder="Strong password"/>
+    </div>
+    <div class="form-group"><label class="form-label">Quota</label>
+      <select class="form-control" id="newEmailQuota">
+        <option>500MB</option><option selected>1GB</option><option>2GB</option><option>5GB</option><option>Unlimited</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-primary" onclick="createEmail()" style="flex:1;justify-content:center;">✅ Create Account</button>
+      <button class="btn btn-outline" onclick="closeEmailModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/dashboard.js"></script>
+<script>
+requireDsAuth();
+initDashSidebar();
+
+let hostingPlans = [];
+let activeHostingOrderId = null;
+
+function renderHosting(plans) {
+  const cont = document.getElementById('hostingContent');
+  if (!plans.length) {
+    cont.innerHTML = `<div class="dash-panel"><div class="dash-panel-body" style="text-align:center;padding:60px;">
+      <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">⚡</div>
+      <h3>No hosting plans yet</h3>
+      <p style="color:var(--text-muted);margin:12px 0 20px;">Get started with a powerful hosting plan.</p>
+      <a href="/hosting.html" class="btn btn-primary">🚀 Browse Hosting Plans</a>
+    </div></div>`; return;
+  }
+  cont.innerHTML = plans.map((h, i) => `
+    <div class="dash-panel">
+      <div class="dash-panel-head">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="domain-icon-wrap" style="width:44px;height:44px;font-size:1.3rem;">⚡</div>
+          <div>
+            <div style="font-weight:800;font-size:1rem;">${h.name}</div>
+            <div style="display:flex;gap:8px;margin-top:4px;">${getStatusBadge(h.status)}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="${h.cpanelUrl}" target="_blank" class="btn btn-primary btn-sm">🖥️ cPanel Login</a>
+          <button class="btn btn-outline btn-sm" onclick="openEmailModal('${h.orderId}', '${h.cpanelUser}')">+ Email Account</button>
+        </div>
+      </div>
+      <div class="dash-panel-body">
+        <!-- Server Info -->
+        <div style="margin-bottom:20px;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">📡 Server Details</div>
+          <div class="hosting-info-grid">
+            <div class="hosting-info-item">
+              <div class="h-lbl">Server IP</div>
+              <div class="h-val">${h.serverIp} <span class="h-copy" onclick="copyText('${h.serverIp}','Server IP')">📋</span></div>
+            </div>
+            <div class="hosting-info-item">
+              <div class="h-lbl">cPanel Username</div>
+              <div class="h-val">${h.cpanelUser} <span class="h-copy" onclick="copyText('${h.cpanelUser}','cPanel Username')">📋</span></div>
+            </div>
+            <div class="hosting-info-item">
+              <div class="h-lbl">cPanel URL</div>
+              <div class="h-val" style="font-size:.8rem;">${h.cpanelUrl} <span class="h-copy" onclick="copyText('${h.cpanelUrl}','cPanel URL')">📋</span></div>
+            </div>
+            <div class="hosting-info-item">
+              <div class="h-lbl">FTP Host</div>
+              <div class="h-val">${h.ftpHost} <span class="h-copy" onclick="copyText('${h.ftpHost}','FTP Host')">📋</span></div>
+            </div>
+            <div class="hosting-info-item">
+              <div class="h-lbl">FTP Username</div>
+              <div class="h-val">${h.cpanelUser} <span class="h-copy" onclick="copyText('${h.cpanelUser}','FTP Username')">📋</span></div>
+            </div>
+            <div class="hosting-info-item">
+              <div class="h-lbl">FTP Port</div>
+              <div class="h-val">21 <span class="h-copy" onclick="copyText('21','FTP Port')">📋</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Nameservers -->
+        <div style="margin-bottom:20px;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">🌐 Nameservers (point your domain here)</div>
+          <div class="hosting-info-grid">
+            ${(h.nameservers||['ns1.domainstore.in','ns2.domainstore.in']).map((ns,ni)=>`
+            <div class="hosting-info-item">
+              <div class="h-lbl">NS ${ni+1}</div>
+              <div class="h-val">${ns} <span class="h-copy" onclick="copyText('${ns}','Nameserver ${ni+1}')">📋</span></div>
+            </div>`).join('')}
+          </div>
+        </div>
+        <!-- Storage -->
+        <div style="margin-bottom:20px;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">💾 Storage & Resources</div>
+          <div class="hosting-info-grid">
+            <div class="hosting-info-item"><div class="h-lbl">Disk Space</div><div class="h-val" style="color:var(--green);">${h.diskLimit}</div></div>
+            <div class="hosting-info-item"><div class="h-lbl">Bandwidth</div><div class="h-val" style="color:var(--accent);">${h.bandwidth}</div></div>
+            <div class="hosting-info-item"><div class="h-lbl">Expiry</div><div class="h-val">${fmtDate(h.expiry)}</div></div>
+            <div class="hosting-info-item"><div class="h-lbl">Plan</div><div class="h-val">${h.name}</div></div>
+          </div>
+        </div>
+        <!-- Email Accounts -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:.9rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">📧 Email Accounts</div>
+            <button class="btn btn-outline btn-sm" onclick="openEmailModal('${h.orderId}', '${h.cpanelUser}')">+ Add Email</button>
+          </div>
+          <div id="emailList-${h.orderId}">
+            ${renderEmailList(h.emailAccounts || [], h.orderId)}
+          </div>
+        </div>
+        <!-- Setup guide -->
+        <div style="margin-top:20px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);border-radius:12px;padding:16px;">
+          <div style="font-weight:700;margin-bottom:8px;font-size:.9rem;">🚀 Quick Setup Guide</div>
+          <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">
+            1. Go to <a href="/dashboard/domains.html" style="color:var(--accent);">My Domains</a> and update nameservers to: <strong style="color:var(--accent);">ns1.domainstore.in, ns2.domainstore.in</strong><br/>
+            2. Wait 24-48 hours for DNS propagation<br/>
+            3. Login to <a href="${h.cpanelUrl}" target="_blank" style="color:var(--accent);">cPanel</a> and upload your website files<br/>
+            4. Create email accounts above for your domain
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEmailList(emails, orderId) {
+  if (!emails.length) return '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:.85rem;">No email accounts yet. Click "+ Add Email" to create one.</div>';
+  return emails.map(e => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:8px;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(108,61,232,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;">📧</div>
+        <div>
+          <div style="font-weight:600;font-size:.875rem;">${e.email}</div>
+          <div style="font-size:.72rem;color:var(--text-muted);">Quota: ${e.quota} · Created: ${fmtDate(e.createdAt)}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="copyText('${e.email}','Email')">📋</button>
+        <button class="btn btn-sm" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);" onclick="deleteEmail('${orderId}','${e.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+let emailModalOrderId = '';
+let emailDomain = '';
+
+function openEmailModal(orderId, cpUser) {
+  emailModalOrderId = orderId;
+  const plan = hostingPlans.find(h => h.orderId === orderId);
+  // Try to find a domain name for email preview
+  document.getElementById('emailPreview').textContent = 'username@yourdomain.com';
+  document.getElementById('newEmailUser').addEventListener('input', e => {
+    document.getElementById('emailPreview').textContent = (e.target.value||'username') + '@yourdomain.com';
+  });
+  document.getElementById('emailModal').style.display = 'flex';
+}
+
+function closeEmailModal() {
+  document.getElementById('emailModal').style.display = 'none';
+  document.getElementById('newEmailUser').value = '';
+  document.getElementById('newEmailPwd').value = '';
+}
+
+async function createEmail() {
+  const emailUser = document.getElementById('newEmailUser').value.trim();
+  const password  = document.getElementById('newEmailPwd').value;
+  const quota     = document.getElementById('newEmailQuota').value;
+  if (!emailUser || !password) return dsToast('Email username and password required', 'error');
+  try {
+    const res = await dsApi(`/api/user/hosting/${emailModalOrderId}/email`, {
+      method: 'POST', body: JSON.stringify({ emailUser, password, quota })
+    });
+    dsToast('✅ Email account created!', 'success');
+    closeEmailModal();
+    document.getElementById(`emailList-${emailModalOrderId}`).innerHTML = renderEmailList(res.emailAccounts, emailModalOrderId);
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+async function deleteEmail(orderId, emailId) {
+  if (!confirm('Delete this email account?')) return;
+  try {
+    const res = await dsApi(`/api/user/hosting/${orderId}/email/${emailId}`, { method: 'DELETE' });
+    dsToast('Email account deleted', 'error');
+    loadHosting();
+  } catch(e) { dsToast(e.message, 'error'); }
+}
+
+async function loadHosting() {
+  try {
+    hostingPlans = await dsApi('/api/user/hosting');
+    renderHosting(hostingPlans);
+  } catch(e) { dsToast('Failed to load hosting', 'error'); }
+}
+
+loadHosting();
+</script>
+</body>
+</html>

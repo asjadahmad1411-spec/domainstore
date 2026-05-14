@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Promo Codes — Admin | DomainStore</title>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/></head>
+<body>
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <div class="nav-section">Management</div>
+    <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
+    <div class="nav-section">Settings</div>
+    <a href="/admin/promos.html" class="nav-item active"><span class="icon">🎟️</span> Promo Codes</a>
+    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2>Promo Codes</h2><p>Create and manage discount codes</p></div>
+    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
+  </div>
+  <div class="content">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Active Promo Codes</span>
+        <button class="btn btn-primary" onclick="openPromoModal()">+ Create Code</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Expiry</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="promosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="promoModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Create Promo Code</span><button class="modal-close" onclick="closeModal('promoModal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Promo Code</label><input type="text" class="form-control" id="promoCode" placeholder="SAVE20" style="text-transform:uppercase;"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Discount Type</label>
+        <select class="form-control" id="promoType"><option value="percent">Percentage (%)</option><option value="flat">Flat Amount (₹)</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Value</label><input type="number" class="form-control" id="promoValue" placeholder="20"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Expiry Date (optional)</label><input type="date" class="form-control" id="promoExpiry"/></div>
+    <label class="checkbox-row"><input type="checkbox" id="promoActive" checked/> Active</label>
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button class="btn btn-primary" onclick="savePromo()" style="flex:1;justify-content:center;">Create Code</button>
+      <button class="btn btn-outline" onclick="closeModal('promoModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/admin/auth.js"></script>
+<script src="/js/admin/promos.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Orders — DomainStore Dashboard</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/dashboard.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+</head>
+<body>
+<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
+<div class="dash-overlay" id="dashOverlay"></div>
+
+<aside class="dash-sidebar" id="dashSidebar">
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
+  <nav class="dash-nav">
+    <div class="dash-nav-section">Overview</div>
+    <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/dashboard/orders.html" class="dash-nav-item active"><span class="nav-icon">📦</span> My Orders</a>
+    <div class="dash-nav-section">Services</div>
+    <a href="/dashboard/domains.html" class="dash-nav-item"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <div class="dash-nav-section">Account</div>
+    <a href="/dashboard/profile.html" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+  </nav>
+  <div class="dash-footer">
+    <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> Go to Store</a>
+    <button onclick="dsLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
+  </div>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-title"><h2>📦 My Orders</h2><p>View all your orders and payment status</p></div>
+  </div>
+  <div class="dash-content">
+    <div class="dash-panel">
+      <div class="dash-panel-head">
+        <span class="dash-panel-title">Order History</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="searchOrder" oninput="filterOrders()" placeholder="🔍 Search..." class="form-control" style="max-width:180px;"/>
+          <select id="statusFilter" onchange="filterOrders()" class="form-control" style="max-width:160px;">
+            <option value="">All Status</option>
+            <option>Active</option><option>Pending</option><option>UTR Pending</option><option>Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:600px;border-collapse:collapse;">
+          <thead>
+            <tr style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--dash-border);">
+              <th style="padding:12px 16px;text-align:left;">Order ID</th>
+              <th style="padding:12px 16px;text-align:left;">Items</th>
+              <th style="padding:12px 16px;text-align:left;">Payment</th>
+              <th style="padding:12px 16px;text-align:left;">Date</th>
+              <th style="padding:12px 16px;text-align:left;">Amount</th>
+              <th style="padding:12px 16px;text-align:left;">Status</th>
+              <th style="padding:12px 16px;text-align:left;">UTR</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/dashboard.js"></script>
+<script>
+requireDsAuth();
+initDashSidebar();
+
+let allOrders = [];
+const payLabels = { upi_manual:'📲 UPI/QR', card:'💳 Card', netbanking:'🏦 NetBanking', cod:'🚚 COD' };
+
+function renderOrders(list) {
+  const tbody = document.getElementById('ordersBody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:60px;color:var(--text-muted);">
+      No orders found. <a href="/domains.html" style="color:var(--accent);">Register a domain →</a></td></tr>`; return;
+  }
+  tbody.innerHTML = list.map(o => `
+    <tr style="border-bottom:1px solid var(--dash-border);font-size:.85rem;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+      <td style="padding:14px 16px;font-family:monospace;color:var(--accent);font-weight:700;">${o.id}</td>
+      <td style="padding:14px 16px;">
+        ${(o.items||[]).map(i=>`<div style="font-size:.82rem;">${i.type==='domain'?'🌐':'⚡'} ${i.name}</div>`).join('')||'-'}
+      </td>
+      <td style="padding:14px 16px;font-size:.82rem;color:var(--text-muted);">${payLabels[o.paymentMethod]||o.paymentMethod||'-'}</td>
+      <td style="padding:14px 16px;color:var(--text-muted);font-size:.82rem;">${fmtDate(o.createdAt)}</td>
+      <td style="padding:14px 16px;font-weight:800;color:var(--green);">${fmtAmt(o.total)}</td>
+      <td style="padding:14px 16px;">${getStatusBadge(o.status)}</td>
+      <td style="padding:14px 16px;">
+        ${o.utr ? `<div style="font-family:monospace;font-size:.8rem;color:var(--accent);">${o.utr}</div><div style="font-size:.7rem;color:var(--text-muted);">${o.utrVerified?'✅ Verified':'⏳ Pending'}</div>` : '<span style="color:var(--text-muted);font-size:.8rem;">-</span>'}
+      </td>
+    </tr>`).join('');
+}
+
+function filterOrders() {
+  const q = document.getElementById('searchOrder').value.toLowerCase();
+  const s = document.getElementById('statusFilter').value;
+  renderOrders(allOrders.filter(o =>
+    (!q || o.id.toLowerCase().includes(q) || (o.items||[]).some(i=>i.name.toLowerCase().includes(q))) &&
+    (!s || o.status === s)
+  ));
+}
+
+async function loadOrders() {
+  try {
+    allOrders = await dsApi('/api/user/orders');
+    renderOrders(allOrders);
+  } catch(e) { dsToast('Failed to load orders', 'error'); }
+}
+
+loadOrders();
+</script>
+</body>
+</html>
