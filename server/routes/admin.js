@@ -103,63 +103,73 @@ router.put('/settings', authMiddleware, (req, res) => {
 });
 
 // ── UTR Verification ──────────────────────────────────────────────────────
-// GET all orders awaiting UTR verification
+// GET all orders with UTR submitted (awaiting admin manual bank check)
 router.get('/utr-pending', authMiddleware, (req, res) => {
   const orders = readJSON(ordersPath);
   res.json(orders.filter(o => o.status === 'UTR Pending' || (o.utr && o.status === 'Pending')));
 });
 
-// POST verify a UTR → mark order as Active
-router.post('/utr-verify/:orderId', authMiddleware, (req, res) => {
+// GET all orders (admin can manually activate any)
+router.get('/orders-all', authMiddleware, (req, res) => {
   const orders = readJSON(ordersPath);
-  const order = orders.find(o => o.id === req.params.orderId);
+  res.json(orders.reverse());
+});
+
+// POST manually ACTIVATE an order (admin checks bank → clicks Activate)
+router.post('/activate/:orderId', authMiddleware, (req, res) => {
+  const orders = readJSON(ordersPath);
+  const order  = orders.find(o => o.id === req.params.orderId);
   if (!order) return res.status(404).json({ error: 'Order not found' });
-  order.status = 'Active';
-  order.utrVerified = true;
-  order.verifiedAt = new Date().toISOString();
-  order.verifiedBy = 'admin';
+  order.status     = 'Active';
+  order.activatedAt= new Date().toISOString();
+  order.activatedBy= 'admin';
+  order.utrVerified= true;
   writeJSON(ordersPath, orders);
   res.json({ success: true, order });
 });
 
-// POST reject a UTR
+// POST cancel/reject an order
 router.post('/utr-reject/:orderId', authMiddleware, (req, res) => {
   const orders = readJSON(ordersPath);
-  const order = orders.find(o => o.id === req.params.orderId);
+  const order  = orders.find(o => o.id === req.params.orderId);
   if (!order) return res.status(404).json({ error: 'Order not found' });
-  order.status = 'Cancelled';
-  order.utrRejected = true;
-  order.rejectedAt = new Date().toISOString();
-  order.rejectedReason = req.body.reason || 'UTR verification failed';
+  order.status      = 'Cancelled';
+  order.rejectedAt  = new Date().toISOString();
+  order.rejectedReason = req.body.reason || 'Payment not received';
   writeJSON(ordersPath, orders);
   res.json({ success: true });
 });
 
-// POST auto-validate UTR format + mark pending
+// POST customer submits UTR (format check only — NO auto-activate)
 router.post('/utr-submit', (req, res) => {
   const { orderId, utr } = req.body;
   if (!orderId || !utr) return res.status(400).json({ error: 'orderId and utr required' });
-
-  // Validate UTR format: 12 alphanumeric characters
   const utrClean = (utr || '').trim().toUpperCase();
-  if (!/^[A-Z0-9]{12,22}$/.test(utrClean)) {
-    return res.status(400).json({ error: 'Invalid UTR format. UTR should be 12-22 alphanumeric characters.' });
-  }
-
+  if (!/^[A-Z0-9]{8,25}$/.test(utrClean))
+    return res.status(400).json({ error: 'Invalid UTR format. Enter 8–25 alphanumeric characters.' });
   const orders = readJSON(ordersPath);
-  // Check duplicate UTR
-  if (orders.find(o => o.utr === utrClean && o.id !== orderId)) {
+  if (orders.find(o => o.utr === utrClean && o.id !== orderId))
     return res.status(409).json({ error: 'This UTR is already used for another order.' });
-  }
-
   const order = orders.find(o => o.id === orderId);
   if (!order) return res.status(404).json({ error: 'Order not found' });
-
-  order.utr = utrClean;
-  order.status = 'UTR Pending';
+  order.utr            = utrClean;
+  order.status         = 'UTR Pending';
   order.utrSubmittedAt = new Date().toISOString();
   writeJSON(ordersPath, orders);
-  res.json({ success: true, message: 'UTR submitted. Your order will be activated within 30 minutes after verification.' });
+  res.json({ success: true, message: 'UTR submitted successfully. Admin will activate your order after verifying payment.' });
+});
+
+// Keep old endpoint for compatibility
+router.post('/utr-verify/:orderId', authMiddleware, (req, res) => {
+  const orders = readJSON(ordersPath);
+  const order  = orders.find(o => o.id === req.params.orderId);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  order.status    = 'Active';
+  order.utrVerified = true;
+  order.verifiedAt  = new Date().toISOString();
+  writeJSON(ordersPath, orders);
+  res.json({ success: true, order });
 });
 
 module.exports = router;
+

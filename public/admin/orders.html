@@ -37,13 +37,13 @@
           <input type="text" class="search-input" id="orderSearch" placeholder="🔍 Search order/email..." oninput="renderOrders()"/>
           <select class="filter-select" id="statusFilter" onchange="renderOrders()">
             <option value="">All Status</option>
-            <option>Pending</option><option>Active</option><option>Cancelled</option>
+            <option>Pending</option><option>Active</option><option>UTR Pending</option><option>Cancelled</option>
           </select>
         </div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>UTR</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
           <tbody id="ordersBody"></tbody>
         </table>
       </div>

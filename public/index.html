@@ -20,10 +20,12 @@
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-actions">
+    <button id="themeToggle" onclick="toggleTheme()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 12px;cursor:pointer;color:var(--text);font-size:1rem;transition:all .2s;" title="Toggle Dark/Light Mode">🌙</button>
     <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Login</a>
     <button class="cart-btn" onclick="location.href='/cart.html'" id="cartBtn">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
     <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
+
 </nav>
 
 <section class="hero">
@@ -132,7 +134,8 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
       <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Got my domain and hosting set up in under 10 minutes! Amazing speed and support."</p><div style="margin-top:20px;font-weight:700;">— Rahul Sharma</div><div style="font-size:0.8rem;color:var(--text-muted);">E-commerce owner, Mumbai</div></div>
       <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Best prices in India for .com domains. Their VPS hosting is incredibly fast!"</p><div style="margin-top:20px;font-weight:700;">— Priya Patel</div><div style="font-size:0.8rem;color:var(--text-muted);">Freelance Developer, Pune</div></div>
-      <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Migrated from GoDaddy and saved 60% on renewal costs. Support team is awesome."</p><div style="margin-top:20px;font-weight:700;">— Arjun Singh</div><div style="font-size:0.8rem;color:var(--text-muted);">Digital Agency, Bangalore</div></div>
+      <div class="card fade-up"><div style="font-size:1.1rem;margin-bottom:16px;">⭐⭐⭐⭐⭐</div><p>"Switched to DomainStore and saved 60% on renewal costs. Fast support team and amazing prices!"</p><div style="margin-top:20px;font-weight:700;">— Arjun Singh</div><div style="font-size:0.8rem;color:var(--text-muted);">Digital Agency, Bangalore</div></div>
+
     </div>
   </div>
 </section>

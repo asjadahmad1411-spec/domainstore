@@ -185,3 +185,25 @@ function planCardHTML(p) {
     }
   });
 })();
+
+// ── DARK / LIGHT MODE ─────────────────────────────────────────
+(function() {
+  // Apply saved theme on load
+  const saved = localStorage.getItem('ds_theme') || 'dark';
+  if (saved === 'light') document.body.classList.add('light-mode');
+  document.addEventListener('DOMContentLoaded', () => {
+    updateThemeBtn();
+  });
+})();
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('ds_theme', isLight ? 'light' : 'dark');
+  updateThemeBtn();
+}
+
+function updateThemeBtn() {
+  const btns = document.querySelectorAll('#themeToggle');
+  const isLight = document.body.classList.contains('light-mode');
+  btns.forEach(btn => { btn.textContent = isLight ? '☀️' : '🌙'; btn.title = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'; });
+}

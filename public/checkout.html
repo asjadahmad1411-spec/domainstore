@@ -82,7 +82,68 @@
             <div class="form-group"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--text-muted);margin-bottom:7px;">Phone Number *</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210"/></div>
           </div>
 
-          <!-- Payment Method -->
+          <!-- Payment Method — UPI Only -->
+          <div class="card">
+            <div class="form-section-title">💳 Payment Method</div>
+
+            <!-- UPI Only Badge -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;background:rgba(108,61,232,.08);border:1px solid rgba(108,61,232,.2);border-radius:12px;padding:12px 16px;">
+              <span style="font-size:1.4rem;">📲</span>
+              <div>
+                <div style="font-weight:700;font-size:.95rem;">UPI Payment</div>
+                <div style="font-size:.75rem;color:var(--text-muted);">Pay via GPay, PhonePe, Paytm, BHIM or any UPI app</div>
+              </div>
+              <div style="margin-left:auto;display:flex;gap:6px;">
+                <span style="font-size:1.4rem;">G</span>
+                <span style="font-size:1.4rem;">📱</span>
+                <span style="font-size:1.4rem;">💙</span>
+              </div>
+            </div>
+
+            <!-- UPI Box -->
+            <div id="field-upi_manual">
+              <div class="upi-box">
+                <!-- Timer -->
+                <div id="payTimer" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="font-size:.82rem;color:#ef4444;font-weight:600;">⏱️ Session expires in:</span>
+                  <span id="timerDisplay" style="font-family:monospace;font-size:1.1rem;font-weight:900;color:#ef4444;">15:00</span>
+                </div>
+
+                <div style="font-weight:700;font-size:1rem;margin-bottom:4px;">Pay to our UPI ID</div>
+                <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:14px;">Scan QR below or click your UPI app to pay instantly</div>
+
+                <!-- QR -->
+                <div id="qrArea" class="qr-placeholder" style="width:180px;height:180px;margin:0 auto 14px;cursor:pointer;" onclick="copyUpiId()" title="Click to copy UPI ID">📱</div>
+                <div id="upiIdDisplay" class="upi-id-display">Loading...</div>
+
+                <!-- Deep Link Buttons -->
+                <div style="margin:16px 0;text-align:center;">
+                  <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px;font-weight:600;">OR — Open Your UPI App Directly:</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="upiAppBtns">
+                    <!-- filled by JS -->
+                  </div>
+                </div>
+
+                <button onclick="copyUpiId()" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-bottom:16px;">📋 Copy UPI ID</button>
+
+                <hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:16px 0;"/>
+
+                <!-- UTR Input -->
+                <div style="font-weight:700;font-size:.9rem;margin-bottom:8px;text-align:left;">✅ After paying, enter your UTR / Transaction ID:</div>
+                <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:10px;text-align:left;">UTR/Reference number is shown in your UPI app payment receipt</div>
+                <div class="utr-input-row">
+                  <input type="text" id="utrInput" placeholder="e.g. 427891234567" maxlength="25" oninput="liveUtrCheck(this)"/>
+                  <button class="btn btn-accent btn-sm" onclick="validateUTR()" style="white-space:nowrap;">✅ Submit UTR</button>
+                </div>
+                <div id="utrStatus" style="font-size:.78rem;margin-top:6px;text-align:left;display:none;padding:6px 10px;border-radius:8px;"></div>
+                <div id="utrMsg" style="font-size:.8rem;margin-top:8px;text-align:left;"></div>
+                <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#f59e0b;text-align:left;margin-top:12px;font-size:.82rem;padding:10px 14px;border-radius:10px;">
+                  ⚡ Your domain/hosting will be activated within <strong>30 minutes</strong> of admin verifying payment in bank.
+                </div>
+              </div>
+            </div>
+
+
           <div class="card">
             <div class="form-section-title">💳 Payment Method</div>
 
