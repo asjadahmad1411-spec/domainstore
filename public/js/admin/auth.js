@@ -60,7 +60,7 @@ async function doLogin() {
   if (!username || !password) { if (errEl) { errEl.textContent = 'Enter username and password'; errEl.style.display='flex'; } return; }
   if (btn) { btn.textContent = '⏳ Logging in...'; btn.disabled = true; }
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })

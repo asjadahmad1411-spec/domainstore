@@ -13,7 +13,24 @@ const settingsPath  = path.join(__dirname, '../data/settings.json');
 const readJSON  = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const writeJSON = (p, d) => fs.writeFileSync(p, JSON.stringify(d, null, 2));
 
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
+
+// ── Admin Login (no auth required) ────────────────────────────
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const correctUser = process.env.ADMIN_USERNAME || 'admin';
+  const correctPass = process.env.ADMIN_PASSWORD || 'admin123';
+  if (!username || !password) return res.status(400).json({ success: false, error: 'Username and password required' });
+  if (username === correctUser && password === correctPass) {
+    const token = jwt.sign({ role: 'admin', username }, JWT_SECRET, { expiresIn: '24h' });
+    return res.json({ success: true, token });
+  }
+  return res.status(401).json({ success: false, error: 'Invalid credentials' });
+});
+
 // ── Stats ─────────────────────────────────────────────────────────────────
+
 router.get('/stats', authMiddleware, (req, res) => {
   const orders    = readJSON(ordersPath);
   const customers = readJSON(customersPath);
