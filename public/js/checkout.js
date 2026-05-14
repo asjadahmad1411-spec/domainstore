@@ -1,169 +1,175 @@
-let selectedPayMethod = 'upi_manual';
 let promoDiscount = 0;
 let promoCode = '';
 let siteSettings = {};
-let placedOrderId = null;
-let utrValidated = false;
 let timerInterval = null;
+let utrValidated = false;
+let currentOrderId = null;
 
 function fmt(n) { return '₹' + (n || 0).toLocaleString('en-IN'); }
 
-// ── Payment Timer (15 min) ────────────────────────────────────
-function startPayTimer() {
+// ── UTR Smart Validation ──────────────────────────────────────
+// REAL UTR patterns used by Indian banks:
+// IMPS: 12 digits numeric e.g. "427891234567"
+// UPI Ref: 12 digits numeric
+// NEFT: alphanumeric with bank prefix e.g. "HDFC523456789012"
+// RTGS: 22 chars alphanumeric
+function validateUtrFormat(utr) {
+  const u = (utr || '').trim().toUpperCase();
+  if (!u) return { ok: false, msg: '' };
+  if (u.length < 12) return { ok: false, msg: `⏳ Keep typing... (${u.length}/12 min)`, level: 'warn' };
+
+  // Must be alphanumeric only
+  if (!/^[A-Z0-9]+$/.test(u)) return { ok: false, msg: '❌ Invalid — only letters and numbers allowed', level: 'invalid' };
+
+  // Reject obvious fakes: all same digit, sequential
+  if (/^(.)\1+$/.test(u)) return { ok: false, msg: '❌ Invalid UTR — repeated digits not valid', level: 'invalid' };
+  if (u === '123456789012' || u === '000000000000' || u === '111111111111' || u === '999999999999')
+    return { ok: false, msg: '❌ This UTR number is not valid', level: 'invalid' };
+
+  // Check for sequential runs (e.g. 123456789012)
+  let seq = 0;
+  for (let i = 1; i < u.length; i++) {
+    const diff = u.charCodeAt(i) - u.charCodeAt(i-1);
+    if (diff === 1 || diff === -1) { seq++; if (seq > 7) return { ok: false, msg: '❌ Sequential numbers are not valid UTR', level: 'invalid' }; }
+    else seq = 0;
+  }
+
+  // Valid length ranges
+  if (u.length < 12 || u.length > 22) return { ok: false, msg: '❌ UTR must be 12–22 characters', level: 'invalid' };
+
+  // IMPS/UPI Ref: exactly 12 digits
+  if (/^\d{12}$/.test(u)) return { ok: true, msg: `✅ Valid UPI/IMPS reference: ${u}`, level: 'valid' };
+
+  // NEFT format: starts with bank code letters
+  if (/^[A-Z]{4}\d{8,14}$/.test(u)) return { ok: true, msg: `✅ Valid NEFT UTR: ${u}`, level: 'valid' };
+
+  // Generic alphanumeric long ref
+  if (u.length >= 12 && /^[A-Z0-9]{12,22}$/.test(u)) return { ok: true, msg: `✅ Valid reference number: ${u}`, level: 'valid' };
+
+  return { ok: false, msg: '❌ UTR format not recognized. Check your UPI app receipt.', level: 'invalid' };
+}
+
+function liveUtrCheck(input) {
+  const val    = (input.value || '').trim().toUpperCase();
+  const status = document.getElementById('utrStatus');
+  if (!status) return;
+
+  const result = validateUtrFormat(val);
+
+  if (!val) {
+    status.className = 'utr-status'; utrValidated = false;
+    input.className  = 'utr-inp'; return;
+  }
+
+  status.className = 'utr-status ' + (result.level || 'warn');
+  status.textContent = result.msg;
+  input.className  = result.ok ? 'utr-inp valid' : (result.level === 'invalid' ? 'utr-inp invalid' : 'utr-inp');
+  utrValidated = result.ok;
+}
+
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer() {
   let secs = 15 * 60;
-  const disp = document.getElementById('timerDisplay');
-  const timerBox = document.getElementById('payTimer');
+  const d = document.getElementById('timerDisplay');
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     secs--;
     const m = String(Math.floor(secs / 60)).padStart(2, '0');
     const s = String(secs % 60).padStart(2, '0');
-    if (disp) disp.textContent = m + ':' + s;
-    if (secs <= 120 && timerBox) timerBox.style.animation = 'pulse 1s infinite';
+    if (d) d.textContent = m + ':' + s;
     if (secs <= 0) {
       clearInterval(timerInterval);
-      if (disp) disp.textContent = '00:00';
-      if (timerBox) timerBox.style.background = 'rgba(239,68,68,.25)';
-      showToast('⏱️ Session expired. Please refresh and pay again.', 'error');
+      showToast('⏱️ Session expired. Please refresh.', 'error');
     }
   }, 1000);
 }
 
-// ── Load settings (UPI ID, QR, deep links) ───────────────────
+// ── Load Settings + Build UI ──────────────────────────────────
 async function loadSettings() {
   try {
     siteSettings = await fetch('/api/admin/settings').then(r => r.json());
-    const upiId   = siteSettings.upiId   || 'domainstore@upi';
-    const upiName = siteSettings.upiName || 'DomainStore';
-    const amount  = getCart().reduce((s,i) => s+i.price, 0);
+  } catch(e) { siteSettings = { upiId: 'domainstore@upi', upiName: 'DomainStore' }; }
 
-    // Show UPI ID
-    const upiDisplay = document.getElementById('upiIdDisplay');
-    if (upiDisplay) upiDisplay.textContent = upiId;
+  const upiId   = siteSettings.upiId   || 'domainstore@upi';
+  const upiName = siteSettings.upiName || 'DomainStore';
+  const amount  = getCart().reduce((s, i) => s + i.price, 0);
 
-    // QR Code
-    const qrArea = document.getElementById('qrArea');
-    if (qrArea) {
-      const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR`;
-      const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
-      qrArea.innerHTML = `<img src="${qrUrl}" alt="UPI QR" style="width:180px;height:180px;border-radius:10px;" onerror="this.parentElement.innerHTML='📱'"/>`;
-      qrArea.style.cssText += ';background:#fff;border:none;padding:8px;';
-    }
+  // Display UPI ID
+  const ud = document.getElementById('upiIdDisplay');
+  if (ud) ud.textContent = upiId;
 
-    // Deep link buttons per UPI app
-    buildUpiAppButtons(upiId, upiName, amount);
-    startPayTimer();
-
-  } catch (e) {
-    const d = document.getElementById('upiIdDisplay');
-    if (d) d.textContent = 'domainstore@upi';
-    buildUpiAppButtons('domainstore@upi', 'DomainStore', 0);
-    startPayTimer();
+  // QR Code
+  const qrArea = document.getElementById('qrArea');
+  if (qrArea) {
+    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=DomainStore`;
+    const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(upiLink)}&color=6c3de8&bgcolor=ffffff`;
+    qrArea.innerHTML = `<img src="${qrUrl}" alt="UPI QR" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.innerHTML='<span style=font-size:2.5rem>📱</span>'"/>`;
   }
+
+  // Deep link buttons
+  buildAppButtons(upiId, upiName, amount);
+  startTimer();
 }
 
-function buildUpiAppButtons(upiId, name, amount) {
-  const container = document.getElementById('upiAppBtns');
-  if (!container) return;
+function buildAppButtons(upiId, name, amount) {
+  const grid = document.getElementById('upiAppGrid');
+  if (!grid) return;
   const enc = encodeURIComponent;
-  const base = `pa=${enc(upiId)}&pn=${enc(name)}&am=${amount}&cu=INR&tn=DomainStore`;
+  const q = `pa=${enc(upiId)}&pn=${enc(name)}&am=${amount}&cu=INR&tn=DomainStore`;
+
   const apps = [
-    { icon: '🟢', label: 'GPay',     url: `tez://upi/pay?${base}`,      fallback: `https://pay.google.com/` },
-    { icon: '💙', label: 'PhonePe',  url: `phonepe://pay?${base}`,       fallback: `https://www.phonepe.com/` },
-    { icon: '🔵', label: 'Paytm',    url: `paytmmp://pay?${base}`,       fallback: `https://paytm.com/` },
-    { icon: '📱', label: 'BHIM',     url: `upi://pay?${base}`,           fallback: `https://www.bhimupi.org.in/` },
-    { icon: '🏦', label: 'Any UPI',  url: `upi://pay?${base}`,           fallback: `upi://pay?${base}` },
-    { icon: '📋', label: 'Copy ID',  url: null,                          fallback: null, copy: upiId },
+    { icon: '🟢', label: 'GPay',    url: `tez://upi/pay?${q}` },
+    { icon: '💜', label: 'PhonePe', url: `phonepe://pay?${q}` },
+    { icon: '🔵', label: 'Paytm',   url: `paytmmp://pay?${q}` },
+    { icon: '🟡', label: 'BHIM',    url: `upi://pay?${q}` },
+    { icon: '🏦', label: 'Any UPI', url: `upi://pay?${q}` },
+    { icon: '📋', label: 'Copy ID', url: null, copy: upiId },
   ];
-  container.innerHTML = apps.map(a => `
-    <button onclick="${a.copy ? `navigator.clipboard.writeText('${a.copy}').then(()=>showToast('Copied!','success'))` : `openUpiApp('${a.url}','${a.fallback}')`}"
-      style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 8px;cursor:pointer;transition:all .2s;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;font-weight:600;"
-      onmouseover="this.style.borderColor='var(--primary)';this.style.background='rgba(108,61,232,.1)'"
-      onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.05)'">
-      <span style="font-size:1.4rem;">${a.icon}</span>${a.label}
+
+  grid.innerHTML = apps.map(a => `
+    <button class="upi-app-btn" onclick="${a.copy
+      ? `copyText('${a.copy}','UPI ID')`
+      : `tryOpenApp('${a.url}')`}">
+      <span class="app-icon">${a.icon}</span>${a.label}
     </button>`).join('');
 }
 
-function openUpiApp(deepLink, fallback) {
-  // Try deep link first — if not opened in 1.5s, open web fallback
-  const start = Date.now();
-  window.location.href = deepLink;
+function tryOpenApp(url) {
+  // Try deep link — show toast if nothing happens
+  window.location.href = url;
   setTimeout(() => {
-    if (Date.now() - start < 2000) {
-      // App didn't open — show toast
-      showToast('UPI app not found. Please open manually or scan QR.', 'error');
-    }
-  }, 1500);
+    showToast('If app did not open, scan the QR code or copy UPI ID.', 'error');
+  }, 1800);
 }
 
 function copyUpiId() {
   const id = siteSettings.upiId || 'domainstore@upi';
-  navigator.clipboard.writeText(id).then(() => showToast('✅ UPI ID Copied: ' + id, 'success'));
+  navigator.clipboard.writeText(id).then(() => showToast('✅ UPI ID copied: ' + id, 'success'));
 }
 
-// ── Live UTR format check as user types ──────────────────────
-function liveUtrCheck(input) {
-  const val   = (input.value || '').trim().toUpperCase();
-  const stat  = document.getElementById('utrStatus');
-  if (!stat) return;
-  if (!val) { stat.style.display = 'none'; utrValidated = false; return; }
-  const valid = /^[A-Z0-9]{8,25}$/.test(val);
-  stat.style.display = 'block';
-  if (valid) {
-    stat.style.background = 'rgba(34,197,94,.1)';
-    stat.style.border     = '1px solid rgba(34,197,94,.3)';
-    stat.style.color      = '#22c55e';
-    stat.textContent      = '✅ Valid UTR format — ' + val;
-    utrValidated = true;
-  } else if (val.length < 8) {
-    stat.style.background = 'rgba(245,158,11,.1)';
-    stat.style.border     = '1px solid rgba(245,158,11,.3)';
-    stat.style.color      = '#f59e0b';
-    stat.textContent      = '⏳ Keep typing... (' + val.length + '/8 min)';
-    utrValidated = false;
-  } else {
-    stat.style.background = 'rgba(239,68,68,.1)';
-    stat.style.border     = '1px solid rgba(239,68,68,.3)';
-    stat.style.color      = '#ef4444';
-    stat.textContent      = '❌ Invalid UTR format. Only letters & numbers allowed.';
-    utrValidated = false;
-  }
+function copyText(text, label) {
+  navigator.clipboard.writeText(text).then(() => showToast('📋 Copied: ' + text, 'success'));
 }
 
-function validateUTR() {
-  const utr = (document.getElementById('utrInput')?.value || '').trim().toUpperCase();
-  const msg = document.getElementById('utrMsg');
-  if (!utr) {
-    if (msg) msg.innerHTML = `<span style="color:#ef4444;">❌ Please enter your UTR/Transaction ID</span>`; return;
-  }
-  if (!/^[A-Z0-9]{8,25}$/.test(utr)) {
-    if (msg) msg.innerHTML = `<span style="color:#ef4444;">❌ Wrong UTR format. Enter 8-25 letters/numbers only.</span>`;
-    utrValidated = false; return;
-  }
-  if (msg) msg.innerHTML = `<span style="color:#22c55e;">✅ UTR confirmed: <strong>${utr}</strong>. Now click Place Order.</span>`;
-  utrValidated = true;
-}
-
-// ── Load checkout summary ─────────────────────────────────────
+// ── Summary ───────────────────────────────────────────────────
 function loadCheckoutSummary() {
   const cart = getCart();
   if (!cart.length) { location.href = '/cart.html'; return; }
+
   const items = document.getElementById('coItems');
-  if (items) {
-    items.innerHTML = cart.map(i => `
-      <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:8px;gap:8px;">
-        <span style="color:var(--text-muted);flex:1;">${i.name}</span>
-        <span style="font-weight:600;white-space:nowrap;">${fmt(i.price)}</span>
-      </div>`).join('');
-  }
-  const savedDiscount = parseInt(sessionStorage.getItem('checkout_discount') || '0');
-  const savedPromo    = sessionStorage.getItem('checkout_promo') || '';
-  if (savedDiscount > 0 && savedPromo) {
-    promoDiscount = savedDiscount; promoCode = savedPromo;
-    const inp = document.getElementById('coPromo');
-    if (inp) inp.value = savedPromo;
+  if (items) items.innerHTML = cart.map(i => `
+    <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:8px;gap:8px;">
+      <span style="color:var(--text-muted);flex:1;">${i.name}</span>
+      <span style="font-weight:600;white-space:nowrap;">${fmt(i.price)}</span>
+    </div>`).join('');
+
+  const sd = parseInt(sessionStorage.getItem('checkout_discount') || '0');
+  const sp = sessionStorage.getItem('checkout_promo') || '';
+  if (sd > 0 && sp) {
+    promoDiscount = sd; promoCode = sp;
+    const inp = document.getElementById('coPromo'); if (inp) inp.value = sp;
     const msg = document.getElementById('coPromoMsg');
-    if (msg) msg.innerHTML = `<span style="color:var(--green);">✅ Promo applied! Saving ${fmt(savedDiscount)}</span>`;
+    if (msg) msg.innerHTML = `<span style="color:var(--green);">✅ Promo applied! Saving ${fmt(sd)}</span>`;
   }
   updateTotals();
 }
@@ -172,22 +178,20 @@ function updateTotals() {
   const cart     = getCart();
   const subtotal = cart.reduce((s, i) => s + i.price, 0);
   const total    = Math.max(subtotal - promoDiscount, 0);
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('coSubtotal', fmt(subtotal));
   set('coDisc', '-' + fmt(promoDiscount));
   set('coTotal', fmt(total));
-  const discRow = document.getElementById('coDiscRow');
-  if (discRow) discRow.style.display = promoDiscount > 0 ? 'flex' : 'none';
-  const codRow = document.getElementById('coCodRow');
-  if (codRow) codRow.style.display = 'none';
+  const dr = document.getElementById('coDiscRow');
+  if (dr) dr.style.display = promoDiscount > 0 ? 'flex' : 'none';
 }
 
-// ── Promo code ────────────────────────────────────────────────
+// ── Promo ─────────────────────────────────────────────────────
 async function applyPromoCode() {
   const code = (document.getElementById('coPromo')?.value || '').trim().toUpperCase();
   const msg  = document.getElementById('coPromoMsg');
   if (!code) return;
-  const cart     = getCart();
+  const cart = getCart();
   const subtotal = cart.reduce((s, i) => s + i.price, 0);
   try {
     const res = await fetch('/api/admin/promos/validate', {
@@ -198,43 +202,49 @@ async function applyPromoCode() {
       promoDiscount = res.discount; promoCode = code;
       sessionStorage.setItem('checkout_discount', promoDiscount);
       sessionStorage.setItem('checkout_promo', promoCode);
-      if (msg) msg.innerHTML = `<span style="color:var(--green);">✅ ${res.type === 'percent' ? res.value + '% off' : '₹' + res.value + ' off'} applied! Saving ${fmt(res.discount)}</span>`;
-      updateTotals();
-      showToast('🎉 Promo code applied!', 'success');
+      if (msg) msg.innerHTML = `<span style="color:var(--green);">✅ ${res.type==='percent'?res.value+'% off':'₹'+res.value+' off'} applied!</span>`;
+      updateTotals(); showToast('🎉 Promo applied!', 'success');
     } else {
       if (msg) msg.innerHTML = `<span style="color:#ef4444;">❌ ${res.error}</span>`;
       promoDiscount = 0; promoCode = ''; updateTotals();
     }
-  } catch (e) {
-    if (msg) msg.innerHTML = `<span style="color:#ef4444;">❌ Could not validate promo</span>`;
-  }
+  } catch(e) { if (msg) msg.innerHTML = `<span style="color:#ef4444;">❌ Could not validate promo</span>`; }
 }
 
-// ── Place order ───────────────────────────────────────────────
-async function placeOrder() {
+// ── Submit UTR + Place Order in one step ─────────────────────
+async function submitUtrAndOrder() {
+  const utr = (document.getElementById('utrInput')?.value || '').trim().toUpperCase();
+  const stat = document.getElementById('utrStatus');
+
+  // Validate UTR first
+  const result = validateUtrFormat(utr);
+  if (!result.ok) {
+    if (stat) { stat.className = 'utr-status invalid'; stat.textContent = result.msg || '❌ Please enter a valid UTR number from your UPI app'; }
+    return;
+  }
+  // Then place order
+  placeOrder(utr);
+}
+
+async function placeOrder(utrValue) {
   const firstName = document.getElementById('firstName')?.value.trim();
   const lastName  = document.getElementById('lastName')?.value.trim();
   const email     = document.getElementById('email')?.value.trim();
   const phone     = document.getElementById('phone')?.value.trim();
-  if (!firstName || !lastName) return showToast('Please enter your name', 'error');
+
+  if (!firstName || !lastName) return showToast('Please enter your full name', 'error');
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Please enter a valid email', 'error');
   if (!phone) return showToast('Please enter your phone number', 'error');
-
-  // UTR required
-  const utrValue = (document.getElementById('utrInput')?.value || '').trim().toUpperCase();
-  if (!utrValue) return showToast('❌ Please enter your UTR/Transaction ID after paying', 'error');
-  if (!utrValidated) { validateUTR(); if (!utrValidated) return; }
+  if (!utrValue) return showToast('Please enter UTR after paying', 'error');
 
   const cart = getCart();
-  if (!cart.length) return showToast('Your cart is empty', 'error');
-
-  const subtotal = cart.reduce((s, i) => s + i.price, 0);
-  const total    = Math.max(subtotal - promoDiscount, 0);
+  if (!cart.length) return showToast('Cart is empty', 'error');
 
   const btn = document.getElementById('placeOrderBtn');
-  btn.textContent = '⏳ Placing order...'; btn.disabled = true;
+  btn.textContent = '⏳ Processing...'; btn.disabled = true;
 
   try {
+    // Create order
     const res = await fetch('/api/orders', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -244,13 +254,14 @@ async function placeOrder() {
     }).then(r => r.json());
 
     if (!res.success) throw new Error(res.error || 'Order failed');
-    placedOrderId = res.orderId;
 
     // Submit UTR
-    await fetch('/api/admin/utr-submit', {
+    const utrRes = await fetch('/api/admin/utr-submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId: res.orderId, utr: utrValue })
-    });
+    }).then(r => r.json());
+
+    if (!utrRes.success) throw new Error(utrRes.error || 'UTR submission failed');
 
     clearInterval(timerInterval);
     localStorage.removeItem('ds_cart');
@@ -260,8 +271,9 @@ async function placeOrder() {
       orderId: res.orderId, email, total: res.total, paymentMethod: 'upi_manual', utr: utrValue
     }));
     location.href = '/confirmation.html';
-  } catch (e) {
-    showToast(e.message || 'Order failed. Try again.', 'error');
+
+  } catch(e) {
+    showToast(e.message || 'Error. Please try again.', 'error');
     btn.textContent = '🔒 Place Order'; btn.disabled = false;
   }
 }

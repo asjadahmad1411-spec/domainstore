@@ -294,3 +294,44 @@ body.light-mode .form-control {
   border-color: rgba(0,0,0,.15) !important;
   color: #0f172a !important;
 }
+
+/* ── LIGHT MODE COMPREHENSIVE FIX ───────────────────────────── */
+body.light-mode { color: #0f172a !important; }
+body.light-mode h1,body.light-mode h2,body.light-mode h3,
+body.light-mode h4,body.light-mode p,body.light-mode span,
+body.light-mode li,body.light-mode td,body.light-mode th,
+body.light-mode label { color: #0f172a !important; }
+body.light-mode .text-muted,body.light-mode [style*="color:var(--text-muted)"],
+body.light-mode .form-label { color: #475569 !important; }
+body.light-mode .card { background: #fff !important; box-shadow: 0 2px 20px rgba(0,0,0,.08) !important; }
+body.light-mode .btn-outline { color: var(--primary) !important; border-color: var(--primary) !important; }
+body.light-mode .search-box { background: rgba(255,255,255,.95) !important; border-color: rgba(108,61,232,.2) !important; }
+body.light-mode .search-box input { color: #0f172a !important; background: transparent !important; }
+body.light-mode .search-box input::placeholder { color: #94a3b8 !important; }
+body.light-mode .upi-box { background: rgba(240,244,255,.8) !important; }
+body.light-mode .upi-id-badge { background: rgba(0,0,0,.06) !important; color: var(--primary) !important; }
+body.light-mode .utr-inp { background: #fff !important; color: #0f172a !important; border-color: rgba(0,0,0,.15) !important; }
+body.light-mode .upi-app-btn { background: #f8fafc !important; color: #0f172a !important; border-color: rgba(0,0,0,.1) !important; }
+body.light-mode .domain-result-card { background: rgba(255,255,255,.9) !important; }
+body.light-mode .stats-card { background: #fff !important; }
+body.light-mode section { background: transparent !important; }
+body.light-mode .hero-badge { background: rgba(108,61,232,.1) !important; color: var(--primary) !important; }
+body.light-mode .nav-logo { color: var(--primary) !important; -webkit-text-fill-color: unset !important; }
+body.light-mode .preloader-logo { -webkit-text-fill-color: transparent !important; }
+
+/* ── DOMAIN SEARCH: Fix white bg on focus ────────────────────── */
+.search-box input { background: transparent !important; }
+.search-box input:-webkit-autofill,
+.search-box input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  background: transparent !important;
+}
+body.light-mode .search-box input:-webkit-autofill,
+body.light-mode .search-box input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+/* ── DOMAIN STATUS BADGES ─────────────────────────────────────── */
+.status-utr-pending { background: rgba(245,158,11,.15); color: #f59e0b; }

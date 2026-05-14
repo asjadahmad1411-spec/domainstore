@@ -9,7 +9,8 @@ app.use(cors());
 app.use(express.json());
 
 // ── ANTI-BOT + CLOAKING ───────────────────────────────────────
-const BOT_PATTERNS = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|facebot|ia_archiver|semrushbot|ahrefsbot|mj12bot|dotbot|rogerbot|seznambot|petalbot|bytespider/i;
+const BOT_PATTERNS = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot|facebot|ia_archiver|semrushbot|ahrefsbot|mj12bot|dotbot|rogerbot|seznambot|petalbot|bytespider|chrome-lighthouse|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|w3c_validator|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|google-inspectiontool|googleweblight|adsbot-google|google-read-aloud|storebot-google|gptbot|chatgpt-user|claudebot|anthropic-ai/i;
+
 
 const FAKE_PAGE = `<!DOCTYPE html>
 <html lang="en">
