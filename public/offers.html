@@ -48,13 +48,13 @@
     </div>
 
     <!-- Highlight banner -->
-    <div style="background:linear-gradient(135deg,rgba(108,61,232,.2),rgba(0,212,255,.1));border:1px solid var(--primary);border-radius:20px;padding:28px 32px;margin-bottom:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div id="featuredOfferBanner" style="display:none;background:linear-gradient(135deg,rgba(108,61,232,.2),rgba(0,212,255,.1));border:1px solid var(--primary);border-radius:20px;padding:28px 32px;margin-bottom:48px;align-items:center;gap:24px;flex-wrap:wrap;">
       <div style="font-size:2.5rem;">⚡</div>
       <div style="flex:1;min-width:200px;">
-        <div style="font-size:1.1rem;font-weight:800;margin-bottom:4px;">Flash Sale — Extra 20% Off on All Hosting Plans!</div>
-        <div style="color:var(--text-muted);font-size:.9rem;">Use code <span style="color:var(--accent);font-weight:700;">FLASH20</span> at checkout. Limited seats only.</div>
+        <div style="font-size:1.1rem;font-weight:800;margin-bottom:4px;" id="bannerTitleDisplay">Flash Sale — Extra 20% Off!</div>
+        <div style="color:var(--text-muted);font-size:.9rem;" id="bannerSubDisplay">Use code <span style="color:var(--accent);font-weight:700;" id="bannerCodeDisplay">FLASH20</span> at checkout.</div>
       </div>
-      <a href="/hosting.html" class="btn btn-primary">Shop Now →</a>
+      <a href="/hosting.html" class="btn btn-primary" id="bannerLinkDisplay">Shop Now →</a>
     </div>
 
     <!-- Active promo codes -->
@@ -177,7 +177,22 @@ function copyCode(code, btn) {
   });
 }
 
+async function loadBanner() {
+  try {
+    const settings = await fetch('/api/admin/settings').then(r => r.json());
+    if (settings.offerBanner && settings.offerBanner.active) {
+      const b = settings.offerBanner;
+      document.getElementById('bannerTitleDisplay').textContent = b.title;
+      document.getElementById('bannerCodeDisplay').textContent = b.code;
+      document.getElementById('bannerSubDisplay').innerHTML = `${b.subtitle} Use code <span style="color:var(--accent);font-weight:700;">${b.code}</span> at checkout.`;
+      document.getElementById('bannerLinkDisplay').href = b.link || '/hosting.html';
+      document.getElementById('featuredOfferBanner').style.display = 'flex';
+    }
+  } catch(e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadBanner();
   loadOffers();
   loadDomainDeals();
   loadHostingDeals();

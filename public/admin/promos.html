@@ -2,9 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Promo Codes — Admin | DomainStore</title>
+<title>Offers & Promos — Admin | DomainStore</title>
 <link rel="stylesheet" href="/css/admin.css"/>
-<link rel="stylesheet" href="/css/responsive.css"/></head>
+<link rel="stylesheet" href="/css/responsive.css"/>
+<style>
+  .banner-preview {
+    background: linear-gradient(135deg, rgba(108, 61, 232, 0.2), rgba(0, 212, 255, 0.1));
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .banner-preview-icon { font-size: 1.5rem; }
+  .banner-preview-text h4 { margin: 0; font-size: 0.95rem; }
+  .banner-preview-text p { margin: 4px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+  .banner-preview-code { font-weight: 800; color: var(--accent); }
+</style>
+</head>
 <body>
 <button class="sidebar-toggle" id="sidebarToggle">☰</button>
 <div class="sidebar" id="sidebar">
@@ -18,8 +35,8 @@
     <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
     <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
     <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
-    <div class="nav-section">Settings</div>
-    <a href="/admin/promos.html" class="nav-item active"><span class="icon">🎟️</span> Promo Codes</a>
+    <div class="nav-section">Marketing</div>
+    <a href="/admin/promos.html" class="nav-item active"><span class="icon">🎁</span> Offers & Promos</a>
     <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
   </nav>
   <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
@@ -27,25 +44,76 @@
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-left"><h2>Promo Codes</h2><p>Create and manage discount codes</p></div>
+    <div class="topbar-left"><h2>Offers & Promos</h2><p>Manage discount banners and coupon codes</p></div>
     <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
   </div>
+  
   <div class="content">
+    
+    <!-- ── FEATURED OFFER BANNER ── -->
+    <div class="panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <span class="panel-title">🔥 Hero Offer Banner</span>
+        <button class="btn btn-outline btn-sm" onclick="saveBannerSettings()" id="saveBannerBtn">Save Banner</button>
+      </div>
+      <div class="panel-body">
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 15px;">This banner appears at the top of the "Offers" page on the website.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label class="form-label">Banner Title</label>
+            <input type="text" class="form-control" id="bannerTitle" placeholder="e.g. Flash Sale — 20% Off!"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Banner Promo Code</label>
+            <input type="text" class="form-control" id="bannerCode" placeholder="e.g. FLASH20" style="text-transform:uppercase;"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Banner Subtitle</label>
+            <input type="text" class="form-control" id="bannerSubtitle" placeholder="e.g. Get instant discount on hosting"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Button Link</label>
+            <input type="text" class="form-control" id="bannerLink" placeholder="e.g. /hosting.html"/>
+          </div>
+        </div>
+        
+        <div style="margin-top: 15px;">
+          <label class="checkbox-row"><input type="checkbox" id="bannerActive"/> Show this banner on website</label>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <span style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Live Preview:</span>
+          <div class="banner-preview" id="bannerPreview">
+            <div class="banner-preview-icon">⚡</div>
+            <div class="banner-preview-text" style="flex: 1;">
+              <h4 id="prevTitle">Flash Sale — 20% Off!</h4>
+              <p id="prevSub">Use code <span class="banner-preview-code" id="prevCode">FLASH20</span> at checkout.</p>
+            </div>
+            <div style="font-size: 0.8rem; padding: 6px 12px; background: var(--primary); color: white; border-radius: 8px; font-weight: 600;">Shop Now →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROMO CODES LIST ── -->
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">Active Promo Codes</span>
+        <span class="panel-title">🎟️ Active Promo Codes</span>
         <button class="btn btn-primary" onclick="openPromoModal()">+ Create Code</button>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Expiry</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-          <tbody id="promosBody"></tbody>
+          <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="promosBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px;">Loading...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Modal for New Promo -->
 <div class="modal-overlay" id="promoModal">
   <div class="modal">
     <div class="modal-header"><span class="modal-title">Create Promo Code</span><button class="modal-close" onclick="closeModal('promoModal')">✕</button></div>
@@ -68,5 +136,67 @@
 <div class="toast" id="toast"></div>
 <script src="/js/admin/auth.js"></script>
 <script src="/js/admin/promos.js"></script>
+<script>
+  // Add live preview logic
+  const inputs = ['bannerTitle', 'bannerSubtitle', 'bannerCode'];
+  inputs.forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      document.getElementById('prevTitle').textContent = document.getElementById('bannerTitle').value || 'Offer Title';
+      document.getElementById('prevSub').innerHTML = (document.getElementById('bannerSubtitle').value || 'Offer subtitle') + 
+        ' Use code <span class="banner-preview-code">' + (document.getElementById('bannerCode').value || 'CODE') + '</span>';
+    });
+  });
+
+  async function loadBannerSettings() {
+    try {
+      const settings = await apiFetch('/api/admin/settings');
+      if (settings.offerBanner) {
+        const b = settings.offerBanner;
+        document.getElementById('bannerTitle').value = b.title || '';
+        document.getElementById('bannerSubtitle').value = b.subtitle || '';
+        document.getElementById('bannerCode').value = b.code || '';
+        document.getElementById('bannerLink').value = b.link || '';
+        document.getElementById('bannerActive').checked = b.active !== false;
+        
+        // Update preview
+        document.getElementById('prevTitle').textContent = b.title || 'Offer Title';
+        document.getElementById('prevSub').innerHTML = (b.subtitle || 'Offer subtitle') + 
+          ' Use code <span class="banner-preview-code">' + (b.code || 'CODE') + '</span>';
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  async function saveBannerSettings() {
+    const btn = document.getElementById('saveBannerBtn');
+    btn.textContent = 'Saving...'; btn.disabled = true;
+    
+    const banner = {
+      title: document.getElementById('bannerTitle').value,
+      subtitle: document.getElementById('bannerSubtitle').value,
+      code: document.getElementById('bannerCode').value,
+      link: document.getElementById('bannerLink').value,
+      active: document.getElementById('bannerActive').checked
+    };
+
+    try {
+      await apiFetch('/api/admin/settings', {
+        method: 'PUT',
+        body: JSON.stringify({ offerBanner: banner })
+      });
+      showToast('Offer banner updated successfully!');
+    } catch(e) {
+      showToast('Failed to save banner settings', 'error');
+    } finally {
+      btn.textContent = 'Save Banner'; btn.disabled = false;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadBannerSettings();
+    // Re-bind sidebar toggle if needed
+    const sb = document.getElementById('sidebarToggle');
+    if (sb) sb.onclick = () => document.getElementById('sidebar').classList.toggle('open');
+  });
+</script>
 </body>
 </html>
