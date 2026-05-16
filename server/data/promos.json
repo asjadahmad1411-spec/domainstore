@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "test-promo-123",
+    "code": "WELCOME10",
+    "type": "percent",
+    "value": 10,
+    "expiry": "2026-12-31",
+    "active": true,
+    "createdAt": "2025-05-16T21:45:00Z"
+  }
+]

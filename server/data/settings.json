@@ -1,4 +1,11 @@
 {
+  "offerBanner": {
+    "title": "Welcome Offer!",
+    "subtitle": "Get 10% off on your first order.",
+    "code": "WELCOME10",
+    "link": "/domains.html",
+    "active": true
+  },
   "storeName": "DomainStore",
   "tagline": "India's #1 Domain Registrar",
   "supportEmail": "support@domainstore.in",

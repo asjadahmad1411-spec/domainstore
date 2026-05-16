@@ -136,6 +136,12 @@ async function loadOffers() {
         </div>
       </div>`;
     }).join('');
+    
+    // Trigger animation
+    setTimeout(() => {
+      document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+    }, 100);
+
   } catch (e) { grid.innerHTML = ''; noOffers.style.display = 'block'; }
 }
 
