@@ -157,24 +157,53 @@ router.post('/utr-reject/:orderId', authMiddleware, (req, res) => {
   res.json({ success: true });
 });
 
-// POST customer submits UTR (format check only — NO auto-activate)
+// POST customer submits UTR — checks duplicate in utrs.json database
 router.post('/utr-submit', (req, res) => {
   const { orderId, utr } = req.body;
-  if (!orderId || !utr) return res.status(400).json({ error: 'orderId and utr required' });
+  if (!orderId || !utr) return res.status(400).json({ success: false, error: 'orderId and utr required' });
+
   const utrClean = (utr || '').trim().toUpperCase();
+
+  // Format check
   if (!/^[A-Z0-9]{8,25}$/.test(utrClean))
-    return res.status(400).json({ error: 'Invalid UTR format. Enter 8–25 alphanumeric characters.' });
+    return res.status(400).json({ success: false, error: 'Invalid UTR format. Enter 8–25 alphanumeric characters.' });
+
+  // Reject obvious fakes
+  if (/^(.)\1{7,}$/.test(utrClean))
+    return res.status(400).json({ success: false, error: 'Invalid UTR — repeated digits not accepted.' });
+
+  // ── UTR Duplicate DB check ──────────────────────────────────
+  const utrsPath = path.join(__dirname, '../data/utrs.json');
+  let utrs = [];
+  try { utrs = JSON.parse(fs.readFileSync(utrsPath, 'utf8')); } catch(e) { utrs = []; }
+
+  const existing = utrs.find(u => u.utr === utrClean);
+  if (existing)
+    return res.status(409).json({ success: false, error: `This UTR (${utrClean}) is already used for order ${existing.orderId}. Each payment has a unique UTR.` });
+
+  // Also check orders.json for old data
   const orders = readJSON(ordersPath);
-  if (orders.find(o => o.utr === utrClean && o.id !== orderId))
-    return res.status(409).json({ error: 'This UTR is already used for another order.' });
+  const dupOrder = orders.find(o => o.utr === utrClean && o.id !== orderId);
+  if (dupOrder)
+    return res.status(409).json({ success: false, error: `This UTR is already linked to another order.` });
+
+  // Find the order
   const order = orders.find(o => o.id === orderId);
-  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (!order) return res.status(404).json({ success: false, error: 'Order not found' });
+
+  // Save UTR to utrs.json database
+  utrs.push({ utr: utrClean, orderId, submittedAt: new Date().toISOString(), email: order.customer?.email || '' });
+  fs.writeFileSync(utrsPath, JSON.stringify(utrs, null, 2));
+
+  // Update order
   order.utr            = utrClean;
   order.status         = 'UTR Pending';
   order.utrSubmittedAt = new Date().toISOString();
   writeJSON(ordersPath, orders);
-  res.json({ success: true, message: 'UTR submitted successfully. Admin will activate your order after verifying payment.' });
+
+  res.json({ success: true, message: 'UTR submitted. Admin will verify and activate your order within 30 minutes.' });
 });
+
 
 // Keep old endpoint for compatibility
 router.post('/utr-verify/:orderId', authMiddleware, (req, res) => {

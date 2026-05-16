@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Pay via UPI — DomainStore</title>
+<meta name="description" content="Complete your payment via UPI."/>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
+<style>
+.pay-wrap{padding-top:80px;min-height:100vh;padding-bottom:50px;}
+.pay-center{max-width:520px;margin:0 auto;}
+
+/* Order info bar */
+.order-bar{background:rgba(108,61,232,.08);border:1px solid rgba(108,61,232,.2);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+
+/* Timer */
+.timer-wrap{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.timer-display{font-family:monospace;font-size:1.4rem;font-weight:900;color:#ef4444;}
+.timer-label{font-size:.8rem;color:#ef4444;font-weight:600;}
+.timer-wrap.urgent{animation:urgentPulse 1s infinite;}
+@keyframes urgentPulse{0%,100%{background:rgba(239,68,68,.08);}50%{background:rgba(239,68,68,.18);}}
+
+/* UPI Steps */
+.pay-steps{display:flex;gap:0;margin-bottom:20px;}
+.pay-step{flex:1;text-align:center;padding:10px 4px;cursor:pointer;border-bottom:2px solid var(--border);font-size:.8rem;font-weight:600;color:var(--text-muted);transition:all .2s;}
+.pay-step.active{border-color:var(--primary);color:var(--primary);}
+.pay-step-num{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--text-muted);font-size:.7rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-bottom:4px;}
+.pay-step.active .pay-step-num{background:var(--primary);color:#fff;}
+
+/* Panel */
+.pay-panel{display:none;}
+.pay-panel.active{display:block;}
+
+/* QR */
+.qr-wrap{background:#fff;border-radius:16px;padding:12px;width:180px;height:180px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+.upi-id-box{background:rgba(0,0,0,.2);border-radius:10px;padding:10px 16px;font-family:monospace;font-size:1rem;font-weight:800;color:var(--accent);letter-spacing:.5px;word-break:break-all;cursor:pointer;transition:background .2s;margin:10px 0;}
+.upi-id-box:hover{background:rgba(0,212,255,.1);}
+
+/* App buttons */
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+.app-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 6px;cursor:pointer;text-align:center;transition:all .2s;color:var(--text);font-size:.72rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;}
+.app-btn:hover,.app-btn:active{border-color:var(--primary);background:rgba(108,61,232,.12);}
+.app-btn-icon{font-size:1.6rem;line-height:1;}
+.app-btn.featured{border-color:rgba(108,61,232,.4);background:rgba(108,61,232,.06);}
+
+/* UTR Input */
+.utr-field{background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:1rem;font-family:monospace;letter-spacing:2px;text-transform:uppercase;outline:none;width:100%;transition:border-color .25s;box-sizing:border-box;}
+.utr-field:focus{border-color:var(--accent);}
+.utr-field.ok{border-color:#22c55e;}
+.utr-field.err{border-color:#ef4444;}
+.utr-hint{font-size:.75rem;margin-top:6px;padding:6px 10px;border-radius:8px;}
+.utr-hint.ok{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.25);}
+.utr-hint.err{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);}
+.utr-hint.warn{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25);}
+
+/* Success state */
+.success-box{text-align:center;padding:30px 20px;}
+.success-icon{width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,.15);border:2px solid #22c55e;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 16px;}
+.pending-timer{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:14px 16px;margin:16px 0;text-align:center;}
+.countdown-big{font-size:2rem;font-weight:900;font-family:monospace;color:#f59e0b;}
+
+@media(max-width:480px){
+  .pay-wrap{padding-top:70px;}
+  .qr-wrap{width:150px;height:150px;}
+  .app-grid{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .app-btn{padding:10px 4px;font-size:.68rem;}
+  .app-btn-icon{font-size:1.3rem;}
+  .timer-display{font-size:1.2rem;}
+  .order-bar{font-size:.78rem;}
+  .utr-field{font-size:.9rem;letter-spacing:1px;}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/domains.html">Domains</a></li>
+    <li><a href="/hosting.html">Hosting</a></li>
+  </ul>
+  <div class="nav-actions">
+    <span style="font-size:.8rem;color:var(--text-muted);">🔒 Secure Pay</span>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="pay-wrap">
+  <div class="container">
+    <div class="pay-center">
+
+      <!-- Order Info Bar -->
+      <div class="order-bar">
+        <div>
+          <div style="font-size:.72rem;color:var(--text-muted);">Order ID</div>
+          <div style="font-weight:700;font-family:monospace;color:var(--accent);font-size:.88rem;" id="displayOrderId">Loading...</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:.72rem;color:var(--text-muted);">Amount to Pay</div>
+          <div style="font-weight:900;font-size:1.2rem;color:var(--primary);" id="displayAmount">₹0</div>
+        </div>
+      </div>
+
+      <!-- Payment Timer -->
+      <div class="timer-wrap" id="timerWrap">
+        <div>
+          <div class="timer-label">⏱️ Time remaining to pay:</div>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-top:2px;">Session will expire after timer</div>
+        </div>
+        <div class="timer-display" id="timerDisplay">10:00</div>
+      </div>
+
+      <!-- Steps -->
+      <div class="pay-steps">
+        <div class="pay-step active" id="stepTab1" onclick="goStep(1)">
+          <div><div class="pay-step-num">1</div></div>
+          <div>Pay via UPI</div>
+        </div>
+        <div class="pay-step" id="stepTab2" onclick="goStep(2)">
+          <div><div class="pay-step-num">2</div></div>
+          <div>Enter UTR</div>
+        </div>
+        <div class="pay-step" id="stepTab3">
+          <div><div class="pay-step-num">3</div></div>
+          <div>Pending</div>
+        </div>
+      </div>
+
+      <!-- PANEL 1: Pay via UPI -->
+      <div class="pay-panel active" id="panel1">
+        <div class="card">
+          <div style="text-align:center;margin-bottom:14px;">
+            <div style="font-weight:700;font-size:1rem;margin-bottom:3px;">Scan QR Code</div>
+            <div style="font-size:.78rem;color:var(--text-muted);">Open any UPI app and scan to pay</div>
+          </div>
+
+          <!-- QR -->
+          <div class="qr-wrap" id="qrArea">
+            <span style="font-size:2rem;">⏳</span>
+          </div>
+
+          <!-- UPI ID -->
+          <div style="text-align:center;">
+            <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:4px;">OR pay to UPI ID (tap to copy):</div>
+            <div class="upi-id-box" id="upiIdDisplay" onclick="copyUpiId()">Loading...</div>
+            <div style="font-size:.68rem;color:var(--text-muted);">👆 Tap to copy</div>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;"/>
+
+          <!-- App Buttons -->
+          <div style="font-size:.8rem;font-weight:700;margin-bottom:8px;text-align:center;">📱 Open Your UPI App Directly:</div>
+          <div class="app-grid" id="appGrid"><!-- JS fills --></div>
+
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:.95rem;margin-top:10px;" onclick="goStep(2)">
+            ✅ I've Paid — Enter UTR →
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL 2: Enter UTR -->
+      <div class="pay-panel" id="panel2">
+        <div class="card">
+          <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">✅ Enter UTR / Transaction Reference</div>
+          <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px;">Find the UTR/Reference number in your UPI app's payment receipt or transaction history. It is usually 12 digits.</div>
+
+          <!-- Example image hint -->
+          <div style="background:rgba(108,61,232,.06);border:1px solid rgba(108,61,232,.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.78rem;color:var(--text-muted);">
+            💡 <strong>Where to find UTR?</strong> Open GPay/PhonePe → Transaction History → Tap on this payment → Copy "Transaction/UTR ID"
+          </div>
+
+          <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:6px;">UTR / Reference Number *</label>
+          <input type="text" id="utrInput" class="utr-field" placeholder="427891XXXXXX" maxlength="25" inputmode="text" autocapitalize="characters" oninput="liveUtrCheck(this)"/>
+          <div class="utr-hint" id="utrHint" style="display:none;"></div>
+
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="goStep(1)" style="flex:0 0 auto;">← Back</button>
+            <button class="btn btn-primary" id="submitUtrBtn" style="flex:1;justify-content:center;padding:12px;font-size:.95rem;" onclick="submitUtr()">
+              ✅ Confirm Payment
+            </button>
+          </div>
+
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:.78rem;color:#f59e0b;">
+            ⚠️ Enter the exact UTR from your UPI app. Wrong or fake UTR will be rejected by admin.
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: Pending / Success -->
+      <div class="pay-panel" id="panel3">
+        <div class="card">
+          <div class="success-box">
+            <div class="success-icon">⏳</div>
+            <h2 style="font-size:1.2rem;margin-bottom:8px;">Payment Verification Pending</h2>
+            <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:0;">Your UTR has been received. Admin is verifying payment in bank account.</p>
+
+            <!-- Countdown 10 min -->
+            <div class="pending-timer" id="pendingTimerBox">
+              <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px;">Estimated activation time:</div>
+              <div class="countdown-big" id="pendingCountdown">10:00</div>
+              <div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;">mins remaining</div>
+            </div>
+
+            <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:12px 16px;text-align:left;margin:14px 0;">
+              <div style="font-size:.82rem;font-weight:700;color:#22c55e;margin-bottom:6px;">✅ What happens next?</div>
+              <div style="font-size:.78rem;color:var(--text-muted);line-height:1.7;">
+                1. Admin checks UTR <strong id="confirmedUtr" style="color:var(--accent);"></strong> in bank<br/>
+                2. Payment confirmed → Domain/Hosting activated<br/>
+                3. You'll receive email confirmation
+              </div>
+            </div>
+
+            <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:16px;">
+              Order ID: <strong id="finalOrderId" style="color:var(--accent);font-family:monospace;"></strong>
+            </div>
+
+            <a href="/" class="btn btn-outline" style="text-decoration:none;justify-content:center;width:100%;margin-bottom:10px;">🏠 Back to Home</a>
+            <div style="font-size:.7rem;color:var(--text-muted);">Keep this order ID safe for support queries</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/main.js"></script>
+<script src="/js/upi-payment.js"></script>
+</body>
+</html>
