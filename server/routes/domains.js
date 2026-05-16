@@ -177,36 +177,79 @@ async function checkDomainAvailability(domain, tldData) {
   return { available: false, message: `❌ ${domain} is already registered.`, price: null, premium: false, source: 'Multiple sources' };
 }
 
-// ── GET /api/domains/check?name=example ──────────────────────
+// ── GET /api/domains/check?name=example(.com optional) ───────
 router.get('/check', async (req, res) => {
   const { name } = req.query;
   if (!name) return res.status(400).json({ error: 'name required' });
 
-  const clean = name.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
-  if (!clean) return res.status(400).json({ error: 'Invalid domain name' });
-
-  const data = read();
+  const data    = read();
   const tldData = data.tlds;
 
-  // Run availability checks for all TLDs in parallel
+  // ── Smart parse: user may have typed "mybiz.com" or just "mybiz"
+  const inputLower = name.toLowerCase().trim();
+  const knownExts  = tldData.map(t => t.extension); // ['.com', '.in', ...]
+
+  let baseName   = null;
+  let forcedExts = null; // if user typed extension, search only that
+
+  // Check if input ends with any known extension
+  for (const ext of knownExts) {
+    if (inputLower.endsWith(ext) && inputLower.length > ext.length) {
+      baseName   = inputLower.slice(0, -ext.length);
+      forcedExts = [ext];
+      break;
+    }
+  }
+
+  // If input has a dot but not a known ext, try to extract it anyway
+  if (!baseName && inputLower.includes('.')) {
+    const parts = inputLower.split('.');
+    baseName   = parts[0];
+    const ext  = '.' + parts.slice(1).join('.');
+    forcedExts = [ext]; // search this specific ext even if unknown
+  }
+
+  // No extension found — clean base name, search all TLDs
+  if (!baseName) {
+    baseName   = inputLower;
+    forcedExts = null;
+  }
+
+  // Clean base name (letters, digits, hyphen only)
+  const clean = baseName.replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
+  if (!clean || clean.length < 2) return res.status(400).json({ error: 'Domain name too short or invalid' });
+
+  // Determine which TLDs to search
+  const tldsToSearch = forcedExts
+    ? tldData.filter(t => forcedExts.includes(t.extension))
+            .concat(forcedExts.filter(e => !tldData.find(t => t.extension === e))
+              .map(e => ({ extension: e, price: null, renewPrice: null, popular: false })))
+    : tldData;
+
+  // Run availability checks in parallel
   const results = await Promise.all(
-    tldData.map(async (tld) => {
+    tldsToSearch.map(async (tld) => {
       const fullDomain = clean + tld.extension;
       const check = await checkDomainAvailability(fullDomain, tldData);
       return {
-        domain: fullDomain,
-        extension: tld.extension,
-        price: check.price ?? tld.price,
+        domain:     fullDomain,
+        extension:  tld.extension,
+        price:      check.price ?? tld.price,
         renewPrice: tld.renewPrice,
-        popular: tld.popular,
-        available: check.available,
-        premium: check.premium || false,
-        source: check.source
+        popular:    tld.popular,
+        available:  check.available,
+        premium:    check.premium || false,
+        source:     check.source
       };
     })
   );
 
-  res.json({ name: clean, results });
+  res.json({ name: clean, forcedExt: forcedExts?.[0] || null, results });
+});
+
+// ── Public: GET /api/domains/tlds-public (no auth) ───────────
+router.get('/tlds-public', (req, res) => {
+  res.json(read().tlds);
 });
 
 // ── Admin: GET /api/domains/tlds ──────────────────────────────

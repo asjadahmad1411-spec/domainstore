@@ -1,69 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Domain Manager — Admin | DomainStore</title>
-<link rel="stylesheet" href="/css/admin.css"/>
-<link rel="stylesheet" href="/css/responsive.css"/></head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Domain Pricing — Admin</title>
+<link rel="stylesheet" href="/css/main.css"/>
+<link rel="stylesheet" href="/css/dashboard.css"/>
+<style>
+.tld-table { width:100%; border-collapse:collapse; }
+.tld-table th { padding:10px 14px; text-align:left; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); border-bottom:1px solid var(--dash-border); }
+.tld-table td { padding:10px 14px; font-size:.88rem; border-bottom:1px solid var(--dash-border); vertical-align:middle; }
+.tld-table tr:hover td { background:rgba(108,61,232,.04); }
+.price-input { background:var(--dash-bg2); border:1px solid var(--dash-border); border-radius:8px; padding:7px 10px; color:var(--text); font-size:.88rem; font-family:monospace; width:90px; outline:none; transition:border .2s; }
+.price-input:focus { border-color:var(--primary); }
+.ext-badge { display:inline-block; background:rgba(108,61,232,.15); color:#a78bfa; border:1px solid rgba(108,61,232,.3); border-radius:20px; padding:3px 10px; font-size:.85rem; font-weight:700; font-family:monospace; }
+.pop-toggle { cursor:pointer; user-select:none; }
+.save-row { display:inline-flex; gap:6px; }
+.quick-set { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+.quick-btn { background:rgba(108,61,232,.1); border:1px solid rgba(108,61,232,.25); border-radius:8px; padding:6px 12px; font-size:.78rem; font-weight:600; cursor:pointer; color:var(--text); transition:all .2s; }
+.quick-btn:hover { background:rgba(108,61,232,.2); }
+.add-form { display:grid; grid-template-columns:1fr 1fr 1fr auto auto; gap:10px; align-items:end; }
+@media(max-width:640px) { .add-form { grid-template-columns:1fr 1fr; } }
+.stat-num { font-size:1.4rem; font-weight:900; }
+</style>
+</head>
 <body>
-<button class="sidebar-toggle" id="sidebarToggle">☰</button>
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Main</div>
-    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
-    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
-    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
-    <div class="nav-section">Management</div>
-    <a href="/admin/domains.html" class="nav-item active"><span class="icon">🌐</span> Domain Manager</a>
-    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
-    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
-    <div class="nav-section">Settings</div>
-    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎟️</span> Promo Codes</a>
-    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
-  </nav>
-  <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
-</div>
+<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
+<div class="dash-overlay" id="dashOverlay"></div>
 
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-left"><h2>Domain Manager</h2><p>Manage TLD extensions and pricing</p></div>
-    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
+<aside class="dash-sidebar" id="dashSidebar">
+  <div class="dash-brand"><a href="/admin/" class="dash-logo">🌐 DomainStore</a><span class="dash-badge">Admin</span></div>
+  <div class="dash-user">
+    <div class="dash-avatar" id="dashAvatar">A</div>
+    <div><div class="dash-username" id="dashUserName">Admin</div><div class="dash-useremail" id="dashUserEmail"></div></div>
   </div>
-  <div class="content">
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">TLD Extensions</span>
-        <button class="btn btn-primary" onclick="openAddTld()">+ Add TLD</button>
+  <nav class="dash-nav">
+    <div class="dash-nav-section">Main</div>
+    <a href="/admin/" class="dash-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> Orders</a>
+    <a href="/admin/customers.html" class="dash-nav-item"><span class="nav-icon">👥</span> Customers</a>
+    <div class="dash-nav-section">Products</div>
+    <a href="/admin/domains.html" class="dash-nav-item active"><span class="nav-icon">🌐</span> Domain Pricing</a>
+    <a href="/admin/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/promos.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Promo Codes</a>
+    <div class="dash-nav-section">Config</div>
+    <a href="/admin/settings.html" class="dash-nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="/admin/utr.html" class="dash-nav-item"><span class="nav-icon">🏦</span> UTR Verify</a>
+  </nav>
+  <div class="dash-footer">
+    <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> View Store</a>
+    <button onclick="adminLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
+  </div>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-topbar">
+    <div class="dash-topbar-title">
+      <h2>🌐 Domain Pricing Manager</h2>
+      <p>Set your own selling price for each domain extension</p>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- Info Banner -->
+    <div style="background:linear-gradient(135deg,rgba(108,61,232,.12),rgba(0,212,255,.06));border:1px solid rgba(108,61,232,.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <span style="font-size:2rem;">💡</span>
+      <div>
+        <div style="font-weight:700;margin-bottom:3px;">Set Any Price You Want</div>
+        <div style="font-size:.82rem;color:var(--text-muted);">
+          Market price doesn't matter — customer pays only what <strong>you set here</strong>. 
+          E.g. set <strong>.com to ₹99</strong> and customer pays only ₹99.
+        </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Extension</th><th>Register Price</th><th>Renew Price</th><th>Popular</th><th>Actions</th></tr></thead>
-          <tbody id="tldBody"></tbody>
+    </div>
+
+    <!-- Quick Price Setter -->
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="panel-header"><span class="panel-title">⚡ Quick Set All Prices</span></div>
+      <div class="panel-body">
+        <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:10px;">Set ALL extensions to same price at once:</div>
+        <div class="quick-set">
+          <button class="quick-btn" onclick="setAllPrices(49)">₹49 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(99)">₹99 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(199)">₹199 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(299)">₹299 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(499)">₹499 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(699)">₹699 for all</button>
+          <button class="quick-btn" onclick="setAllPrices(999)">₹999 for all</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveAllPrices()" id="saveAllBtn">💾 Save All Prices</button>
+        <span id="saveAllMsg" style="font-size:.8rem;margin-left:10px;"></span>
+      </div>
+    </div>
+
+    <!-- TLD Table -->
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="panel-header">
+        <span class="panel-title">📋 Domain Extensions & Pricing</span>
+        <span id="tldCount" style="font-size:.8rem;color:var(--text-muted);"></span>
+      </div>
+      <div class="panel-body" style="overflow-x:auto;padding:0;">
+        <table class="tld-table">
+          <thead>
+            <tr>
+              <th>Extension</th>
+              <th>Your Price (₹/yr)</th>
+              <th>Renew Price (₹/yr)</th>
+              <th>Popular</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tldBody">
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="tldModal">
-  <div class="modal">
-    <div class="modal-header"><span class="modal-title" id="tldModalTitle">Add TLD</span><button class="modal-close" onclick="closeModal('tldModal')">✕</button></div>
-    <div class="form-group"><label class="form-label">Extension (e.g. .com)</label><input type="text" class="form-control" id="tldExt" placeholder=".xyz"/></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Register Price (₹)</label><input type="number" class="form-control" id="tldPrice" placeholder="799"/></div>
-      <div class="form-group"><label class="form-label">Renew Price (₹)</label><input type="number" class="form-control" id="tldRenew" placeholder="999"/></div>
+    <!-- Add New TLD -->
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">➕ Add New Extension</span></div>
+      <div class="panel-body">
+        <div class="add-form">
+          <div>
+            <label class="form-label">Extension (e.g. .xyz)</label>
+            <input type="text" id="newExt" class="form-control" placeholder=".xyz" style="font-family:monospace;" oninput="if(!this.value.startsWith('.'))this.value='.'+this.value"/>
+          </div>
+          <div>
+            <label class="form-label">Your Price (₹)</label>
+            <input type="number" id="newPrice" class="form-control" placeholder="99" min="1"/>
+          </div>
+          <div>
+            <label class="form-label">Renew Price (₹)</label>
+            <input type="number" id="newRenew" class="form-control" placeholder="199" min="1"/>
+          </div>
+          <div>
+            <label class="form-label">Popular?</label>
+            <select id="newPopular" class="form-control"><option value="false">No</option><option value="true">Yes</option></select>
+          </div>
+          <div style="padding-top:28px;">
+            <button class="btn btn-primary" onclick="addTld()">➕ Add</button>
+          </div>
+        </div>
+        <div id="addMsg" style="font-size:.82rem;margin-top:10px;"></div>
+      </div>
     </div>
-    <label class="checkbox-row"><input type="checkbox" id="tldPopular"/> Mark as Popular</label>
-    <div style="display:flex;gap:10px;margin-top:24px;">
-      <button class="btn btn-primary" onclick="saveTld()" style="flex:1;justify-content:center;">Save TLD</button>
-      <button class="btn btn-outline" onclick="closeModal('tldModal')">Cancel</button>
-    </div>
+
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="/js/admin/auth.js"></script>
-<script src="/js/admin/domains.js"></script>
+<script src="/js/dashboard.js"></script>
+<script>
+requireDsAuth('admin');
+initDashSidebar();
+
+const API_BASE = '/api/domains/tlds';
+let tlds = [];
+
+function getToken() { return localStorage.getItem('ds_admin_token') || localStorage.getItem('ds_user_token') || ''; }
+function authHdr() { return { 'Content-Type':'application/json', 'Authorization':'Bearer '+getToken() }; }
+
+async function adminLogout() {
+  localStorage.removeItem('ds_admin_token');
+  localStorage.removeItem('ds_admin_user');
+  location.href = '/admin/login.html';
+}
+
+async function loadTlds() {
+  try {
+    const res = await fetch(API_BASE, { headers: authHdr() });
+    tlds = await res.json();
+    renderTable();
+    document.getElementById('tldCount').textContent = `(${tlds.length} extensions)`;
+  } catch(e) { dsToast('Failed to load TLDs', 'error'); }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tldBody');
+  if (!tlds.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No extensions found. Add one below.</td></tr>'; return; }
+  tbody.innerHTML = tlds.map((t, i) => `
+    <tr id="tldRow-${i}">
+      <td><span class="ext-badge">${t.extension}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:var(--text-muted);font-size:.85rem;">₹</span>
+          <input type="number" class="price-input" id="price-${i}" value="${t.price}" min="1" placeholder="99"
+            onchange="markDirty(${i})" style="border-color:var(--primary);"/>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:var(--text-muted);font-size:.85rem;">₹</span>
+          <input type="number" class="price-input" id="renew-${i}" value="${t.renewPrice}" min="1" placeholder="299"
+            onchange="markDirty(${i})"/>
+        </div>
+      </td>
+      <td>
+        <label class="pop-toggle" onclick="togglePopular(${i})" title="Toggle popular">
+          <span id="pop-${i}" style="font-size:1.3rem;">${t.popular ? '⭐' : '☆'}</span>
+        </label>
+      </td>
+      <td style="text-align:right;">
+        <div class="save-row">
+          <button class="btn btn-primary btn-sm" id="saveBtn-${i}" onclick="saveTld(${i})">💾 Save</button>
+          <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="deleteTld('${t.extension}',${i})">🗑️</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function markDirty(i) {
+  const btn = document.getElementById(`saveBtn-${i}`);
+  if (btn) btn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+}
+
+function togglePopular(i) {
+  tlds[i].popular = !tlds[i].popular;
+  const el = document.getElementById(`pop-${i}`);
+  if (el) el.textContent = tlds[i].popular ? '⭐' : '☆';
+  markDirty(i);
+}
+
+async function saveTld(i) {
+  const ext      = tlds[i].extension;
+  const price    = parseInt(document.getElementById(`price-${i}`)?.value || 0);
+  const renew    = parseInt(document.getElementById(`renew-${i}`)?.value || 0);
+  const popular  = tlds[i].popular;
+  const btn      = document.getElementById(`saveBtn-${i}`);
+
+  if (!price || price < 1) { dsToast('Price must be at least ₹1', 'error'); return; }
+  btn.textContent = '⏳'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/${encodeURIComponent(ext)}`, {
+      method: 'PUT',
+      headers: authHdr(),
+      body: JSON.stringify({ price, renewPrice: renew || price, popular })
+    }).then(r => r.json());
+    if (res.error) throw new Error(res.error);
+    tlds[i] = { ...tlds[i], price, renewPrice: renew, popular };
+    btn.textContent = '✅ Saved'; btn.disabled = false;
+    btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    setTimeout(() => { btn.textContent = '💾 Save'; btn.style.background = ''; }, 2000);
+    dsToast(`${ext} → ₹${price}/yr saved!`, 'success');
+  } catch(e) {
+    dsToast(e.message || 'Save failed', 'error');
+    btn.textContent = '💾 Save'; btn.disabled = false; btn.style.background = '';
+  }
+}
+
+function setAllPrices(price) {
+  tlds.forEach((_, i) => {
+    const inp = document.getElementById(`price-${i}`);
+    if (inp) { inp.value = price; markDirty(i); }
+  });
+  dsToast(`All prices set to ₹${price} — Click "Save All Prices" to apply`, 'success');
+}
+
+async function saveAllPrices() {
+  const btn = document.getElementById('saveAllBtn');
+  const msg = document.getElementById('saveAllMsg');
+  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+  let ok = 0, fail = 0;
+  for (let i = 0; i < tlds.length; i++) {
+    const price = parseInt(document.getElementById(`price-${i}`)?.value || 0);
+    const renew = parseInt(document.getElementById(`renew-${i}`)?.value || 0);
+    try {
+      await fetch(`${API_BASE}/${encodeURIComponent(tlds[i].extension)}`, {
+        method: 'PUT', headers: authHdr(),
+        body: JSON.stringify({ price, renewPrice: renew || price, popular: tlds[i].popular })
+      });
+      tlds[i].price = price; tlds[i].renewPrice = renew || price;
+      ok++;
+    } catch(e) { fail++; }
+  }
+  btn.textContent = '💾 Save All Prices'; btn.disabled = false;
+  msg.style.color = fail > 0 ? '#ef4444' : '#22c55e';
+  msg.textContent = `✅ ${ok} saved${fail > 0 ? `, ❌ ${fail} failed` : ''}`;
+  dsToast(`All prices updated! ${ok} extensions saved.`, 'success');
+  setTimeout(() => msg.textContent = '', 4000);
+}
+
+async function deleteTld(ext, i) {
+  if (!confirm(`Delete ${ext}? It won't appear in domain search anymore.`)) return;
+  try {
+    await fetch(`${API_BASE}/${encodeURIComponent(ext)}`, { method: 'DELETE', headers: authHdr() });
+    tlds.splice(i, 1);
+    renderTable();
+    dsToast(`${ext} deleted`, 'success');
+  } catch(e) { dsToast('Delete failed', 'error'); }
+}
+
+async function addTld() {
+  const ext    = (document.getElementById('newExt')?.value || '').trim().toLowerCase();
+  const price  = parseInt(document.getElementById('newPrice')?.value || 0);
+  const renew  = parseInt(document.getElementById('newRenew')?.value || price);
+  const pop    = document.getElementById('newPopular')?.value === 'true';
+  const msg    = document.getElementById('addMsg');
+
+  if (!ext.startsWith('.') || ext.length < 2) { msg.style.color='#ef4444'; msg.textContent='❌ Extension must start with . (e.g. .xyz)'; return; }
+  if (!price || price < 1) { msg.style.color='#ef4444'; msg.textContent='❌ Price must be at least ₹1'; return; }
+
+  try {
+    const res = await fetch(API_BASE, {
+      method: 'POST', headers: authHdr(),
+      body: JSON.stringify({ extension: ext, price, renewPrice: renew, popular: pop })
+    }).then(r => r.json());
+    if (res.error) throw new Error(res.error);
+    tlds.push(res);
+    renderTable();
+    document.getElementById('newExt').value = '';
+    document.getElementById('newPrice').value = '';
+    document.getElementById('newRenew').value = '';
+    msg.style.color = '#22c55e';
+    msg.textContent = `✅ ${ext} added at ₹${price}/yr`;
+    dsToast(`${ext} added successfully!`, 'success');
+    setTimeout(() => msg.textContent = '', 3000);
+  } catch(e) { msg.style.color='#ef4444'; msg.textContent='❌ ' + (e.message || 'Failed to add'); }
+}
+
+loadTlds();
+</script>
 </body>
 </html>

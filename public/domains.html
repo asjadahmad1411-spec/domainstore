@@ -29,11 +29,17 @@
       <p style="margin-top:12px;font-size:1.05rem;">Search from millions of available domains across 10+ TLDs</p>
     </div>
 
-    <div class="search-box" style="max-width:700px;margin:0 auto 48px;">
+    <div class="search-box" style="max-width:700px;margin:0 auto 12px;">
       <span>🔍</span>
-      <input type="text" id="searchInput" placeholder="Enter domain name (e.g. mybusiness)" onkeydown="if(event.key==='Enter')runSearch()"/>
+      <input type="text" id="searchInput"
+        placeholder="Type domain name — e.g. mybiz or mybiz.com"
+        oninput="onSearchInput(this)"
+        onkeydown="if(event.key==='Enter')runSearch()"
+        autocomplete="off" spellcheck="false"/>
       <button class="btn btn-primary" onclick="runSearch()">Check Availability</button>
     </div>
+    <div id="searchHint" style="text-align:center;font-size:.8rem;margin-bottom:36px;min-height:20px;transition:all .2s;"></div>
+    <style>@keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}</style>
 
     <div id="searchResults"></div>
 
