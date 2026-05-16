@@ -1,13 +1,13 @@
-// upi-payment.js — Dedicated UPI Payment Page Logic
+// upi-payment.js — UPI Payment Page + Real-time Order Status Polling
 let siteSettings = {};
-let payTimer = null;
+let payTimer     = null;
 let pendingTimer = null;
+let pollTimer    = null;
 let currentOrderId = null;
-let currentTotal = 0;
+let currentTotal   = 0;
 
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
-  // Get order from URL or sessionStorage
   const params = new URLSearchParams(location.search);
   currentOrderId = params.get('order');
   const pending  = (() => { try { return JSON.parse(sessionStorage.getItem('pendingOrder') || 'null'); } catch { return null; } })();
@@ -17,14 +17,11 @@ async function init() {
 
   currentTotal = pending?.total || 0;
 
-  // Show order info
   const oid = document.getElementById('displayOrderId');
   if (oid) oid.textContent = currentOrderId;
-
   const amt = document.getElementById('displayAmount');
   if (amt) amt.textContent = '₹' + (currentTotal || 0).toLocaleString('en-IN');
 
-  // Load settings for UPI ID
   try {
     siteSettings = await fetch('/api/admin/settings').then(r => r.json());
   } catch(e) {
@@ -41,56 +38,50 @@ function buildUpiUI() {
   const upiName = siteSettings.upiName || 'DomainStore';
   const amount  = currentTotal || 0;
 
-  // UPI ID display
   const uid = document.getElementById('upiIdDisplay');
   if (uid) uid.textContent = upiId;
 
-  // QR Code (with amount)
   const qr = document.getElementById('qrArea');
   if (qr) {
-    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('DomainStore-' + currentOrderId)}`;
+    const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('DS-' + currentOrderId)}`;
     const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(upiLink)}&color=6c3de8&bgcolor=ffffff&margin=2`;
     qr.innerHTML  = `<img src="${qrUrl}" alt="UPI QR Code" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.parentElement.innerHTML='<span style=font-size:2rem>📱</span>'"/>`;
   }
 
-  // App Buttons
   const grid = document.getElementById('appGrid');
   if (!grid) return;
   const enc = encodeURIComponent;
-  const q   = `pa=${enc(upiId)}&pn=${enc(upiName)}&am=${amount}&cu=INR&tn=${enc('DomainStore-' + currentOrderId)}`;
+  const q   = `pa=${enc(upiId)}&pn=${enc(upiName)}&am=${amount}&cu=INR&tn=${enc('DS-' + currentOrderId)}`;
 
   const apps = [
-    { icon: '🟢', label: 'Google Pay', url: `tez://upi/pay?${q}`,    featured: true  },
-    { icon: '💜', label: 'PhonePe',    url: `phonepe://pay?${q}`,     featured: true  },
-    { icon: '🔵', label: 'Paytm',      url: `paytmmp://pay?${q}`,     featured: false },
-    { icon: '🟡', label: 'BHIM',       url: `upi://pay?${q}`,          featured: false },
-    { icon: '🏦', label: 'Any UPI',    url: `upi://pay?${q}`,          featured: false },
-    { icon: '📋', label: 'Copy ID',    url: null, copy: upiId,         featured: false },
+    { icon: '🟢', label: 'Google Pay', url: `tez://upi/pay?${q}`,   featured: true },
+    { icon: '💜', label: 'PhonePe',    url: `phonepe://pay?${q}`,    featured: true },
+    { icon: '🔵', label: 'Paytm',      url: `paytmmp://pay?${q}`,    featured: false },
+    { icon: '🟡', label: 'BHIM',       url: `upi://pay?${q}`,        featured: false },
+    { icon: '🏦', label: 'Any UPI',    url: `upi://pay?${q}`,        featured: false },
+    { icon: '📋', label: 'Copy ID',    url: null, copy: upiId,       featured: false },
   ];
 
   grid.innerHTML = apps.map(a => `
     <button class="app-btn${a.featured?' featured':''}" onclick="${a.copy
-      ? `copyText('${a.copy}')`
-      : `openApp('${a.url}')`}">
+      ? `copyUpiText('${a.copy}')`
+      : `openUpiApp('${a.url}')`}">
       <span class="app-btn-icon">${a.icon}</span>
       <span>${a.label}</span>
     </button>`).join('');
 }
 
-function openApp(url) {
+function openUpiApp(url) {
   window.location.href = url;
-  setTimeout(() => showToast('If app did not open, scan the QR code above.', 'error'), 1800);
+  setTimeout(() => showToast('If app did not open, scan QR or copy UPI ID.', 'error'), 1800);
 }
 
-function copyUpiId() {
-  copyText(siteSettings.upiId || 'domainstore@upi');
-}
-
-function copyText(text) {
+function copyUpiId() { copyUpiText(siteSettings.upiId || 'domainstore@upi'); }
+function copyUpiText(text) {
   navigator.clipboard.writeText(text).then(() => showToast('📋 Copied: ' + text, 'success'));
 }
 
-// ── Payment Timer (10 min) ────────────────────────────────────
+// ── Payment Session Timer (10 min) ────────────────────────────
 function startPayTimer() {
   let secs = 10 * 60;
   const disp = document.getElementById('timerDisplay');
@@ -105,7 +96,7 @@ function startPayTimer() {
     if (secs <= 0) {
       clearInterval(payTimer);
       if (disp) disp.textContent = '00:00';
-      showToast('⏱️ Session expired! Please go back and try again.', 'error');
+      showToast('⏱️ Session expired! Please restart checkout.', 'error');
     }
   }, 1000);
 }
@@ -121,44 +112,33 @@ function goStep(step) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── Live UTR Validation ───────────────────────────────────────
+// ── UTR Live Validation ───────────────────────────────────────
 function liveUtrCheck(input) {
   const val  = (input.value || '').trim().toUpperCase();
   const hint = document.getElementById('utrHint');
   input.value = val;
-
-  if (!val) {
-    input.className = 'utr-field';
-    hint.style.display = 'none'; return;
-  }
-
+  if (!val) { input.className = 'utr-field'; hint.style.display = 'none'; return; }
   const result = validateUtr(val);
   hint.style.display = 'block';
-  hint.className = 'utr-hint ' + result.level;
-  hint.textContent = result.msg;
-  input.className = 'utr-field ' + (result.ok ? 'ok' : result.level === 'invalid' ? 'err' : '');
+  hint.className      = 'utr-hint ' + result.level;
+  hint.textContent    = result.msg;
+  input.className     = 'utr-field ' + (result.ok ? 'ok' : result.level === 'invalid' ? 'err' : '');
 }
 
 function validateUtr(utr) {
   const u = (utr || '').trim().toUpperCase();
-
   if (!u) return { ok: false, msg: '', level: '' };
-  if (u.length < 8) return { ok: false, msg: `⏳ Keep typing... (${u.length}/12 min)`, level: 'warn' };
+  if (u.length < 8) return { ok: false, msg: `⏳ Keep typing... (${u.length} chars)`, level: 'warn' };
   if (!/^[A-Z0-9]+$/.test(u)) return { ok: false, msg: '❌ Only letters and numbers allowed', level: 'invalid' };
-
-  // Reject obvious fakes
-  if (/^(.)\1{7,}$/.test(u)) return { ok: false, msg: '❌ Invalid — repeated digits not a valid UTR', level: 'invalid' };
-  const seq = ['12345678901', '23456789012', '98765432109', '00000000000', '11111111111', '99999999999'];
-  if (seq.some(s => u.includes(s))) return { ok: false, msg: '❌ Sequential numbers are not valid UTR', level: 'invalid' };
-  if (['123456789012','000000000000','111111111111','999999999999','123412341234'].includes(u))
-    return { ok: false, msg: '❌ This UTR number is not valid', level: 'invalid' };
-
-  // Valid formats
-  if (/^\d{12}$/.test(u)) return { ok: true, msg: `✅ Valid UPI/IMPS reference: ${u}`, level: 'ok' };
-  if (/^[A-Z]{4}\d{8,14}$/.test(u)) return { ok: true, msg: `✅ Valid NEFT UTR: ${u}`, level: 'ok' };
-  if (u.length >= 12 && u.length <= 22) return { ok: true, msg: `✅ Valid reference: ${u}`, level: 'ok' };
-
-  return { ok: false, msg: '❌ UTR format not recognized. Check your UPI app receipt.', level: 'invalid' };
+  if (/^(.)\1{7,}$/.test(u)) return { ok: false, msg: '❌ Invalid UTR — repeated digits', level: 'invalid' };
+  const badSeq = ['12345678901','23456789012','98765432109'];
+  if (badSeq.some(s => u.includes(s))) return { ok: false, msg: '❌ Sequential numbers not valid', level: 'invalid' };
+  if (['123456789012','000000000000','111111111111','999999999999'].includes(u))
+    return { ok: false, msg: '❌ This UTR is not valid', level: 'invalid' };
+  if (/^\d{12}$/.test(u)) return { ok: true, msg: `✅ Valid UPI reference (12-digit)`, level: 'ok' };
+  if (/^[A-Z]{4}\d{8,14}$/.test(u)) return { ok: true, msg: `✅ Valid NEFT/RTGS UTR`, level: 'ok' };
+  if (u.length >= 12 && u.length <= 22) return { ok: true, msg: `✅ Valid reference number`, level: 'ok' };
+  return { ok: false, msg: '❌ UTR format not recognized. Check your payment receipt.', level: 'invalid' };
 }
 
 // ── Submit UTR ────────────────────────────────────────────────
@@ -168,7 +148,7 @@ async function submitUtr() {
   const result = validateUtr(utrVal);
 
   if (!result.ok) {
-    if (hint) { hint.style.display = 'block'; hint.className = 'utr-hint err'; hint.textContent = result.msg || '❌ Please enter a valid UTR'; }
+    if (hint) { hint.style.display = 'block'; hint.className = 'utr-hint err'; hint.textContent = result.msg || '❌ Enter a valid UTR'; }
     document.getElementById('utrInput')?.classList.add('err');
     return;
   }
@@ -190,19 +170,18 @@ async function submitUtr() {
       return;
     }
 
-    // Success — show pending panel
     clearInterval(payTimer);
     const cu = document.getElementById('confirmedUtr'); if (cu) cu.textContent = utrVal;
     const fo = document.getElementById('finalOrderId'); if (fo) fo.textContent = currentOrderId;
 
-    // Save to sessionStorage for confirmation page
     sessionStorage.setItem('lastOrder', JSON.stringify({
       orderId: currentOrderId, utr: utrVal, total: currentTotal, status: 'UTR Pending'
     }));
 
     goStep(3);
     startPendingCountdown();
-    showToast('✅ UTR submitted! Awaiting admin verification.', 'success');
+    startOrderPolling(); // ← LIVE POLLING STARTS HERE
+    showToast('✅ UTR submitted! Waiting for admin verification.', 'success');
 
   } catch(e) {
     showToast('Network error. Please try again.', 'error');
@@ -210,7 +189,67 @@ async function submitUtr() {
   }
 }
 
-// ── Pending Countdown (10 min) ────────────────────────────────
+// ── LIVE ORDER POLLING — checks every 8 sec if admin activated ─
+function startOrderPolling() {
+  clearInterval(pollTimer);
+  let tries = 0;
+  pollTimer = setInterval(async () => {
+    tries++;
+    if (tries > 75) { clearInterval(pollTimer); return; } // stop after ~10 min
+    try {
+      const res = await fetch(`/api/orders/status/${currentOrderId}`).then(r => r.json());
+      if (res.status === 'Active') {
+        clearInterval(pollTimer);
+        clearInterval(pendingTimer);
+        showActivatedUI();
+      }
+    } catch(e) { /* silent */ }
+  }, 8000);
+}
+
+// ── Show SUCCESS when admin activates ────────────────────────
+function showActivatedUI() {
+  const panel = document.getElementById('panel3');
+  if (!panel) return;
+
+  // Burst animation + replace pending content with SUCCESS
+  panel.innerHTML = `
+    <div class="card">
+      <div style="text-align:center;padding:20px 10px;">
+        <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin:0 auto 20px;animation:popIn .6s cubic-bezier(.175,.885,.32,1.275);">✅</div>
+        <h2 style="font-size:1.4rem;margin-bottom:8px;color:#22c55e;">Payment Confirmed!</h2>
+        <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:20px;">Your domain/hosting has been activated successfully.</p>
+
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:16px;margin:16px 0;text-align:left;">
+          <div style="font-size:.8rem;color:#22c55e;font-weight:700;margin-bottom:8px;">🎉 What's Activated:</div>
+          <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">
+            ✅ Domain registered & active<br/>
+            ✅ Hosting plan activated<br/>
+            ✅ Login to dashboard to manage
+          </div>
+        </div>
+
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:20px;">
+          Order: <strong style="color:var(--accent);font-family:monospace;">${currentOrderId}</strong>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="/dashboard/" class="btn btn-primary" style="justify-content:center;text-decoration:none;padding:13px;">
+            🚀 Go to Dashboard
+          </a>
+          <a href="/" class="btn btn-outline" style="justify-content:center;text-decoration:none;">
+            🏠 Back to Store
+          </a>
+        </div>
+      </div>
+    </div>`;
+
+  // Confetti-style toast
+  showToast('🎉 Payment confirmed! Your service is now active!', 'success');
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+}
+
+// ── Pending Countdown (10 min display) ───────────────────────
 function startPendingCountdown() {
   let secs = 10 * 60;
   const disp = document.getElementById('pendingCountdown');
@@ -227,16 +266,10 @@ function startPendingCountdown() {
       if (box) {
         box.style.background = 'rgba(34,197,94,.07)';
         box.style.borderColor = 'rgba(34,197,94,.2)';
-        box.innerHTML = '<div style="color:#22c55e;font-size:.9rem;font-weight:700;">✅ Check your email for confirmation!</div>';
+        box.innerHTML = '<div style="color:#22c55e;font-size:.9rem;font-weight:700;">✅ Check your email for status!</div>';
       }
     }
   }, 1000);
 }
 
-// ── Hamburger ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  init();
-  const hb = document.getElementById('hamburger');
-  const nl = document.getElementById('navLinks');
-  if (hb && nl) hb.addEventListener('click', () => nl.classList.toggle('open'));
-});
+document.addEventListener('DOMContentLoaded', () => { init(); });

@@ -358,3 +358,9 @@ body.light-mode .search-box input:-webkit-autofill:focus {
   .mobile-menu-extra { display: block; }
   .mobile-menu-extra a { color: var(--text) !important; font-size: .9rem !important; }
 }
+
+/* ── HAMBURGER ACTIVE (X animation) ─────────────────────────── */
+.hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hamburger span { transition: transform .3s, opacity .3s; }

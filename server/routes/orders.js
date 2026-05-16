@@ -82,6 +82,14 @@ router.post('/', (req, res) => {
   res.json({ success: true, orderId: order.id, total });
 });
 
+// ── GET /api/orders/status/:id — PUBLIC (for live polling) ───
+// Returns only status field — no auth needed, no sensitive data
+router.get('/status/:id', (req, res) => {
+  const order = readOrders().find(o => o.id === req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  res.json({ orderId: order.id, status: order.status, updatedAt: order.updatedAt || order.createdAt });
+});
+
 // ── GET /api/orders — admin list ─────────────────────────────
 router.get('/', authMiddleware, (req, res) => {
   const orders = readOrders();

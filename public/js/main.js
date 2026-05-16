@@ -1,5 +1,9 @@
-// ── Cart utilities ──────────────────────────────────────────
-const getCart = () => JSON.parse(localStorage.getItem('ds_cart') || '[]');
+// ═══════════════════════════════════════════════════════════
+// main.js — DomainStore Global Script
+// ═══════════════════════════════════════════════════════════
+
+// ── Cart ──────────────────────────────────────────────────────
+const getCart  = () => JSON.parse(localStorage.getItem('ds_cart') || '[]');
 const saveCart = (c) => { localStorage.setItem('ds_cart', JSON.stringify(c)); updateCartBadge(); };
 const updateCartBadge = () => {
   const n = getCart().length;
@@ -8,87 +12,174 @@ const updateCartBadge = () => {
 
 function addToCart(item) {
   const cart = getCart();
-  const exists = cart.find(i => i.id === item.id);
-  if (exists) { showToast(`${item.name} is already in cart!`, 'error'); return; }
+  if (cart.find(i => i.id === item.id)) { showToast(`${item.name} already in cart!`, 'error'); return; }
   cart.push(item);
   saveCart(cart);
   showToast(`✅ ${item.name} added to cart!`, 'success');
 }
 
-// ── Toast ────────────────────────────────────────────────────
+// ── Toast ─────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  if (!t) return;
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
   t.textContent = msg;
   t.className = `toast ${type} show`;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// ── Nav hamburger (global, works on every page) ─────────────
-document.addEventListener('DOMContentLoaded', () => {
+// ── Theme (apply immediately before DOM ready) ────────────────
+(function() {
+  if (localStorage.getItem('ds_theme') === 'light') document.body.classList.add('light-mode');
+})();
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('ds_theme', isLight ? 'light' : 'dark');
+  document.querySelectorAll('#themeToggle').forEach(b => {
+    b.textContent = isLight ? '☀️' : '🌙';
+    b.title = isLight ? 'Switch Dark Mode' : 'Switch Light Mode';
+  });
+}
+
+// ── Preloader ─────────────────────────────────────────────────
+(function() {
+  document.documentElement.classList.add('page-loading');
+  if (!document.getElementById('preloader')) {
+    const pl = document.createElement('div');
+    pl.id = 'preloader';
+    pl.innerHTML = `<div class="preloader-logo">🌐 DomainStore</div>
+      <div class="preloader-bar"><div class="preloader-bar-fill"></div></div>
+      <div class="preloader-dots"><span></span><span></span><span></span></div>`;
+    document.addEventListener('DOMContentLoaded', () => document.body.insertBefore(pl, document.body.firstChild));
+  }
+  function hide() {
+    const pl = document.getElementById('preloader');
+    if (pl) pl.classList.add('hidden');
+    document.documentElement.classList.remove('page-loading');
+  }
+  if (document.readyState === 'complete') setTimeout(hide, 200);
+  else window.addEventListener('load', () => setTimeout(hide, 350));
+})();
+
+// ════════════════════════════════════════════════════════════
+// DOMContentLoaded — runs ONCE, handles everything
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+
   updateCartBadge();
 
-  const hb = document.getElementById('hamburger');
-  const nl = document.getElementById('navLinks');
-  if (hb && nl) {
-    hb.addEventListener('click', (e) => {
+  // ── Theme button state ──────────────────────────────────
+  const isLight = document.body.classList.contains('light-mode');
+  document.querySelectorAll('#themeToggle').forEach(b => {
+    b.textContent = isLight ? '☀️' : '🌙';
+    b.title = isLight ? 'Switch Dark Mode' : 'Switch Light Mode';
+  });
+
+  // ── Auth button (Login / Account name) ─────────────────
+  const token = localStorage.getItem('ds_user_token');
+  const user  = (() => { try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch { return null; } })();
+  document.querySelectorAll('#navAuthBtn, .mobile-login-link').forEach(el => {
+    if (token && user) {
+      const name = (user.name || 'Account').split(' ')[0];
+      el.textContent = '👤 ' + name;
+      el.href = '/dashboard/';
+    } else {
+      el.textContent = '👤 Login';
+      el.href = '/login.html';
+    }
+  });
+
+  // ── HAMBURGER MENU ── (SINGLE handler, no duplicates) ───
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('navLinks');
+
+  if (hamburger && navLinks) {
+    // Remove any cloned node listeners by replacing element
+    const newHb = hamburger.cloneNode(true);
+    hamburger.parentNode.replaceChild(newHb, hamburger);
+
+    newHb.addEventListener('click', function(e) {
+      e.preventDefault();
       e.stopPropagation();
-      const isOpen = nl.classList.toggle('open');
-      hb.setAttribute('aria-expanded', isOpen);
+      const open = navLinks.classList.toggle('open');
+      newHb.classList.toggle('active', open);
+      newHb.setAttribute('aria-expanded', open.toString());
+      document.body.style.overflow = open ? 'hidden' : '';
     });
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-      if (nl.classList.contains('open') && !nl.contains(e.target) && e.target !== hb && !hb.contains(e.target)) {
-        nl.classList.remove('open');
-        hb.setAttribute('aria-expanded', 'false');
+
+    // Close on outside tap/click
+    document.addEventListener('click', function(e) {
+      if (navLinks.classList.contains('open') &&
+          !navLinks.contains(e.target) &&
+          !newHb.contains(e.target)) {
+        navLinks.classList.remove('open');
+        newHb.classList.remove('active');
+        newHb.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
       }
     });
-    // Close on nav link click (mobile UX)
-    nl.querySelectorAll('a').forEach(a => {
+
+    // Close when a menu link is tapped
+    navLinks.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => {
-        nl.classList.remove('open');
-        hb.setAttribute('aria-expanded', 'false');
+        navLinks.classList.remove('open');
+        newHb.classList.remove('active');
+        newHb.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
       });
     });
   }
 
-  // Scroll fade-up
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  // ── Scroll fade-up ──────────────────────────────────────
+  const obs = new IntersectionObserver(entries =>
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 
-  // Hero particles
+  // ── Hero particles ──────────────────────────────────────
   const pc = document.getElementById('particles');
   if (pc) {
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 20; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      p.style.cssText = `left:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;`;
+      p.style.cssText = `left:${Math.random()*100}%;animation-duration:${7+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;`;
       pc.appendChild(p);
     }
   }
 
-  // Home page: load hosting plans preview
+  // ── Home: load hosting plans ────────────────────────────
   const grid = document.getElementById('homePlanGrid');
   if (grid) loadHomePlans(grid);
 
-  // Hero search redirect
+  // ── Hero search ─────────────────────────────────────────
   window.searchDomain = function() {
     const v = (document.getElementById('heroInput') || {}).value || '';
-    if (v.trim()) location.href = `/domains.html?q=${encodeURIComponent(v.trim())}`;
-    else location.href = '/domains.html';
+    location.href = v.trim() ? `/domains.html?q=${encodeURIComponent(v.trim())}` : '/domains.html';
   };
+
+  // ── Active nav link highlight ───────────────────────────
+  const path = location.pathname;
+  if (navLinks) {
+    navLinks.querySelectorAll('a').forEach(a => {
+      if (a.getAttribute('href') === path || (path === '/' && a.getAttribute('href') === '/')) {
+        a.style.color = 'var(--accent)';
+        a.style.fontWeight = '700';
+      }
+    });
+  }
+
 });
 
+// ── Home plans card ───────────────────────────────────────────
 async function loadHomePlans(grid) {
   try {
     const plans = await fetch('/api/hosting').then(r => r.json());
-    const shown = plans.filter(p => p.highlighted).slice(0, 3);
-    if (!shown.length) { shown.push(...plans.slice(0, 3)); }
-    grid.innerHTML = shown.map(p => planCardHTML(p)).join('');
-  } catch (e) {
+    let shown = plans.filter(p => p.highlighted).slice(0, 3);
+    if (!shown.length) shown = plans.slice(0, 3);
+    grid.innerHTML = shown.map(planCardHTML).join('');
+  } catch(e) {
     grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Could not load plans.</p>';
   }
 }
@@ -100,131 +191,9 @@ function planCardHTML(p) {
     <div class="plan-price">₹${p.price}<span>/mo</span></div>
     <div class="plan-renew">₹${p.renewPrice}/mo on renewal</div>
     <ul class="plan-features">${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="addToCart({id:'hosting-${p.id}',type:'hosting',name:'${p.name} Hosting',price:${p.price},period:'month'})">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;"
+      onclick="addToCart({id:'hosting-${p.id}',type:'hosting',name:'${p.name} Hosting',price:${p.price},period:'month'})">
       ${p.highlighted ? '🚀 Get Started' : 'Select Plan'}
     </button>
   </div>`;
-}
-
-// Smart nav auth button
-(function() {
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('navAuthBtn');
-    if (!btn) return;
-    const token = localStorage.getItem('ds_user_token');
-    const user  = (() => { try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch { return null; } })();
-    if (token && user) {
-      btn.textContent = '👤 ' + (user.name?.split(' ')[0] || 'Account');
-      btn.href = '/dashboard/';
-    } else {
-      btn.textContent = '👤 Login';
-      btn.href = '/login.html';
-    }
-  });
-})();
-
-// ── PRELOADER ─────────────────────────────────────────────────
-(function() {
-  // Add class to prevent flash
-  document.documentElement.classList.add('page-loading');
-  // Inject preloader HTML if not already present
-  if (!document.getElementById('preloader')) {
-    const pl = document.createElement('div');
-    pl.id = 'preloader';
-    pl.innerHTML = `
-      <div class="preloader-logo">🌐 DomainStore</div>
-      <div class="preloader-bar"><div class="preloader-bar-fill"></div></div>
-      <div class="preloader-dots"><span></span><span></span><span></span></div>`;
-    document.body.insertBefore(pl, document.body.firstChild);
-  }
-  function hidePreloader() {
-    const pl = document.getElementById('preloader');
-    if (pl) { pl.classList.add('hidden'); }
-    document.documentElement.classList.remove('page-loading');
-  }
-  if (document.readyState === 'complete') { setTimeout(hidePreloader, 300); }
-  else { window.addEventListener('load', () => setTimeout(hidePreloader, 400)); }
-})();
-
-// ── SMART NAVBAR INJECTOR ─────────────────────────────────────
-(function() {
-  document.addEventListener('DOMContentLoaded', function() {
-    // Fix nav-links: add Offers if missing
-    const navLinks = document.getElementById('navLinks');
-    if (navLinks) {
-      // Check if Offers already in nav
-      if (!navLinks.querySelector('a[href="/offers.html"]')) {
-        const li = document.createElement('li');
-        li.innerHTML = '<a href="/offers.html">🎁 Offers</a>';
-        navLinks.appendChild(li);
-      }
-    }
-
-    // Fix nav-actions: inject Account btn if missing
-    const navActions = document.querySelector('.nav-actions');
-    if (navActions && !document.getElementById('navAuthBtn')) {
-      const token = localStorage.getItem('ds_user_token');
-      const user  = (function(){ try{ return JSON.parse(localStorage.getItem('ds_user')||'null'); }catch(e){return null;} })();
-      const btn = document.createElement('a');
-      btn.id = 'navAuthBtn';
-      btn.className = 'btn btn-outline btn-sm';
-      btn.style.cssText = 'font-size:.82rem;text-decoration:none;';
-      if (token && user) {
-        btn.textContent = '👤 ' + ((user.name||'Account').split(' ')[0]);
-        btn.href = '/dashboard/';
-      } else {
-        btn.textContent = '👤 Login';
-        btn.href = '/login.html';
-      }
-      // Insert before cart button
-      const cartBtn = navActions.querySelector('.cart-btn, #cartBtn');
-      if (cartBtn) { navActions.insertBefore(btn, cartBtn); }
-      else { navActions.insertBefore(btn, navActions.firstChild); }
-    } else if (document.getElementById('navAuthBtn')) {
-      // Update existing btn
-      const btn = document.getElementById('navAuthBtn');
-      const token = localStorage.getItem('ds_user_token');
-      const user  = (function(){ try{ return JSON.parse(localStorage.getItem('ds_user')||'null'); }catch(e){return null;} })();
-      if (token && user) {
-        btn.textContent = '👤 ' + ((user.name||'Account').split(' ')[0]);
-        btn.href = '/dashboard/';
-      } else {
-        btn.textContent = '👤 Login';
-        btn.href = '/login.html';
-      }
-    }
-
-    // Hamburger: make Offers + account visible in mobile menu
-    const hb = document.getElementById('hamburger');
-    const nl = document.getElementById('navLinks');
-    if (hb && nl) {
-      hb.addEventListener('click', () => nl.classList.toggle('open'));
-      // Close on outside click
-      document.addEventListener('click', (e) => {
-        if (!hb.contains(e.target) && !nl.contains(e.target)) nl.classList.remove('open');
-      });
-    }
-  });
-})();
-
-// ── DARK / LIGHT MODE ─────────────────────────────────────────
-(function() {
-  // Apply saved theme on load
-  const saved = localStorage.getItem('ds_theme') || 'dark';
-  if (saved === 'light') document.body.classList.add('light-mode');
-  document.addEventListener('DOMContentLoaded', () => {
-    updateThemeBtn();
-  });
-})();
-
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light-mode');
-  localStorage.setItem('ds_theme', isLight ? 'light' : 'dark');
-  updateThemeBtn();
-}
-
-function updateThemeBtn() {
-  const btns = document.querySelectorAll('#themeToggle');
-  const isLight = document.body.classList.contains('light-mode');
-  btns.forEach(btn => { btn.textContent = isLight ? '☀️' : '🌙'; btn.title = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode'; });
 }
