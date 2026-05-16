@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/css/responsive.css"/>
 </head>
 <body>
-<nav class="navbar" id="navbar">
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
   <a href="/" class="nav-logo">🌐 DomainStore</a>
   <ul class="nav-links" id="navLinks">
     <li><a href="/">Home</a></li>
@@ -31,15 +31,16 @@
     <li><a href="/hosting.html">Hosting</a></li>
     <li><a href="/offers.html">🎁 Offers</a></li>
     <li><a href="#features">Features</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <!-- Mobile only: login + theme inside menu -->
+    <li class="mobile-menu-extra"><a href="/login.html">👤 Login / Account</a></li>
+    <li class="mobile-menu-extra"><a href="javascript:void(0)" onclick="toggleTheme()">🌙 Toggle Dark/Light</a></li>
   </ul>
   <div class="nav-actions">
-    <button id="themeToggle" onclick="toggleTheme()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 12px;cursor:pointer;color:var(--text);font-size:1rem;transition:all .2s;" title="Toggle Dark/Light Mode">🌙</button>
-    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Login</a>
-    <button class="cart-btn" onclick="location.href='/cart.html'" id="cartBtn">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
-    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <button id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">🌙</button>
+    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm">👤 Login</a>
+    <button class="cart-btn" onclick="location.href='/cart.html'" id="cartBtn">🛒 <span class="cart-label">Cart</span> <span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
   </div>
-
 </nav>
 
 <section class="hero">
