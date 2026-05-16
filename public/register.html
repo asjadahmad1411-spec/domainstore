@@ -1,83 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Create Account — DomainStore</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Create Free Account — DomainStore | Domain & Hosting Registration</title>
+<meta name="description" content="Create your free DomainStore account to register domains, buy hosting plans, and manage everything from one dashboard."/>
+<meta name="robots" content="noindex, nofollow"/>
+<meta property="og:title" content="Create Free Account — DomainStore"/>
+<meta property="og:description" content="Register for free and start managing your domains and hosting."/>
+<meta property="og:type" content="website"/>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/responsive.css"/>
 <style>
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;}
-.auth-card{width:100%;max-width:480px;background:var(--glass);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:24px;padding:40px;}
-.auth-logo{text-align:center;font-size:1.6rem;font-weight:900;margin-bottom:6px;}
-.auth-sub{text-align:center;font-size:.85rem;color:var(--text-muted);margin-bottom:32px;}
-.pass-wrap{position:relative;}
-.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;}
-.strength-bar{height:4px;border-radius:2px;margin-top:6px;transition:all .3s;background:var(--border);}
-.strength-text{font-size:.72rem;color:var(--text-muted);margin-top:4px;}
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 80px 16px 40px; }
+.auth-card { width: 100%; max-width: 480px; background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 24px; padding: 36px 32px; }
+@media(max-width:480px) { .auth-card { padding: 24px 18px; border-radius: 16px; } }
+.auth-logo { text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 5px; }
+.auth-sub { text-align: center; font-size: .85rem; color: var(--text-muted); margin-bottom: 24px; }
+.pass-wrap { position: relative; }
+.pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: .95rem; padding: 6px; }
+.strength-bar { height: 4px; border-radius: 2px; margin-top: 5px; transition: all .3s; background: var(--border); width: 0; }
+.strength-text { font-size: .7rem; margin-top: 3px; }
+.err-box { display: none; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #ef4444; padding: 11px 14px; border-radius: 10px; font-size: .83rem; margin-bottom: 14px; }
+.trust-badges { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+.trust-badge { font-size: .7rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="/" class="nav-logo">🌐 DomainStore</a>
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <a href="/" class="nav-logo" aria-label="DomainStore Home">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks" role="menubar">
+    <li role="none"><a href="/" role="menuitem">Home</a></li>
+    <li role="none"><a href="/domains.html" role="menuitem">Domains</a></li>
+    <li role="none"><a href="/hosting.html" role="menuitem">Hosting</a></li>
+    <li role="none"><a href="/offers.html" role="menuitem">🎁 Offers</a></li>
+  </ul>
   <div class="nav-actions">
     <a href="/login.html" class="btn btn-outline btn-sm">Login</a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
-<div class="auth-wrap">
+<main class="auth-wrap">
   <div class="auth-card fade-up">
     <div class="auth-logo">✨ Create Account</div>
-    <div class="auth-sub">Start managing your domains & hosting</div>
+    <div class="auth-sub">Start managing your domains &amp; hosting for free</div>
 
-    <div id="errMsg" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;"></div>
+    <div class="err-box" id="errMsg" role="alert"></div>
 
-    <form id="regForm" onsubmit="doRegister(event)">
+    <form id="regForm" onsubmit="doRegister(event)" novalidate>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="fname" placeholder="Rahul" required/></div>
-        <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lname" placeholder="Sharma" required/></div>
+        <div class="form-group">
+          <label class="form-label" for="fname">First Name *</label>
+          <input type="text" class="form-control" id="fname" name="fname" placeholder="Rahul" required autocomplete="given-name"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="lname">Last Name *</label>
+          <input type="text" class="form-control" id="lname" name="lname" placeholder="Sharma" required autocomplete="family-name"/>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com" required autocomplete="email"/></div>
-      <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210"/></div>
       <div class="form-group">
-        <label class="form-label">Password *</label>
+        <label class="form-label" for="email">Email Address *</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="rahul@example.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone / WhatsApp</label>
+        <input type="tel" class="form-control" id="phone" name="phone" placeholder="+91 98765 43210" autocomplete="tel"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password *</label>
         <div class="pass-wrap">
-          <input type="password" class="form-control" id="password" placeholder="Min 6 characters" required oninput="checkStrength(this.value)"/>
-          <button type="button" class="pass-toggle" onclick="togglePass('password')">👁️</button>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Min 6 characters" required autocomplete="new-password" oninput="checkStrength(this.value)"/>
+          <button type="button" class="pass-toggle" onclick="togglePass('password')" aria-label="Show password">👁️</button>
         </div>
         <div class="strength-bar" id="strengthBar"></div>
         <div class="strength-text" id="strengthText"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">Confirm Password *</label>
+        <label class="form-label" for="confirm">Confirm Password *</label>
         <div class="pass-wrap">
-          <input type="password" class="form-control" id="confirm" placeholder="Repeat password" required/>
-          <button type="button" class="pass-toggle" onclick="togglePass('confirm')">👁️</button>
+          <input type="password" class="form-control" id="confirm" name="confirm" placeholder="Repeat password" required autocomplete="new-password"/>
+          <button type="button" class="pass-toggle" onclick="togglePass('confirm')" aria-label="Show password">👁️</button>
         </div>
       </div>
-      <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:16px;">
-        By creating an account you agree to our <a href="#" style="color:var(--accent);">Terms of Service</a> and <a href="#" style="color:var(--accent);">Privacy Policy</a>.
+
+      <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">
+        By creating an account you agree to our
+        <a href="/terms.html" style="color:var(--accent);">Terms of Service</a> and
+        <a href="/privacy.html" style="color:var(--accent);">Privacy Policy</a>.
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;" id="regBtn">
-        🚀 Create My Account
+
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:.95rem;" id="regBtn">
+        🚀 Create My Free Account
       </button>
     </form>
 
-    <div style="text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted);">
+    <div style="text-align:center;margin-top:16px;font-size:.84rem;color:var(--text-muted);">
       Already have an account? <a href="/login.html" style="color:var(--accent);font-weight:700;">Login →</a>
     </div>
-    <div style="text-align:center;margin-top:10px;"><a href="/" style="font-size:.82rem;color:var(--text-muted);">← Back to Store</a></div>
-  </div>
-</div>
+    <div style="text-align:center;margin-top:8px;">
+      <a href="/" style="font-size:.8rem;color:var(--text-muted);">← Back to Store</a>
+    </div>
 
-<div class="toast" id="toast"></div>
+    <div class="trust-badges">
+      <span class="trust-badge">🔒 SSL Secured</span>
+      <span class="trust-badge">✅ Free Account</span>
+      <span class="trust-badge">🇮🇳 Made in India</span>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/js/main.js"></script>
 <script>
-function togglePass(id) { const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+if (localStorage.getItem('ds_user_token')) location.href = '/dashboard/';
+
+function togglePass(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
 
 function checkStrength(val) {
   const bar = document.getElementById('strengthBar');
   const txt = document.getElementById('strengthText');
-  if (!val) { bar.style.width='0'; txt.textContent=''; return; }
+  if (!val) { bar.style.width = '0'; txt.textContent = ''; return; }
   let score = 0;
   if (val.length >= 6) score++;
   if (val.length >= 10) score++;
@@ -85,7 +133,7 @@ function checkStrength(val) {
   if (/[0-9]/.test(val)) score++;
   if (/[^A-Za-z0-9]/.test(val)) score++;
   const colors = ['','#ef4444','#f59e0b','#eab308','#22c55e','#16a34a'];
-  const labels = ['','Very Weak','Weak','Fair','Strong','Very Strong'];
+  const labels = ['','Very Weak 😟','Weak 😐','Fair 🙂','Strong 💪','Very Strong 🔐'];
   bar.style.background = colors[score] || 'var(--border)';
   bar.style.width = (score * 20) + '%';
   txt.textContent = labels[score] || '';
@@ -96,30 +144,38 @@ async function doRegister(e) {
   e.preventDefault();
   const btn = document.getElementById('regBtn');
   const err = document.getElementById('errMsg');
+  err.style.display = 'none';
   const pwd = document.getElementById('password').value;
   const cnf = document.getElementById('confirm').value;
-  if (pwd !== cnf) { err.textContent='Passwords do not match'; err.style.display='block'; return; }
-  btn.textContent='⏳ Creating account...'; btn.disabled=true; err.style.display='none';
+  if (pwd !== cnf) {
+    err.textContent = '❌ Passwords do not match';
+    err.style.display = 'block'; return;
+  }
+  if (pwd.length < 6) {
+    err.textContent = '❌ Password must be at least 6 characters';
+    err.style.display = 'block'; return;
+  }
+  btn.textContent = '⏳ Creating account...'; btn.disabled = true;
   try {
     const res = await fetch('/api/auth/register', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: document.getElementById('fname').value.trim() + ' ' + document.getElementById('lname').value.trim(),
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
         password: pwd
       })
-    }).then(r=>r.json());
+    }).then(r => r.json());
     if (res.error) throw new Error(res.error);
     localStorage.setItem('ds_user_token', res.token);
     localStorage.setItem('ds_user', JSON.stringify(res.user));
     location.href = '/dashboard/';
   } catch(e2) {
-    err.textContent=e2.message; err.style.display='block';
-    btn.textContent='🚀 Create My Account'; btn.disabled=false;
+    err.textContent = '❌ ' + e2.message;
+    err.style.display = 'block';
+    btn.textContent = '🚀 Create My Free Account'; btn.disabled = false;
   }
 }
-if (localStorage.getItem('ds_user_token')) location.href='/dashboard/';
 </script>
 </body>
 </html>

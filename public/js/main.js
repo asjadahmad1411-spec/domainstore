@@ -25,12 +25,33 @@ function showToast(msg, type = 'success') {
   t._timer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// ── Nav hamburger ────────────────────────────────────────────
+// ── Nav hamburger (global, works on every page) ─────────────
 document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
+
   const hb = document.getElementById('hamburger');
   const nl = document.getElementById('navLinks');
-  if (hb && nl) hb.addEventListener('click', () => nl.classList.toggle('open'));
+  if (hb && nl) {
+    hb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = nl.classList.toggle('open');
+      hb.setAttribute('aria-expanded', isOpen);
+    });
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (nl.classList.contains('open') && !nl.contains(e.target) && e.target !== hb && !hb.contains(e.target)) {
+        nl.classList.remove('open');
+        hb.setAttribute('aria-expanded', 'false');
+      }
+    });
+    // Close on nav link click (mobile UX)
+    nl.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        nl.classList.remove('open');
+        hb.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
 
   // Scroll fade-up
   const observer = new IntersectionObserver((entries) => {

@@ -1,65 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Login — DomainStore Account</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — DomainStore | Manage Your Domains & Hosting</title>
+<meta name="description" content="Login to your DomainStore account to manage domains, hosting plans, and orders. India's trusted domain registrar."/>
+<meta name="robots" content="noindex, nofollow"/>
+<meta property="og:title" content="Login — DomainStore"/>
+<meta property="og:description" content="Access your domain and hosting control panel."/>
+<meta property="og:type" content="website"/>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/responsive.css"/>
 <style>
-.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px;}
-.auth-card{width:100%;max-width:440px;background:var(--glass);backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:24px;padding:40px;}
-.auth-logo{text-align:center;font-size:1.6rem;font-weight:900;margin-bottom:6px;}
-.auth-sub{text-align:center;font-size:.85rem;color:var(--text-muted);margin-bottom:32px;}
-.social-divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
-.social-divider::before,.social-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.auth-footer{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted);}
-.pass-wrap{position:relative;}
-.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:4px;}
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 80px 16px 40px; }
+.auth-card { width: 100%; max-width: 440px; background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 24px; padding: 36px 32px; }
+@media(max-width:480px) { .auth-card { padding: 28px 20px; border-radius: 18px; } }
+.auth-logo { text-align: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 5px; }
+.auth-sub { text-align: center; font-size: .85rem; color: var(--text-muted); margin-bottom: 28px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--text-muted); font-size: .78rem; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.pass-wrap { position: relative; }
+.pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: .95rem; padding: 6px; line-height: 1; }
+.err-box { display: none; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #ef4444; padding: 11px 14px; border-radius: 10px; font-size: .83rem; margin-bottom: 14px; }
+.success-box { display: none; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); color: #22c55e; padding: 11px 14px; border-radius: 10px; font-size: .83rem; margin-bottom: 14px; }
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="/" class="nav-logo">🌐 DomainStore</a>
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <a href="/" class="nav-logo" aria-label="DomainStore Home">🌐 DomainStore</a>
+  <ul class="nav-links" id="navLinks" role="menubar">
+    <li role="none"><a href="/" role="menuitem">Home</a></li>
+    <li role="none"><a href="/domains.html" role="menuitem">Domains</a></li>
+    <li role="none"><a href="/hosting.html" role="menuitem">Hosting</a></li>
+    <li role="none"><a href="/offers.html" role="menuitem">🎁 Offers</a></li>
+  </ul>
   <div class="nav-actions">
     <a href="/register.html" class="btn btn-outline btn-sm">Create Account</a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
-<div class="auth-wrap">
+<main class="auth-wrap">
   <div class="auth-card fade-up">
     <div class="auth-logo">🔐 Welcome Back</div>
-    <div class="auth-sub">Login to manage your domains & hosting</div>
+    <div class="auth-sub">Login to manage your domains &amp; hosting</div>
 
-    <div id="errMsg" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;"></div>
+    <div class="err-box" id="errMsg" role="alert"></div>
 
-    <form id="loginForm" onsubmit="doLogin(event)">
+    <form id="loginForm" onsubmit="doLogin(event)" novalidate>
       <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input type="email" class="form-control" id="email" placeholder="you@example.com" required autocomplete="email"/>
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required autocomplete="email"/>
       </div>
       <div class="form-group">
-        <label class="form-label">Password</label>
+        <label class="form-label" for="password">Password</label>
         <div class="pass-wrap">
-          <input type="password" class="form-control" id="password" placeholder="Your password" required autocomplete="current-password"/>
-          <button type="button" class="pass-toggle" onclick="togglePass('password')">👁️</button>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Your password" required autocomplete="current-password"/>
+          <button type="button" class="pass-toggle" onclick="togglePass('password')" aria-label="Show password">👁️</button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;" id="loginBtn">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;margin-top:6px;font-size:.95rem;" id="loginBtn">
         🔐 Login to Account
       </button>
     </form>
 
-    <div class="social-divider"><span style="font-size:.78rem;color:var(--text-muted);">New to DomainStore?</span></div>
+    <div class="auth-divider">New to DomainStore?</div>
     <a href="/register.html" class="btn btn-outline" style="width:100%;justify-content:center;">✨ Create Free Account</a>
-    <div class="auth-footer">
-      <a href="/" style="color:var(--accent);">← Back to Store</a>
+
+    <div style="text-align:center;margin-top:16px;">
+      <a href="/" style="font-size:.82rem;color:var(--text-muted);">← Back to Store</a>
     </div>
   </div>
-</div>
+</main>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/js/main.js"></script>
 <script>
+// Already logged in?
+if (localStorage.getItem('ds_user_token')) location.href = '/dashboard/';
+
 function togglePass(id) {
   const el = document.getElementById(id);
   el.type = el.type === 'password' ? 'text' : 'password';
@@ -69,25 +90,26 @@ async function doLogin(e) {
   e.preventDefault();
   const btn = document.getElementById('loginBtn');
   const err = document.getElementById('errMsg');
-  btn.textContent = '⏳ Logging in...'; btn.disabled = true;
   err.style.display = 'none';
+  btn.textContent = '⏳ Logging in...'; btn.disabled = true;
   try {
     const res = await fetch('/api/auth/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+      body: JSON.stringify({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      })
     }).then(r => r.json());
     if (res.error) throw new Error(res.error);
     localStorage.setItem('ds_user_token', res.token);
     localStorage.setItem('ds_user', JSON.stringify(res.user));
     location.href = '/dashboard/';
   } catch(e2) {
-    err.textContent = e2.message; err.style.display = 'block';
+    err.textContent = '❌ ' + e2.message;
+    err.style.display = 'block';
     btn.textContent = '🔐 Login to Account'; btn.disabled = false;
   }
 }
-
-// Already logged in?
-if (localStorage.getItem('ds_user_token')) location.href = '/dashboard/';
 </script>
 </body>
 </html>
