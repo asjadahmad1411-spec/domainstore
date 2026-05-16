@@ -59,8 +59,53 @@
               <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="firstName" placeholder="Rahul" autocomplete="given-name"/></div>
               <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lastName" placeholder="Sharma" autocomplete="family-name"/></div>
             </div>
-            <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com" autocomplete="email"/></div>
+            <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com" autocomplete="email" oninput="checkEmailExists(this.value)"/></div>
             <div class="form-group"><label class="form-label">WhatsApp / Phone *</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210" autocomplete="tel"/></div>
+
+            <!-- Password section — hidden if already logged in -->
+            <div id="passwordSection">
+              <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <span style="font-size:1rem;">🔐</span>
+                <div>
+                  <div style="font-size:.88rem;font-weight:700;">Create Your Account</div>
+                  <div style="font-size:.72rem;color:var(--text-muted);">Track orders, manage domains — all in one place</div>
+                </div>
+              </div>
+              <div class="form-group" style="position:relative;">
+                <label class="form-label">Password *</label>
+                <div style="position:relative;">
+                  <input type="password" class="form-control" id="password" placeholder="Min 6 characters"
+                    oninput="checkPwdStrength(this.value)" autocomplete="new-password"
+                    style="padding-right:44px;"/>
+                  <button type="button" onclick="togglePwd('password','eyeBtn1')" id="eyeBtn1"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted);">👁️</button>
+                </div>
+                <!-- Strength bar -->
+                <div style="margin-top:7px;display:flex;gap:4px;align-items:center;" id="strengthWrap">
+                  <div style="flex:1;display:flex;gap:3px;">
+                    <div id="sb1" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
+                    <div id="sb2" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
+                    <div id="sb3" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
+                    <div id="sb4" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
+                  </div>
+                  <span id="strengthLabel" style="font-size:.68rem;color:var(--text-muted);white-space:nowrap;min-width:40px;"></span>
+                </div>
+              </div>
+              <div class="form-group" style="position:relative;">
+                <label class="form-label">Confirm Password *</label>
+                <div style="position:relative;">
+                  <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter password"
+                    oninput="checkPwdMatch()" autocomplete="new-password"
+                    style="padding-right:44px;"/>
+                  <button type="button" onclick="togglePwd('confirmPassword','eyeBtn2')" id="eyeBtn2"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted);">👁️</button>
+                </div>
+                <div id="pwdMatchMsg" style="font-size:.72rem;margin-top:5px;"></div>
+              </div>
+              <div id="emailCheckMsg" style="font-size:.75rem;margin-top:-10px;margin-bottom:8px;"></div>
+            </div>
+
           </div>
 
           <!-- Payment Method Info -->

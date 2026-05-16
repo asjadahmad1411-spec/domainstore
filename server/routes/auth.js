@@ -37,6 +37,14 @@ router.post('/register', (req, res) => {
   res.json({ success: true, token, user: safe });
 });
 
+// POST /api/auth/check-email — public, just checks if email exists
+router.post('/check-email', (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.json({ exists: false });
+  const exists = readUsers().some(u => u.email === email.toLowerCase());
+  res.json({ exists });
+});
+
 // POST /api/auth/login
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
