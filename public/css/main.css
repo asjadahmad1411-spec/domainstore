@@ -336,10 +336,11 @@ body.light-mode .nav-logo { color: var(--primary) !important; -webkit-text-fill-
 body.light-mode .preloader-logo { -webkit-text-fill-color: transparent !important; }
 
 /* ── DOMAIN SEARCH: Fix white bg on focus ────────────────────── */
-.search-box input { background: transparent !important; }
+.search-box input { background: transparent !important; color: var(--text) !important; caret-color: var(--text) !important; }
+.search-box:focus-within { background: var(--glass) !important; border-color: var(--primary) !important; }
 .search-box input:-webkit-autofill,
 .search-box input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(15,12,41,0.95) inset !important;
   -webkit-text-fill-color: var(--text) !important;
   background: transparent !important;
 }

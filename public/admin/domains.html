@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Domain Pricing — Admin</title>
-<link rel="stylesheet" href="/css/main.css"/>
-<link rel="stylesheet" href="/css/dashboard.css"/>
+<link rel="stylesheet" href="/css/admin.css"/>
+<link rel="stylesheet" href="/css/responsive.css"/>
 <style>
 .tld-table { width:100%; border-collapse:collapse; }
 .tld-table th { padding:10px 14px; text-align:left; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); border-bottom:1px solid var(--dash-border); }
@@ -25,43 +25,32 @@
 </style>
 </head>
 <body>
-<button class="dash-mobile-toggle" id="dashMobileToggle">☰</button>
-<div class="dash-overlay" id="dashOverlay"></div>
-
-<aside class="dash-sidebar" id="dashSidebar">
-  <div class="dash-brand"><a href="/admin/" class="dash-logo">🌐 DomainStore</a><span class="dash-badge">Admin</span></div>
-  <div class="dash-user">
-    <div class="dash-avatar" id="dashAvatar">A</div>
-    <div><div class="dash-username" id="dashUserName">Admin</div><div class="dash-useremail" id="dashUserEmail"></div></div>
-  </div>
-  <nav class="dash-nav">
-    <div class="dash-nav-section">Main</div>
-    <a href="/admin/" class="dash-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-    <a href="/admin/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> Orders</a>
-    <a href="/admin/customers.html" class="dash-nav-item"><span class="nav-icon">👥</span> Customers</a>
-    <div class="dash-nav-section">Products</div>
-    <a href="/admin/domains.html" class="dash-nav-item active"><span class="nav-icon">🌐</span> Domain Pricing</a>
-    <a href="/admin/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> Hosting Plans</a>
-    <a href="/admin/promos.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Promo Codes</a>
-    <div class="dash-nav-section">Config</div>
-    <a href="/admin/settings.html" class="dash-nav-item"><span class="nav-icon">⚙️</span> Settings</a>
-    <a href="/admin/utr.html" class="dash-nav-item"><span class="nav-icon">🏦</span> UTR Verify</a>
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <a href="/admin/dashboard.html" class="nav-item"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <div class="nav-section">Management</div>
+    <a href="/admin/domains.html" class="nav-item active"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
+    <div class="nav-section">Marketing</div>
+    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎁</span> Offers & Promos</a>
+    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
   </nav>
-  <div class="dash-footer">
-    <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> View Store</a>
-    <button onclick="adminLogout()" class="dash-nav-item" style="width:100%;background:none;border:none;text-align:left;color:var(--text-muted);cursor:pointer;"><span class="nav-icon">🚪</span> Logout</button>
-  </div>
-</aside>
+  <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
+</div>
 
-<div class="dash-main">
-  <div class="dash-topbar">
-    <div class="dash-topbar-title">
-      <h2>🌐 Domain Pricing Manager</h2>
-      <p>Set your own selling price for each domain extension</p>
-    </div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><h2>🌐 Domain Pricing Manager</h2><p>Set your own selling price for each domain extension</p></div>
+    <div class="topbar-right"><span class="admin-badge">👤 Admin</span><button class="logout-btn" onclick="adminLogout()">Logout</button></div>
   </div>
 
-  <div class="dash-content">
+  <div class="content">
 
     <!-- Info Banner -->
     <div style="background:linear-gradient(135deg,rgba(108,61,232,.12),rgba(0,212,255,.06));border:1px solid rgba(108,61,232,.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
@@ -151,10 +140,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="/js/dashboard.js"></script>
+<script src="/js/admin/auth.js"></script>
 <script>
-requireDsAuth('admin');
-initDashSidebar();
+requireAdminAuth();
 
 const API_BASE = '/api/domains/tlds';
 let tlds = [];
@@ -174,7 +162,7 @@ async function loadTlds() {
     tlds = await res.json();
     renderTable();
     document.getElementById('tldCount').textContent = `(${tlds.length} extensions)`;
-  } catch(e) { dsToast('Failed to load TLDs', 'error'); }
+  } catch(e) { showToast('Failed to load TLDs', 'error'); }
 }
 
 function renderTable() {
@@ -230,7 +218,7 @@ async function saveTld(i) {
   const popular  = tlds[i].popular;
   const btn      = document.getElementById(`saveBtn-${i}`);
 
-  if (!price || price < 1) { dsToast('Price must be at least ₹1', 'error'); return; }
+  if (!price || price < 1) { showToast('Price must be at least ₹1', 'error'); return; }
   btn.textContent = '⏳'; btn.disabled = true;
 
   try {
@@ -244,9 +232,9 @@ async function saveTld(i) {
     btn.textContent = '✅ Saved'; btn.disabled = false;
     btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
     setTimeout(() => { btn.textContent = '💾 Save'; btn.style.background = ''; }, 2000);
-    dsToast(`${ext} → ₹${price}/yr saved!`, 'success');
+    showToast(`${ext} → ₹${price}/yr saved!`, 'success');
   } catch(e) {
-    dsToast(e.message || 'Save failed', 'error');
+    showToast(e.message || 'Save failed', 'error');
     btn.textContent = '💾 Save'; btn.disabled = false; btn.style.background = '';
   }
 }
@@ -256,7 +244,7 @@ function setAllPrices(price) {
     const inp = document.getElementById(`price-${i}`);
     if (inp) { inp.value = price; markDirty(i); }
   });
-  dsToast(`All prices set to ₹${price} — Click "Save All Prices" to apply`, 'success');
+  showToast(`All prices set to ₹${price} — Click "Save All Prices" to apply`, 'success');
 }
 
 async function saveAllPrices() {
@@ -279,7 +267,7 @@ async function saveAllPrices() {
   btn.textContent = '💾 Save All Prices'; btn.disabled = false;
   msg.style.color = fail > 0 ? '#ef4444' : '#22c55e';
   msg.textContent = `✅ ${ok} saved${fail > 0 ? `, ❌ ${fail} failed` : ''}`;
-  dsToast(`All prices updated! ${ok} extensions saved.`, 'success');
+  showToast(`All prices updated! ${ok} extensions saved.`, 'success');
   setTimeout(() => msg.textContent = '', 4000);
 }
 
@@ -289,8 +277,8 @@ async function deleteTld(ext, i) {
     await fetch(`${API_BASE}/${encodeURIComponent(ext)}`, { method: 'DELETE', headers: authHdr() });
     tlds.splice(i, 1);
     renderTable();
-    dsToast(`${ext} deleted`, 'success');
-  } catch(e) { dsToast('Delete failed', 'error'); }
+    showToast(`${ext} deleted`, 'success');
+  } catch(e) { showToast('Delete failed', 'error'); }
 }
 
 async function addTld() {
@@ -316,7 +304,7 @@ async function addTld() {
     document.getElementById('newRenew').value = '';
     msg.style.color = '#22c55e';
     msg.textContent = `✅ ${ext} added at ₹${price}/yr`;
-    dsToast(`${ext} added successfully!`, 'success');
+    showToast(`${ext} added successfully!`, 'success');
     setTimeout(() => msg.textContent = '', 3000);
   } catch(e) { msg.style.color='#ef4444'; msg.textContent='❌ ' + (e.message || 'Failed to add'); }
 }
