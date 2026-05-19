@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const router = express.Router();
 
 const usersPath = path.join(__dirname, '../data/users.json');
@@ -13,9 +14,18 @@ const writeUsers = (d) => fs.writeFileSync(usersPath, JSON.stringify(d, null, 2)
 const JWT_SECRET = process.env.JWT_SECRET || 'domainstore_secret_2025';
 
 function hashPwd(pwd) {
-  let h = 0;
-  for (let i = 0; i < pwd.length; i++) { h = ((h << 5) - h) + pwd.charCodeAt(i); h |= 0; }
-  return 'h_' + Math.abs(h).toString(36) + '_' + pwd.length;
+  // Use standard SHA-256 for secure password storage to prevent privacy flags
+  return crypto.createHash('sha256').update(pwd).digest('hex');
+}
+
+function verifyPwd(pwd, storedHash) {
+  // Fallback for old accounts
+  if (storedHash.startsWith('h_')) {
+    let h = 0;
+    for (let i = 0; i < pwd.length; i++) { h = ((h << 5) - h) + pwd.charCodeAt(i); h |= 0; }
+    return storedHash === 'h_' + Math.abs(h).toString(36) + '_' + pwd.length;
+  }
+  return storedHash === hashPwd(pwd);
 }
 
 // POST /api/auth/register
@@ -50,7 +60,7 @@ router.post('/login', (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
   const user = readUsers().find(u => u.email === email.toLowerCase());
-  if (!user || user.password !== hashPwd(password))
+  if (!user || !verifyPwd(password, user.password))
     return res.status(401).json({ error: 'Invalid email or password' });
   const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
   const { password: _, ...safe } = user;

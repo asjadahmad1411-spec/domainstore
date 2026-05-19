@@ -18,7 +18,7 @@ body { background: var(--dash-bg); }
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--dash-border);
   display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 250;
   transition: transform .3s;
 }
 .dash-logo { padding: 24px 20px 16px; border-bottom: 1px solid var(--dash-border); }
@@ -140,7 +140,7 @@ body { background: var(--dash-bg); }
 
 /* Mobile sidebar */
 .dash-mobile-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--primary); border: none; border-radius: 10px; padding: 10px 12px; color: #fff; font-size: 1.1rem; cursor: pointer; }
-.dash-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 99; }
+.dash-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 240; }
 
 @media(max-width:900px) {
   .dash-sidebar { transform: translateX(-100%); }
