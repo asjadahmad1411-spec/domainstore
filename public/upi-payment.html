@@ -2,133 +2,172 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Secure Payment Checkout | DomainStore</title>
-<meta name="description" content="Complete your secure payment checkout."/>
-<link rel="stylesheet" href="/css/main.css"/>
-<link rel="stylesheet" href="/css/responsive.css"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Secure Checkout</title>
 <style>
-/* Razorpay-style Modal Checkout */
-body { background: var(--bg); }
-.pay-wrap { padding: 60px 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-.pay-modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden; position: relative; }
+  :root {
+    --brand: #338cf0; /* Razorpay-like blue */
+    --brand-hover: #2173d1;
+    --text: #0d233a;
+    --text-mut: #68798c;
+    --border: #e2e8f0;
+    --bg: #f5f8fa;
+    --green: #22c55e;
+  }
+  body {
+    margin: 0; padding: 0; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex; justify-content: center; align-items: center; min-height: 100vh;
+  }
+  .rzp-modal {
+    background: #fff; width: 100%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .rzp-header {
+    background: var(--brand); color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .rzp-header-brand { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .rzp-header-brand img { height: 20px; filter: brightness(0) invert(1); } /* Make logo white if any */
+  .rzp-timer {
+    background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-variant-numeric: tabular-nums; font-weight: 600;
+  }
+  
+  .rzp-amount-bar {
+    padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fcfcfc;
+  }
+  .rzp-amount-text { font-size: 0.85rem; color: var(--text-mut); font-weight: 500; }
+  .rzp-amount-val { font-size: 1.3rem; font-weight: 700; color: var(--text); }
 
-/* Header & Timer */
-.pay-header { background: rgba(108,61,232,0.05); padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.pay-brand { font-weight: 800; font-size: 1.1rem; color: var(--text); }
-.session-timer { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; padding: 4px 10px; border-radius: 50px; font-family: monospace; font-weight: 700; font-size: 0.9rem; }
-.session-timer.urgent { animation: pulse 1s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .rzp-body { padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  
+  .rzp-qr-wrap {
+    width: 160px; height: 160px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 16px;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+  }
+  .rzp-qr-wrap img { width: 100%; height: 100%; object-fit: contain; }
+  
+  .rzp-upi-id {
+    font-size: 0.9rem; font-weight: 500; color: var(--text); background: #f1f5f9; padding: 8px 12px; border-radius: 6px; border: 1px dashed #cbd5e1;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px;
+  }
+  .rzp-upi-id:hover { background: #e2e8f0; }
+  
+  .rzp-divider {
+    width: 100%; text-align: center; border-bottom: 1px solid var(--border); line-height: 0.1em; margin: 10px 0 20px;
+  }
+  .rzp-divider span { background:#fff; padding:0 10px; color:var(--text-mut); font-size:0.8rem; }
+  
+  .rzp-apps {
+    display: flex; gap: 12px; justify-content: center; width: 100%; margin-bottom: 24px;
+  }
+  .rzp-app-btn {
+    width: 50px; height: 50px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; background: #fff; padding: 10px; box-sizing: border-box;
+  }
+  .rzp-app-btn:hover { border-color: var(--brand); box-shadow: 0 4px 12px rgba(51,140,240,0.15); transform: translateY(-2px); }
+  .rzp-app-btn img { width: 100%; height: 100%; object-fit: contain; }
+  
+  .rzp-footer {
+    padding: 0 20px 20px;
+  }
+  .rzp-btn-paid {
+    width: 100%; background: var(--brand); color: #fff; border: none; padding: 14px; border-radius: 4px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .rzp-btn-paid:hover { background: var(--brand-hover); }
+  .rzp-btn-paid:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-/* Amount Bar */
-.amount-bar { padding: 24px; text-align: center; border-bottom: 1px dashed var(--border); }
-.amount-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 6px; }
-.amount-value { font-size: 2.2rem; font-weight: 900; color: var(--primary); }
-.order-id-display { font-family: monospace; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
+  /* Loading State */
+  .rzp-loading { display: none; padding: 40px 20px; text-align: center; flex-direction: column; align-items: center; }
+  .rzp-spinner {
+    width: 40px; height: 40px; border: 3px solid rgba(51,140,240,0.2); border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-/* QR Section */
-.qr-section { padding: 24px; text-align: center; }
-.qr-box { background: #fff; padding: 12px; border-radius: 16px; width: 180px; height: 180px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-.upi-id-box { display: inline-block; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px 16px; font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--accent); cursor: pointer; transition: all 0.2s; }
-.upi-id-box:hover { background: rgba(0,212,255,0.1); }
+  /* Success State */
+  .rzp-success { display: none; padding: 40px 20px; text-align: center; flex-direction: column; align-items: center; }
+  .rzp-check {
+    width: 60px; height: 60px; background: var(--green); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 20px;
+  }
 
-/* Payment Buttons */
-.pay-actions { padding: 0 24px 24px; }
-.btn-huge { width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 800; border-radius: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; transition: transform 0.2s; }
-.btn-huge:active { transform: scale(0.98); }
-.app-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-.app-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-weight: 600; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
-.app-btn:hover { background: rgba(108,61,232,0.1); border-color: var(--primary); }
+  .view-active { display: flex !important; }
+  
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 4px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 9999; }
+  .toast.show { opacity: 1; }
 
-/* Loading State */
-.loading-screen { display: none; padding: 40px 24px; text-align: center; }
-.spinner { width: 60px; height: 60px; border: 4px solid rgba(108,61,232,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.verification-timer { font-size: 2rem; font-family: monospace; font-weight: 900; color: #f59e0b; margin: 16px 0; }
-
-/* Success State */
-.success-screen { display: none; padding: 40px 24px; text-align: center; }
-.success-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; box-shadow: 0 10px 25px rgba(16,185,129,0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-
-/* View toggles */
-.view { display: none; }
-.view.active { display: block; animation: fadeIn 0.3s; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.secure-badge { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 </style>
 </head>
 <body>
 
-<div class="pay-wrap">
-  <div class="pay-modal">
-    
-    <!-- View 1: Main Payment Checkout -->
-    <div id="viewCheckout" class="view active">
-      <div class="pay-header">
-        <div class="pay-brand">🌐 DomainStore</div>
-        <div class="session-timer" id="payTimer">10:00</div>
-      </div>
-
-      <div class="amount-bar">
-        <div class="amount-label">Amount Payable</div>
-        <div class="amount-value" id="displayAmount">₹0</div>
-        <div class="order-id-display">Order #<span id="displayOrderId">...</span></div>
-      </div>
-
-      <div class="qr-section">
-        <div style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-bottom:12px;">Scan with any UPI App</div>
-        <div class="qr-box" id="qrArea"><span style="font-size:2rem;color:var(--text-muted);">⏳</span></div>
-        <div class="upi-id-box" id="upiIdDisplay" onclick="copyUpiId()">Loading...</div>
-        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:6px;">👆 Tap to copy UPI ID</div>
-      </div>
-
-      <div class="pay-actions">
-        <div class="app-grid" id="appGrid">
-          <!-- JS injected -->
-        </div>
-        <button class="btn btn-primary btn-huge" id="btnIHavePaid" onclick="markAsPaid()">✅ I Have Paid</button>
-      </div>
-      
-      <div class="secure-badge">🔒 100% Secure SSL Payment</div>
-    </div>
-
-    <!-- View 2: Verification Loading -->
-    <div id="viewLoading" class="view loading-screen">
-      <div class="spinner"></div>
-      <h2 style="font-size:1.3rem; margin-bottom:8px;">Verifying Payment</h2>
-      <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">Please wait while we confirm the payment with our bank. <br/><strong style="color:var(--accent);">Do not close or refresh this window.</strong></p>
-      
-      <div class="verification-timer" id="verifyTimer">02:00</div>
-      <p style="font-size:0.75rem; color:var(--text-muted);">Order #<span id="loadingOrderId"></span></p>
-    </div>
-
-    <!-- View 3: Success -->
-    <div id="viewSuccess" class="view success-screen">
-      <div class="success-icon">✓</div>
-      <h2 style="font-size:1.5rem; color:#10b981; margin-bottom:8px;">Payment Successful!</h2>
-      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:24px;">Your order has been verified and activated.</p>
-      
-      <div style="background:rgba(255,255,255,0.05); border-radius:12px; padding:16px; margin-bottom:24px; text-align:left;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;">
-          <span style="color:var(--text-muted)">Order ID</span>
-          <span style="font-family:monospace; font-weight:700;" id="successOrderId"></span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-          <span style="color:var(--text-muted)">Amount Paid</span>
-          <span style="font-weight:700; color:var(--primary);" id="successAmount"></span>
-        </div>
-      </div>
-
-      <a href="/dashboard/" class="btn btn-primary btn-huge" style="text-decoration:none;">Go to Dashboard →</a>
-    </div>
-
+<div class="rzp-modal">
+  <div class="rzp-header">
+    <div class="rzp-header-brand">DomainStore</div>
+    <div class="rzp-timer" id="payTimer">10:00</div>
   </div>
+
+  <!-- View: Payment Selection -->
+  <div id="viewMain" class="view-active" style="flex-direction: column;">
+    <div class="rzp-amount-bar">
+      <div class="rzp-amount-text">Amount Payable</div>
+      <div class="rzp-amount-val" id="displayAmount">₹0</div>
+    </div>
+
+    <div class="rzp-body">
+      <div class="rzp-qr-wrap" id="qrArea">
+        <span style="font-size:1.5rem; color:#ccc;">Loading QR...</span>
+      </div>
+      <div class="rzp-upi-id" onclick="copyUpiId()">
+        <span id="upiIdDisplay">loading...</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </div>
+
+      <div class="rzp-divider"><span>OR PAY USING APP</span></div>
+
+      <div class="rzp-apps" id="appGrid">
+        <div class="rzp-app-btn" onclick="openUpiApp('gpay')" title="Google Pay">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay"/>
+        </div>
+        <div class="rzp-app-btn" onclick="openUpiApp('phonepe')" title="PhonePe">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg" alt="PhonePe"/>
+        </div>
+        <div class="rzp-app-btn" onclick="openUpiApp('paytm')" title="Paytm">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm"/>
+        </div>
+        <div class="rzp-app-btn" onclick="openUpiApp('bhim')" title="BHIM / Any UPI">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="rzp-footer">
+      <button class="rzp-btn-paid" id="btnIHavePaid" onclick="markAsPaid()">I have paid</button>
+      <div style="text-align:center; margin-top:12px; font-size:0.75rem; color:#94a3b8; display:flex; align-items:center; justify-content:center; gap:4px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Secured by UPI
+      </div>
+    </div>
+  </div>
+
+  <!-- View: Verifying Payment -->
+  <div id="viewLoading" class="rzp-loading">
+    <div class="rzp-spinner"></div>
+    <h3 style="margin:0 0 8px; color:var(--text); font-size:1.1rem;">Verifying Payment</h3>
+    <p style="margin:0 0 16px; color:var(--text-mut); font-size:0.85rem; max-width:280px; line-height:1.4;">Please do not refresh or close this page while we confirm your payment.</p>
+    <div style="font-size:1.5rem; font-weight:700; color:#f59e0b; font-variant-numeric:tabular-nums;" id="verifyTimer">02:00</div>
+  </div>
+
+  <!-- View: Success -->
+  <div id="viewSuccess" class="rzp-success">
+    <div class="rzp-check">✓</div>
+    <h3 style="margin:0 0 8px; color:var(--green); font-size:1.2rem;">Payment Successful</h3>
+    <p style="margin:0 0 24px; color:var(--text-mut); font-size:0.9rem;">Your order has been verified.</p>
+    <a href="/dashboard/" style="background:var(--green); color:#fff; text-decoration:none; padding:12px 24px; border-radius:4px; font-weight:600; font-size:0.95rem;">Go to Dashboard</a>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="/js/main.js"></script>
+
 <script src="/js/upi-payment.js"></script>
 </body>
 </html>

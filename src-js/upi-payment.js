@@ -16,17 +16,9 @@ async function init() {
 
   currentTotal = pending?.total || 0;
 
-  // Set IDs and Amounts in UI
-  ['displayOrderId', 'loadingOrderId', 'successOrderId'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = currentOrderId;
-  });
-  
   const formattedTotal = '₹' + (currentTotal || 0).toLocaleString('en-IN');
-  ['displayAmount', 'successAmount'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = formattedTotal;
-  });
+  const dispAmt = document.getElementById('displayAmount');
+  if(dispAmt) dispAmt.textContent = formattedTotal;
 
   try {
     siteSettings = await fetch('/api/admin/settings').then(r => r.json());
@@ -44,48 +36,55 @@ function buildUpiUI() {
   const amount  = currentTotal || 0;
 
   const uid = document.getElementById('upiIdDisplay');
-  if (uid) uid.textContent = upiId;
+  if (uid) uid.innerHTML = `<span>${upiId}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 
   const qr = document.getElementById('qrArea');
   if (qr) {
     const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('DS-' + currentOrderId)}`;
-    const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}&color=6c3de8&bgcolor=ffffff&margin=0`;
-    qr.innerHTML  = `<img src="${qrUrl}" alt="UPI QR" style="width:100%;height:100%;object-fit:contain;border-radius:12px;"/>`;
+    const qrUrl   = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiLink)}&color=000000&bgcolor=ffffff&margin=0`;
+    qr.innerHTML  = `<img src="${qrUrl}" alt="UPI QR"/>`;
   }
-
-  const grid = document.getElementById('appGrid');
-  if (!grid) return;
-  const enc = encodeURIComponent;
-  const q   = `pa=${enc(upiId)}&pn=${enc(upiName)}&am=${amount}&cu=INR&tn=${enc('DS-' + currentOrderId)}`;
-
-  const apps = [
-    { icon: '🟢', label: 'GPay', url: `tez://upi/pay?${q}` },
-    { icon: '💜', label: 'PhonePe', url: `phonepe://pay?${q}` },
-    { icon: '🔵', label: 'Paytm', url: `paytmmp://pay?${q}` },
-    { icon: '🏦', label: 'Any UPI App', url: `upi://pay?${q}` },
-  ];
-
-  grid.innerHTML = apps.map(a => `
-    <div class="app-btn" onclick="openUpiApp('${a.url}')">
-      <span style="font-size:1.2rem">${a.icon}</span> ${a.label}
-    </div>`).join('');
 }
 
-function openUpiApp(url) {
+function openUpiApp(app) {
+  const upiId   = siteSettings.upiId   || 'domainstore@upi';
+  const upiName = siteSettings.upiName || 'DomainStore';
+  const amount  = currentTotal || 0;
+  
+  const enc = encodeURIComponent;
+  const q   = `pa=${enc(upiId)}&pn=${enc(upiName)}&am=${amount}&cu=INR&tn=${enc('DS-' + currentOrderId)}`;
+  
+  let url = `upi://pay?${q}`;
+  if(app === 'gpay') url = `tez://upi/pay?${q}`;
+  else if(app === 'phonepe') url = `phonepe://pay?${q}`;
+  else if(app === 'paytm') url = `paytmmp://pay?${q}`;
+  
   window.location.href = url;
   setTimeout(() => showToast('If app did not open, please scan the QR code.', 'warning'), 1500);
 }
 
 function copyUpiId() {
   navigator.clipboard.writeText(siteSettings.upiId || 'domainstore@upi').then(() => {
-    showToast('📋 UPI ID Copied!', 'success');
+    showToast('UPI ID Copied!', 'success');
   });
 }
 
+function showToast(msg, type='success') {
+  const toast = document.getElementById('toast');
+  if(!toast) return;
+  toast.textContent = msg;
+  toast.style.background = type === 'error' ? '#ef4444' : (type === 'warning' ? '#f59e0b' : '#333');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 function showView(viewId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('viewMain').classList.remove('view-active');
+  document.getElementById('viewLoading').classList.remove('view-active');
+  document.getElementById('viewSuccess').classList.remove('view-active');
+  
   const el = document.getElementById(viewId);
-  if (el) el.classList.add('active');
+  if (el) el.classList.add('view-active');
 }
 
 function startSessionTimer() {
@@ -97,7 +96,6 @@ function startSessionTimer() {
     const m = String(Math.floor(secs / 60)).padStart(2, '0');
     const s = String(secs % 60).padStart(2, '0');
     if (disp) disp.textContent = m + ':' + s;
-    if (secs <= 120 && disp) disp.classList.add('urgent');
     if (secs <= 0) {
       clearInterval(sessionTimer);
       if (disp) disp.textContent = '00:00';
@@ -110,17 +108,16 @@ function startSessionTimer() {
 async function markAsPaid() {
   if (!currentOrderId) return;
   const btn = document.getElementById('btnIHavePaid');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;margin:0;"></span> Processing...'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
 
   try {
-    // We send 'MANUAL' to tell backend this is the new verification flow
     const res = await fetch('/api/admin/utr-submit', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId: currentOrderId, utr: 'MANUAL' })
     }).then(r => r.json());
 
     if (!res.success) {
-      if (btn) { btn.disabled = false; btn.innerHTML = '✅ I Have Paid'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'I have paid'; }
       showToast(res.error || 'Failed to submit request', 'error');
       return;
     }
@@ -131,7 +128,7 @@ async function markAsPaid() {
     startOrderPolling();
 
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.innerHTML = '✅ I Have Paid'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'I have paid'; }
     showToast('Network error', 'error');
   }
 }
@@ -152,13 +149,12 @@ function startVerificationTimer() {
       clearInterval(pollTimer);
       if (disp) disp.textContent = '00:00';
       
-      // If 2 minutes run out and no success, show timeout message
       document.getElementById('viewLoading').innerHTML = `
         <div style="font-size:3rem;margin-bottom:10px;">⏳</div>
-        <h2 style="font-size:1.3rem; margin-bottom:8px;">Manual Verification Pending</h2>
-        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">Your payment request is securely logged. Admin review is taking longer than expected. If amount was deducted, your order will be activated shortly.</p>
-        <p style="font-size:0.8rem; margin-top:20px;">Order ID: <strong>${currentOrderId}</strong></p>
-        <a href="/" class="btn btn-outline" style="margin-top:20px; text-decoration:none;">Back to Store</a>
+        <h3 style="font-size:1.1rem; margin-bottom:8px;">Verification Pending</h3>
+        <p style="font-size:0.85rem; color:var(--text-mut); max-width:280px; line-height:1.4;">Admin review is taking longer than expected. If amount was deducted, your order will be activated shortly.</p>
+        <p style="font-size:0.8rem; margin-top:16px;">Order ID: <strong>${currentOrderId}</strong></p>
+        <a href="/" style="display:inline-block; margin-top:16px; padding:8px 16px; border:1px solid var(--border); color:var(--text); text-decoration:none; border-radius:4px; font-size:0.85rem;">Back to Store</a>
       `;
     }
   }, 1000);
@@ -166,7 +162,6 @@ function startVerificationTimer() {
 
 function startOrderPolling() {
   clearInterval(pollTimer);
-  // Poll every 3 seconds
   pollTimer = setInterval(async () => {
     try {
       const res = await fetch(\`/api/orders/status/\${currentOrderId}\`).then(r => r.json());
@@ -175,7 +170,6 @@ function startOrderPolling() {
         clearInterval(verifyTimer);
         showView('viewSuccess');
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        showToast('🎉 Payment Confirmed!', 'success');
       }
     } catch(e) { /* silent fail for polling */ }
   }, 3000);
