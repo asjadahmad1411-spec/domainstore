@@ -18,5 +18,15 @@
     "totalSpent": 849,
     "joinedAt": "2026-05-14T18:18:06.464Z",
     "lastOrder": "2026-05-14T18:18:06.464Z"
+  },
+  {
+    "id": "26e41eb4-3b09-446e-bc8f-1b1c62abbdce",
+    "name": "Asjad Ahmad",
+    "email": "asjadahmad1411@gmail.com",
+    "phone": "7098080756",
+    "orders": 2,
+    "totalSpent": 1298,
+    "joinedAt": "2026-05-20T02:32:15.242Z",
+    "lastOrder": "2026-05-20T02:35:13.660Z"
   }
 ]

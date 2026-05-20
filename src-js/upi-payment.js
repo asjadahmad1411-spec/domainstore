@@ -123,6 +123,8 @@ async function markAsPaid() {
     }
 
     clearInterval(sessionTimer);
+    const payTimerEl = document.getElementById('payTimer');
+    if (payTimerEl) payTimerEl.style.display = 'none';
     showView('viewLoading');
     startVerificationTimer();
     startOrderPolling();

@@ -108,7 +108,7 @@
   <!-- View: Payment Selection -->
   <div id="viewMain" class="view-active" style="flex-direction: column;">
     <div class="rzp-amount-bar">
-      <div class="rzp-amount-text">Amount Payable</div>
+      <div class="rzp-amount-text">Amount Payable <span style="font-size:0.75rem; color:#94a3b8; margin-left:8px;">(Order #<span id="displayOrderId">...</span>)</span></div>
       <div class="rzp-amount-val" id="displayAmount">₹0</div>
     </div>
 
@@ -116,9 +116,8 @@
       <div class="rzp-qr-wrap" id="qrArea">
         <span style="font-size:1.5rem; color:#ccc;">Loading QR...</span>
       </div>
-      <div class="rzp-upi-id" onclick="copyUpiId()">
-        <span id="upiIdDisplay">loading...</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <div class="rzp-upi-id" onclick="copyUpiId()" id="upiIdDisplay">
+        loading...
       </div>
 
       <div class="rzp-divider"><span>OR PAY USING APP</span></div>
@@ -141,6 +140,14 @@
       <div style="text-align:center; margin-top:12px; font-size:0.75rem; color:#94a3b8; display:flex; align-items:center; justify-content:center; gap:4px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         Secured by UPI
+      </div>
+      <div style="display:flex; justify-content:center; gap:16px; margin-top:16px;">
+        <div style="font-size:0.7rem; color:var(--text-mut); display:flex; align-items:center; gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> 100% Secure
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-mut); display:flex; align-items:center; gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> SSL Encrypted
+        </div>
       </div>
     </div>
   </div>
