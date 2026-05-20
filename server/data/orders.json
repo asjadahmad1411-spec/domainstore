@@ -26,10 +26,12 @@
     "codFee": 0,
     "total": 998,
     "paymentMethod": "upi_manual",
-    "status": "UTR Pending",
+    "status": "Active",
     "createdAt": "2026-05-14T17:55:50.982Z",
     "utr": "HDFC427891234567",
-    "utrSubmittedAt": "2026-05-14T17:55:50.986Z"
+    "utrSubmittedAt": "2026-05-14T17:55:50.986Z",
+    "utrVerified": true,
+    "verifiedAt": "2026-05-20T02:44:33.346Z"
   },
   {
     "id": "ORD-5FFFC14D",
@@ -106,10 +108,12 @@
     "codFee": 0,
     "total": 899,
     "paymentMethod": "upi_manual",
-    "status": "UTR Pending",
+    "status": "Active",
     "createdAt": "2026-05-20T02:35:13.660Z",
     "utr": "Manual Verification",
-    "utrSubmittedAt": "2026-05-20T02:37:47.995Z"
+    "utrSubmittedAt": "2026-05-20T02:37:47.995Z",
+    "utrVerified": true,
+    "verifiedAt": "2026-05-20T02:44:35.549Z"
   },
   {
     "id": "ORD-5979683D",
@@ -131,9 +135,38 @@
     "codFee": 0,
     "total": 799,
     "paymentMethod": "upi_manual",
-    "status": "UTR Pending",
+    "status": "Active",
     "createdAt": "2026-05-20T02:39:36.782Z",
     "utr": "Manual Verification",
-    "utrSubmittedAt": "2026-05-20T02:39:51.391Z"
+    "utrSubmittedAt": "2026-05-20T02:42:27.170Z",
+    "utrVerified": true,
+    "verifiedAt": "2026-05-20T02:44:34.177Z"
+  },
+  {
+    "id": "ORD-AC672A7D",
+    "customer": {
+      "name": "Asjad Ahmad",
+      "email": "asjadahmad1411@gmail.com",
+      "phone": "7098080756"
+    },
+    "items": [
+      {
+        "id": "domain-hjyfjjhhj.in",
+        "type": "domain",
+        "name": "hjyfjjhhj.in",
+        "price": 399
+      }
+    ],
+    "promoCode": null,
+    "discount": 0,
+    "codFee": 0,
+    "total": 399,
+    "paymentMethod": "upi_manual",
+    "status": "Active",
+    "createdAt": "2026-05-20T02:43:01.408Z",
+    "utr": "Manual Verification",
+    "utrSubmittedAt": "2026-05-20T02:43:12.686Z",
+    "utrVerified": true,
+    "verifiedAt": "2026-05-20T02:44:34.829Z"
   }
 ]

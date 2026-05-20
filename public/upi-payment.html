@@ -15,12 +15,21 @@
     --green: #22c55e;
   }
   body {
-    margin: 0; padding: 0; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     display: flex; justify-content: center; align-items: center; min-height: 100vh;
+    background-color: #f8fafc;
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(51, 140, 240, 0.2) 0px, transparent 50%),
+      radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.1) 0px, transparent 60%);
+    background-attachment: fixed;
   }
   .rzp-modal {
-    background: #fff; width: 100%; max-width: 400px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden;
-    display: flex; flex-direction: column; position: relative;
+    background: rgba(255, 255, 255, 0.85); width: 100%; max-width: 400px; border-radius: 12px; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05); 
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden; display: flex; flex-direction: column; position: relative;
   }
   .rzp-header {
     background: var(--brand); color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center;
