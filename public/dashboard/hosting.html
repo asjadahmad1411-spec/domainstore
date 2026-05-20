@@ -17,14 +17,14 @@
   <nav class="dash-nav">
     <div class="dash-nav-section">Overview</div>
     <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
-    <a href="/dashboard/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
+    <a href="/dashboard/orders" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
     <div class="dash-nav-section">Services</div>
-    <a href="/dashboard/domains.html" class="dash-nav-item"><span class="nav-icon">🌐</span> My Domains</a>
-    <a href="/dashboard/hosting.html" class="dash-nav-item active"><span class="nav-icon">⚡</span> My Hosting</a>
-    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <a href="/dashboard/domains" class="dash-nav-item"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting" class="dash-nav-item active"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
     <div class="dash-nav-section">Account</div>
-    <a href="/dashboard/profile.html" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
-    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+    <a href="/dashboard/profile" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
   </nav>
   <div class="dash-footer">
     <a href="/" class="dash-nav-item"><span class="nav-icon">🛍️</span> Go to Store</a>
@@ -35,7 +35,7 @@
 <div class="dash-main">
   <div class="dash-topbar">
     <div class="dash-topbar-title"><h2>⚡ My Hosting</h2><p>Server details, cPanel access, FTP, and email setup</p></div>
-    <div class="dash-topbar-actions"><a href="/hosting.html" class="btn btn-primary btn-sm">+ Get More Hosting</a></div>
+    <div class="dash-topbar-actions"><a href="/hosting" class="btn btn-primary btn-sm">+ Get More Hosting</a></div>
   </div>
   <div class="dash-content" id="hostingContent">
     <div class="dash-panel"><div class="dash-panel-body" style="text-align:center;padding:60px;color:var(--text-muted);">⏳ Loading hosting plans...</div></div>
@@ -81,7 +81,7 @@ function renderHosting(plans) {
       <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">⚡</div>
       <h3>No hosting plans yet</h3>
       <p style="color:var(--text-muted);margin:12px 0 20px;">Get started with a powerful hosting plan.</p>
-      <a href="/hosting.html" class="btn btn-primary">🚀 Browse Hosting Plans</a>
+      <a href="/hosting" class="btn btn-primary">🚀 Browse Hosting Plans</a>
     </div></div>`; return;
   }
   cont.innerHTML = plans.map((h, i) => `
@@ -165,7 +165,7 @@ function renderHosting(plans) {
         <div style="margin-top:20px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);border-radius:12px;padding:16px;">
           <div style="font-weight:700;margin-bottom:8px;font-size:.9rem;">🚀 Quick Setup Guide</div>
           <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">
-            1. Go to <a href="/dashboard/domains.html" style="color:var(--accent);">My Domains</a> and update nameservers to: <strong style="color:var(--accent);">ns1.domainstore.in, ns2.domainstore.in</strong><br/>
+            1. Go to <a href="/dashboard/domains" style="color:var(--accent);">My Domains</a> and update nameservers to: <strong style="color:var(--accent);">ns1.domainstore.in, ns2.domainstore.in</strong><br/>
             2. Wait 24-48 hours for DNS propagation<br/>
             3. Login to <a href="${h.cpanelUrl}" target="_blank" style="color:var(--accent);">cPanel</a> and upload your website files<br/>
             4. Create email accounts above for your domain

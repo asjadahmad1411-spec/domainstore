@@ -11,16 +11,16 @@
   <div class="sidebar-logo"><div class="logo-text">🌐 DomainStore</div><div class="logo-sub">Admin Panel</div></div>
   <nav class="sidebar-nav">
     <div class="nav-section">Main</div>
-    <a href="/admin/dashboard.html" class="nav-item active"><span class="icon">📊</span> Dashboard</a>
-    <a href="/admin/orders.html" class="nav-item"><span class="icon">📦</span> Orders</a>
-    <a href="/admin/utr.html" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
+    <a href="/admin/dashboard" class="nav-item active"><span class="icon">📊</span> Dashboard</a>
+    <a href="/admin/orders" class="nav-item"><span class="icon">📦</span> Orders</a>
+    <a href="/admin/utr" class="nav-item"><span class="icon">🏦</span> UTR Verify</a>
     <div class="nav-section">Management</div>
-    <a href="/admin/domains.html" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
-    <a href="/admin/hosting.html" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
-    <a href="/admin/customers.html" class="nav-item"><span class="icon">👥</span> Customers</a>
+    <a href="/admin/domains" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
+    <a href="/admin/hosting" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
+    <a href="/admin/customers" class="nav-item"><span class="icon">👥</span> Customers</a>
     <div class="nav-section">Marketing</div>
-    <a href="/admin/promos.html" class="nav-item"><span class="icon">🎁</span> Offers & Promos</a>
-    <a href="/admin/settings.html" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+    <a href="/admin/promos" class="nav-item"><span class="icon">🎁</span> Offers & Promos</a>
+    <a href="/admin/settings" class="nav-item"><span class="icon">⚙️</span> Settings</a>
   </nav>
   <div class="sidebar-footer"><a href="/" style="font-size:0.82rem;color:var(--text-muted);text-decoration:none;">← View Website</a></div>
 </div>
@@ -35,7 +35,7 @@
       <div class="stat-card"><div class="stat-icon purple">💰</div><div><div class="stat-value" id="sRevenue">₹0</div><div class="stat-label">Total Revenue</div></div></div>
       <div class="stat-card"><div class="stat-icon cyan">📦</div><div><div class="stat-value" id="sOrders">0</div><div class="stat-label">Total Orders</div></div></div>
       <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-value" id="sPending">0</div><div class="stat-label">Pending Orders</div></div></div>
-      <div class="stat-card" style="cursor:pointer;" onclick="location.href='/admin/utr.html'"><div class="stat-icon" style="background:rgba(245,158,11,.15);">🏦</div><div><div class="stat-value" id="sUtr" style="color:#f59e0b;">0</div><div class="stat-label">UTR Pending</div></div></div>
+      <div class="stat-card" style="cursor:pointer;" onclick="location.href='/admin/utr'"><div class="stat-icon" style="background:rgba(245,158,11,.15);">🏦</div><div><div class="stat-value" id="sUtr" style="color:#f59e0b;">0</div><div class="stat-label">UTR Pending</div></div></div>
       <div class="stat-card"><div class="stat-icon green">👥</div><div><div class="stat-value" id="sCustomers">0</div><div class="stat-label">Customers</div></div></div>
       <div class="stat-card"><div class="stat-icon cyan">🌐</div><div><div class="stat-value" id="sDomains">0</div><div class="stat-label">Domains Sold</div></div></div>
     </div>
@@ -43,7 +43,7 @@
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">📋 Recent Orders</span>
-        <a href="/admin/orders.html" class="btn btn-outline btn-sm">View All</a>
+        <a href="/admin/orders" class="btn btn-outline btn-sm">View All</a>
       </div>
       <div class="table-wrap">
         <table>
@@ -55,11 +55,11 @@
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="bottomPanels">
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">🌐 Domain TLDs</span><a href="/admin/domains.html" class="btn btn-outline btn-sm">Manage</a></div>
+        <div class="panel-header"><span class="panel-title">🌐 Domain TLDs</span><a href="/admin/domains" class="btn btn-outline btn-sm">Manage</a></div>
         <div id="tldMiniList" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">⚡ Top Plans</span><a href="/admin/hosting.html" class="btn btn-outline btn-sm">Manage</a></div>
+        <div class="panel-header"><span class="panel-title">⚡ Top Plans</span><a href="/admin/hosting" class="btn btn-outline btn-sm">Manage</a></div>
         <div id="planMiniList" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
     </div>

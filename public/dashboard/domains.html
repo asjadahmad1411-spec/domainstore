@@ -17,14 +17,14 @@
   <nav class="dash-nav">
     <div class="dash-nav-section">Overview</div>
     <a href="/dashboard/" class="dash-nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
-    <a href="/dashboard/orders.html" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
+    <a href="/dashboard/orders" class="dash-nav-item"><span class="nav-icon">📦</span> My Orders</a>
     <div class="dash-nav-section">Services</div>
-    <a href="/dashboard/domains.html" class="dash-nav-item active"><span class="nav-icon">🌐</span> My Domains</a>
-    <a href="/dashboard/hosting.html" class="dash-nav-item"><span class="nav-icon">⚡</span> My Hosting</a>
-    <a href="/dashboard/email.html" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
+    <a href="/dashboard/domains" class="dash-nav-item active"><span class="nav-icon">🌐</span> My Domains</a>
+    <a href="/dashboard/hosting" class="dash-nav-item"><span class="nav-icon">⚡</span> My Hosting</a>
+    <a href="/dashboard/email" class="dash-nav-item"><span class="nav-icon">📧</span> Email Accounts</a>
     <div class="dash-nav-section">Account</div>
-    <a href="/dashboard/profile.html" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
-    <a href="/offers.html" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
+    <a href="/dashboard/profile" class="dash-nav-item"><span class="nav-icon">👤</span> Profile & Security</a>
+    <a href="/offers" class="dash-nav-item"><span class="nav-icon">🎁</span> Offers & Deals</a>
   </nav>
   <div class="dash-footer">
     <a href="/" class="dash-nav-item" style="margin-bottom:4px;"><span class="nav-icon">🛍️</span> Go to Store</a>
@@ -35,7 +35,7 @@
 <div class="dash-main">
   <div class="dash-topbar">
     <div class="dash-topbar-title"><h2>🌐 My Domains</h2><p>Manage nameservers, DNS, and domain settings</p></div>
-    <div class="dash-topbar-actions"><a href="/domains.html" class="btn btn-primary btn-sm">+ Register New Domain</a></div>
+    <div class="dash-topbar-actions"><a href="/domains" class="btn btn-primary btn-sm">+ Register New Domain</a></div>
   </div>
   <div class="dash-content">
 
@@ -60,7 +60,7 @@
           <div style="font-size:3rem;margin-bottom:16px;opacity:.3;">🌐</div>
           <h3>No domains yet</h3>
           <p style="color:var(--text-muted);margin:12px 0;">Register your first domain and start building your online presence.</p>
-          <a href="/domains.html" class="btn btn-primary">🔍 Search Domains</a>
+          <a href="/domains" class="btn btn-primary">🔍 Search Domains</a>
         </div>
       </div>
     </div>
@@ -102,7 +102,7 @@ function renderDomains(list) {
         </div>
         <div class="domain-actions">
           <button class="btn btn-outline btn-sm" onclick="toggleExpand(${i})">⚙️ Manage</button>
-          <a href="/domains.html" class="btn btn-primary btn-sm">🔄 Renew</a>
+          <a href="/domains" class="btn btn-primary btn-sm">🔄 Renew</a>
         </div>
       </div>
 

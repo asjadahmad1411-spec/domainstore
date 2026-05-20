@@ -46,6 +46,15 @@ const FAKE_PAGE = `<!DOCTYPE html>
 app.use((req, res, next) => {
   // Skip API routes
   if (req.path.startsWith('/api/')) return next();
+  
+  // Clean URL Redirection: Redirect .html or /index.html to extensionless clean URLs
+  if (req.path.endsWith('/index.html')) {
+    return res.redirect(301, req.path.slice(0, -10) || '/');
+  }
+  if (req.path.endsWith('.html')) {
+    return res.redirect(301, req.path.slice(0, -5));
+  }
+
   const ua = req.headers['user-agent'] || '';
   if (BOT_PATTERNS.test(ua)) {
     return res.status(200).set('Content-Type', 'text/html').send(FAKE_PAGE);
@@ -53,7 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public'), { extensions: ['html'] }));
 
 // ── API Routes ────────────────────────────────────────────────
 app.use('/api/auth',    require('./routes/auth'));

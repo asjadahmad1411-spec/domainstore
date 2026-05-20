@@ -29,12 +29,12 @@
   <a href="/" class="nav-logo">🌐 DomainStore</a>
   <ul class="nav-links" id="navLinks">
     <li><a href="/">Home</a></li>
-    <li><a href="/domains.html">Domains</a></li>
-    <li><a href="/hosting.html">Hosting</a></li>
-    <li><a href="/offers.html" style="color:var(--accent)">🎁 Offers</a></li>
+    <li><a href="/domains">Domains</a></li>
+    <li><a href="/hosting">Hosting</a></li>
+    <li><a href="/offers" style="color:var(--accent)">🎁 Offers</a></li>
   </ul>
   <div class="nav-actions">
-    <a href="/login.html" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Account</a><button class="cart-btn" onclick="location.href='/cart.html'">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
+    <a href="/login" id="navAuthBtn" class="btn btn-outline btn-sm" style="font-size:.82rem;">👤 Account</a><button class="cart-btn" onclick="location.href='/cart'">🛒 Cart <span class="cart-count" id="cartCount">0</span></button>
     <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -54,7 +54,7 @@
         <div style="font-size:1.1rem;font-weight:800;margin-bottom:4px;" id="bannerTitleDisplay">Flash Sale — Extra 20% Off!</div>
         <div style="color:var(--text-muted);font-size:.9rem;" id="bannerSubDisplay">Use code <span style="color:var(--accent);font-weight:700;" id="bannerCodeDisplay">FLASH20</span> at checkout.</div>
       </div>
-      <a href="/hosting.html" class="btn btn-primary" id="bannerLinkDisplay">Shop Now →</a>
+      <a href="/hosting" class="btn btn-primary" id="bannerLinkDisplay">Shop Now →</a>
     </div>
 
     <!-- Active promo codes -->
@@ -95,7 +95,7 @@
 </section>
 
 <footer style="background:var(--bg2);border-top:1px solid var(--border);padding:28px;text-align:center;font-size:.85rem;color:var(--text-muted);">
-  © 2025 DomainStore · <a href="/" style="color:var(--accent)">Home</a> · <a href="/domains.html" style="color:var(--accent)">Domains</a> · <a href="/hosting.html" style="color:var(--accent)">Hosting</a>
+  © 2025 DomainStore · <a href="/" style="color:var(--accent)">Home</a> · <a href="/domains" style="color:var(--accent)">Domains</a> · <a href="/hosting" style="color:var(--accent)">Hosting</a>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -131,8 +131,8 @@ async function loadOffers() {
           <span>🗓️</span><span>${expiryText}</span>
         </div>
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
-          <a href="/domains.html" class="btn btn-outline btn-sm">Use on Domain</a>
-          <a href="/hosting.html" class="btn btn-primary btn-sm">Use on Hosting</a>
+          <a href="/domains" class="btn btn-outline btn-sm">Use on Domain</a>
+          <a href="/hosting" class="btn btn-primary btn-sm">Use on Hosting</a>
         </div>
       </div>`;
     }).join('');
@@ -154,7 +154,7 @@ async function loadDomainDeals() {
         <div style="font-size:1.5rem;font-weight:900;color:var(--accent);margin-bottom:6px;">${t.extension}</div>
         <div style="font-size:1.4rem;font-weight:800;">₹${t.price}<span style="font-size:.8rem;font-weight:400;color:var(--text-muted)">/yr</span></div>
         ${t.popular ? '<div style="margin:8px 0;"><span class="badge badge-accent">🔥 Hot Deal</span></div>' : '<div style="margin:8px 0;height:26px;"></div>'}
-        <a href="/domains.html" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-top:8px;">Register</a>
+        <a href="/domains" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-top:8px;">Register</a>
       </div>`).join('');
   } catch(e) {}
 }
@@ -169,7 +169,7 @@ async function loadHostingDeals() {
         <div class="plan-price">₹${p.price}<span>/mo</span></div>
         <div class="plan-renew">₹${p.renewPrice}/mo renewal</div>
         <ul class="plan-features">${(p.features||[]).map(f=>`<li>${f}</li>`).join('')}</ul>
-        <a href="/hosting.html" class="btn ${p.highlighted?'btn-primary':'btn-outline'}" style="width:100%;justify-content:center;">Get This Plan</a>
+        <a href="/hosting" class="btn ${p.highlighted?'btn-primary':'btn-outline'}" style="width:100%;justify-content:center;">Get This Plan</a>
       </div>`).join('');
   } catch(e) {}
 }
