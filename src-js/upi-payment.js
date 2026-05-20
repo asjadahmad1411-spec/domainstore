@@ -172,6 +172,13 @@ function startOrderPolling() {
         clearInterval(verifyTimer);
         showView('viewSuccess');
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        // Fire Ads Conversions
+        if (window.gtag && window.googleAdsTag) {
+          window.gtag('event', 'conversion', { 'send_to': window.googleAdsTag, 'value': currentTotal, 'currency': 'INR', 'transaction_id': currentOrderId });
+        }
+        if (window.fbq) {
+          window.fbq('track', 'Purchase', { value: currentTotal, currency: 'INR' });
+        }
       }
     } catch(e) { /* silent fail for polling */ }
   }, 3000);

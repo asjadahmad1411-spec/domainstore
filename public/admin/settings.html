@@ -98,6 +98,20 @@
         <button class="btn btn-primary" style="margin-top:16px;" onclick="saveSecuritySettings()">💾 Save Security Settings</button>
       </div>
 
+      <!-- Ads & Tracking -->
+      <div class="panel" style="border-color:rgba(16,185,129,.3);">
+        <div class="panel-header"><span class="panel-title">📈 Ads & Tracking</span></div>
+        <div class="form-group">
+          <label class="form-label">Google Ads Tag (AW-XXXXX)</label>
+          <input type="text" class="form-control" id="googleAdsTag" placeholder="e.g. AW-123456789"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Meta (Facebook) Pixel ID</label>
+          <input type="text" class="form-control" id="metaPixelId" placeholder="e.g. 9876543210"/>
+        </div>
+        <button class="btn btn-primary" onclick="saveTrackingSettings()">💾 Save Tracking Setup</button>
+      </div>
+
       <!-- Admin Password -->
       <div class="panel">
         <div class="panel-header"><span class="panel-title">🔐 Admin Password</span></div>
@@ -119,7 +133,7 @@ let currentSettings = {};
 async function loadSettingsPage() {
   try {
     currentSettings = await apiFetch('/api/admin/settings');
-    const fields = ['storeName','tagline','supportEmail','supportPhone','gstNumber','upiId','upiName'];
+    const fields = ['storeName','tagline','supportEmail','supportPhone','gstNumber','upiId','upiName','googleAdsTag','metaPixelId'];
     fields.forEach(f => { const el = document.getElementById(f); if (el && currentSettings[f]) el.value = currentSettings[f]; });
     const pm = currentSettings.paymentMethods || {};
     ['upi_manual','card','netbanking','cod'].forEach(k => {
@@ -200,7 +214,18 @@ async function saveSecuritySettings() {
   try {
     await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ enableCloaking: cloakingEnabled, enableHomeCloaking: homeCloakingEnabled }) });
     showToast('Security settings updated!', 'success');
-  } catch(e) { showToast('Failed to save', 'error'); }
+  } catch(e) { showToast('Failed to save security settings', 'error'); }
+}
+
+async function saveTrackingSettings() {
+  const data = {
+    googleAdsTag: document.getElementById('googleAdsTag')?.value.trim(),
+    metaPixelId:  document.getElementById('metaPixelId')?.value.trim()
+  };
+  try {
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify(data) });
+    showToast('Tracking setup saved!', 'success');
+  } catch(e) { showToast('Failed to save tracking settings', 'error'); }
 }
 
 function changePassword() {
