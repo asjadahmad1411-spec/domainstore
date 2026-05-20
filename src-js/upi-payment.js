@@ -164,7 +164,7 @@ function startOrderPolling() {
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
     try {
-      const res = await fetch(\`/api/orders/status/\${currentOrderId}\`).then(r => r.json());
+      const res = await fetch(`/api/orders/status/${currentOrderId}`).then(r => r.json());
       if (res.status === 'Active') {
         clearInterval(pollTimer);
         clearInterval(verifyTimer);
