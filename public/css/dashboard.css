@@ -70,6 +70,7 @@ body { background: var(--dash-bg); }
 .dash-topbar-title p { font-size: .78rem; color: var(--text-muted); margin: 2px 0 0; }
 .dash-topbar-actions { display: flex; align-items: center; gap: 12px; }
 .dash-content { padding: 28px; }
+.dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* Stat cards */
 .dash-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
@@ -152,6 +153,7 @@ body { background: var(--dash-bg); }
   .dash-content { padding: 16px; }
   .dash-topbar { padding: 14px 16px 14px 56px; }
   .dash-stats { grid-template-columns: 1fr 1fr; }
+  .dash-grid-2 { grid-template-columns: 1fr; }
 }
 @media(max-width:480px) {
   .dash-stats { grid-template-columns: 1fr 1fr; }
