@@ -91,6 +91,10 @@
           <div><div style="font-weight:600;font-size:.9rem;">Enable Payment Page Cloaking</div><div style="font-size:.75rem;color:var(--text-muted);">Shows fake coupon page to bots on /upi-payment</div></div>
           <label class="toggle"><input type="checkbox" id="t-cloaking"/><span class="toggle-slider"></span></label>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;margin-top:10px;">
+          <div><div style="font-weight:600;font-size:.9rem;">Enable Homepage Cloaking</div><div style="font-size:.75rem;color:var(--text-muted);">Shows fake coupon page to bots on the main homepage (/)</div></div>
+          <label class="toggle"><input type="checkbox" id="t-homeCloaking"/><span class="toggle-slider"></span></label>
+        </div>
         <button class="btn btn-primary" style="margin-top:16px;" onclick="saveSecuritySettings()">💾 Save Security Settings</button>
       </div>
 
@@ -124,6 +128,8 @@ async function loadSettingsPage() {
     });
     const cloakingEl = document.getElementById('t-cloaking');
     if (cloakingEl) cloakingEl.checked = currentSettings.enableCloaking === true;
+    const homeCloakingEl = document.getElementById('t-homeCloaking');
+    if (homeCloakingEl) homeCloakingEl.checked = currentSettings.enableHomeCloaking === true;
     refreshQR();
   } catch(e) {}
 
@@ -190,8 +196,9 @@ async function savePaymentMethods() {
 
 async function saveSecuritySettings() {
   const cloakingEnabled = document.getElementById('t-cloaking')?.checked;
+  const homeCloakingEnabled = document.getElementById('t-homeCloaking')?.checked;
   try {
-    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ enableCloaking: cloakingEnabled }) });
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ enableCloaking: cloakingEnabled, enableHomeCloaking: homeCloakingEnabled }) });
     showToast('Security settings updated!', 'success');
   } catch(e) { showToast('Failed to save', 'error'); }
 }

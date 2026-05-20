@@ -23,5 +23,6 @@
   "codFee": 50,
   "codLimit": 5000,
   "maintenanceMode": false,
-  "enableCloaking": true
+  "enableCloaking": true,
+  "enableHomeCloaking": true
 }

