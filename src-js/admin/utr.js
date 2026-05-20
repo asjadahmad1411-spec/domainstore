@@ -12,7 +12,7 @@ async function loadUTROrders() {
 
     const tbody = document.getElementById('utrBody');
     if (!pending.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px;">🎉 No pending UTR verifications</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px;">🎉 No pending verifications</td></tr>';
     } else {
       tbody.innerHTML = pending.map(o => `
         <tr>

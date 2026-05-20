@@ -13,7 +13,7 @@
     <div class="nav-section">Main</div>
     <a href="/admin/dashboard" class="nav-item"><span class="icon">📊</span> Dashboard</a>
     <a href="/admin/orders" class="nav-item"><span class="icon">📦</span> Orders</a>
-    <a href="/admin/utr" class="nav-item active"><span class="icon">🏦</span> UTR Verify</a>
+    <a href="/admin/utr" class="nav-item active"><span class="icon">🏦</span> Payment Verify</a>
     <div class="nav-section">Management</div>
     <a href="/admin/domains" class="nav-item"><span class="icon">🌐</span> Domain Manager</a>
     <a href="/admin/hosting" class="nav-item"><span class="icon">⚡</span> Hosting Plans</a>
@@ -27,7 +27,7 @@
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-left"><h2>UTR Verification</h2><p>Verify UPI payments submitted by customers</p></div>
+    <div class="topbar-left"><h2>Payment Verification</h2><p>Verify manual payments submitted by customers</p></div>
     <div class="topbar-right">
       <span id="pendingBadge" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#f59e0b;padding:5px 14px;border-radius:50px;font-size:.8rem;font-weight:700;">Loading...</span>
       <span class="admin-badge">👤 Admin</span>
@@ -41,12 +41,12 @@
       <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
         <div style="font-size:1.8rem;">ℹ️</div>
         <div>
-          <div style="font-weight:700;margin-bottom:6px;color:var(--accent);">How UTR Verification Works</div>
+          <div style="font-weight:700;margin-bottom:6px;color:var(--accent);">How Manual Payment Verification Works</div>
           <p style="font-size:.875rem;color:var(--text-muted);">
-            1. Customer pays on your UPI ID and submits their UTR number.<br/>
-            2. Orders appear below with status "UTR Pending".<br/>
-            3. You verify the UTR in your UPI app / bank statement.<br/>
-            4. Click <strong style="color:var(--green)">✅ Verify</strong> to activate the order, or <strong style="color:var(--red)">❌ Reject</strong> if UTR is invalid.
+            1. Customer pays and clicks "I have paid".<br/>
+            2. Orders appear below with status "Pending".<br/>
+            3. You verify the amount received in your bank statement.<br/>
+            4. Click <strong style="color:var(--green)">✅ Verify</strong> to activate the order, or <strong style="color:var(--red)">❌ Reject</strong> if payment not found.
           </p>
         </div>
       </div>
@@ -54,7 +54,7 @@
 
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">🏦 Pending UTR Payments</span>
+        <span class="panel-title">🏦 Pending Payments</span>
         <button class="btn btn-outline btn-sm" onclick="loadUTROrders()">🔄 Refresh</button>
       </div>
       <div class="table-wrap">
@@ -64,7 +64,7 @@
               <th>Order ID</th>
               <th>Customer</th>
               <th>Amount</th>
-              <th>UTR Number</th>
+              <th>Info</th>
               <th>Submitted</th>
               <th>Items</th>
               <th>Actions</th>
@@ -84,7 +84,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>UTR</th><th>Verified At</th></tr></thead>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Info</th><th>Verified At</th></tr></thead>
           <tbody id="verifiedBody"></tbody>
         </table>
       </div>
@@ -100,10 +100,9 @@
     <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:16px;">Order: <span id="rejectOrderId" style="color:var(--accent);font-weight:700;"></span></p>
     <div class="form-group"><label class="form-label">Rejection Reason</label>
       <select class="form-control" id="rejectReason">
-        <option>UTR not found in bank statement</option>
+        <option>Payment not found in bank</option>
         <option>Amount mismatch</option>
-        <option>Duplicate UTR</option>
-        <option>Invalid UTR format</option>
+        <option>Fake payment attempt</option>
         <option>Other</option>
       </select>
     </div>
