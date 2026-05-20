@@ -22,5 +22,6 @@
   },
   "codFee": 50,
   "codLimit": 5000,
-  "maintenanceMode": false
+  "maintenanceMode": false,
+  "enableCloaking": true
 }

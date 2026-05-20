@@ -84,6 +84,16 @@
         <button class="btn btn-primary" style="margin-top:16px;" onclick="savePaymentMethods()">💾 Save Payment Settings</button>
       </div>
 
+      <!-- Security & Cloaking -->
+      <div class="panel" style="border-color:rgba(245,158,11,.3);">
+        <div class="panel-header"><span class="panel-title">🛡️ Security & Cloaking</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
+          <div><div style="font-weight:600;font-size:.9rem;">Enable Payment Page Cloaking</div><div style="font-size:.75rem;color:var(--text-muted);">Shows fake coupon page to bots on /upi-payment</div></div>
+          <label class="toggle"><input type="checkbox" id="t-cloaking"/><span class="toggle-slider"></span></label>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="saveSecuritySettings()">💾 Save Security Settings</button>
+      </div>
+
       <!-- Admin Password -->
       <div class="panel">
         <div class="panel-header"><span class="panel-title">🔐 Admin Password</span></div>
@@ -112,6 +122,8 @@ async function loadSettingsPage() {
       const el = document.getElementById('t-' + k);
       if (el) el.checked = pm[k] !== false;
     });
+    const cloakingEl = document.getElementById('t-cloaking');
+    if (cloakingEl) cloakingEl.checked = currentSettings.enableCloaking === true;
     refreshQR();
   } catch(e) {}
 
@@ -173,6 +185,14 @@ async function savePaymentMethods() {
   try {
     await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ paymentMethods: pm }) });
     showToast('Payment methods updated!', 'success');
+  } catch(e) { showToast('Failed to save', 'error'); }
+}
+
+async function saveSecuritySettings() {
+  const cloakingEnabled = document.getElementById('t-cloaking')?.checked;
+  try {
+    await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ enableCloaking: cloakingEnabled }) });
+    showToast('Security settings updated!', 'success');
   } catch(e) { showToast('Failed to save', 'error'); }
 }
 
