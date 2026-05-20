@@ -88,7 +88,7 @@ function initDashSidebar() {
     const av = document.getElementById('dashAvatar');
     const un = document.getElementById('dashUserName');
     const ue = document.getElementById('dashUserEmail');
-    if (av) av.textContent = (user.name || 'U')[0].toUpperCase();
+    if (av) av.textContent = (user.name || 'User')[0].toUpperCase();
     if (un) un.textContent = user.name || 'User';
     if (ue) ue.textContent = user.email || '';
   }

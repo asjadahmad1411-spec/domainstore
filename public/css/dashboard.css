@@ -38,8 +38,9 @@ body { background: var(--dash-bg); }
   display: flex; align-items: center; justify-content: center;
   font-weight: 900; font-size: .9rem; color: #fff; flex-shrink: 0;
 }
-.dash-user-info .u-name { font-size: .82rem; font-weight: 700; line-height: 1.2; }
-.dash-user-info .u-email { font-size: .7rem; color: var(--text-muted); }
+.dash-user-info { min-width: 0; overflow: hidden; }
+.dash-user-info .u-name { font-size: .82rem; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-user-info .u-email { font-size: .7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dash-nav { flex: 1; padding: 8px 10px; overflow-y: auto; }
 .dash-nav-section { font-size: .68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 14px 10px 6px; }
 .dash-nav-item {
@@ -156,6 +157,7 @@ body { background: var(--dash-bg); }
   .dash-stats { grid-template-columns: 1fr 1fr; }
   .dash-stat { padding: 14px; }
   .dash-stat-val { font-size: 1.3rem; }
+  .dash-topbar-actions { display: none; }
 }
 
 /* Hosting info grid */

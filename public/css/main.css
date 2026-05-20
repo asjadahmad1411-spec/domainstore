@@ -40,7 +40,7 @@ p { color: var(--text-muted); }
 .grad { background: linear-gradient(135deg, var(--primary-light), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
 /* BUTTONS */
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 50px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; transition: all 0.3s; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 50px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; text-decoration: none; transition: all 0.3s; }
 .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; box-shadow: 0 4px 20px rgba(108,61,232,0.4); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,61,232,0.6); }
 .btn-accent { background: linear-gradient(135deg, var(--accent), #0099cc); color: #000; font-weight: 700; }
