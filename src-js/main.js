@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════
-// main.js — DomainStore Global Script
+// main.js — EnrootHost Global Script
 // ═══════════════════════════════════════════════════════════
 
 // ── Cart ──────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ function toggleTheme() {
   if (!document.getElementById('preloader')) {
     const pl = document.createElement('div');
     pl.id = 'preloader';
-    pl.innerHTML = `<div class="preloader-logo">🌐 DomainStore</div>
+    pl.innerHTML = `<div class="preloader-logo" style="display:flex; justify-content:center; align-items:center; gap:6px;"><span style="font-size:1.6rem;">🌱</span><span style="font-weight:900; background:linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Enroot</span><span style="font-weight:700; color:inherit;">Host</span></div>
       <div class="preloader-bar"><div class="preloader-bar-fill"></div></div>
       <div class="preloader-dots"><span></span><span></span><span></span></div>`;
     document.addEventListener('DOMContentLoaded', () => document.body.insertBefore(pl, document.body.firstChild));

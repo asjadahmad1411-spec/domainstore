@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>My Hosting — DomainStore Dashboard</title>
+<title>My Hosting — EnrootHost Dashboard</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/dashboard.css"/>
 <link rel="stylesheet" href="/css/responsive.css"/>
@@ -12,7 +12,7 @@
 <div class="dash-overlay" id="dashOverlay"></div>
 
 <aside class="dash-sidebar" id="dashSidebar">
-  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">EnrootHost</div><div class="logo-sub">Account Dashboard</div></div></a></div>
   <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
   <nav class="dash-nav">
     <div class="dash-nav-section">Overview</div>
@@ -134,7 +134,7 @@ function renderHosting(plans) {
         <div style="margin-bottom:20px;">
           <div style="font-weight:700;font-size:.9rem;margin-bottom:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;">🌐 Nameservers (point your domain here)</div>
           <div class="hosting-info-grid">
-            ${(h.nameservers||['ns1.domainstore.in','ns2.domainstore.in']).map((ns,ni)=>`
+            ${(h.nameservers||['ns1.enroothost.com','ns2.enroothost.com']).map((ns,ni)=>`
             <div class="hosting-info-item">
               <div class="h-lbl">NS ${ni+1}</div>
               <div class="h-val">${ns} <span class="h-copy" onclick="copyText('${ns}','Nameserver ${ni+1}')">📋</span></div>
@@ -165,7 +165,7 @@ function renderHosting(plans) {
         <div style="margin-top:20px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.15);border-radius:12px;padding:16px;">
           <div style="font-weight:700;margin-bottom:8px;font-size:.9rem;">🚀 Quick Setup Guide</div>
           <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">
-            1. Go to <a href="/dashboard/domains" style="color:var(--accent);">My Domains</a> and update nameservers to: <strong style="color:var(--accent);">ns1.domainstore.in, ns2.domainstore.in</strong><br/>
+            1. Go to <a href="/dashboard/domains" style="color:var(--accent);">My Domains</a> and update nameservers to: <strong style="color:var(--accent);">ns1.enroothost.com, ns2.enroothost.com</strong><br/>
             2. Wait 24-48 hours for DNS propagation<br/>
             3. Login to <a href="${h.cpanelUrl}" target="_blank" style="color:var(--accent);">cPanel</a> and upload your website files<br/>
             4. Create email accounts above for your domain

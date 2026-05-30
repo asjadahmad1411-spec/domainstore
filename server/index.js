@@ -99,7 +99,7 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`\n🚀 DomainStore running at http://localhost:${PORT}`);
+  console.log(`\n🚀 EnrootHost running at http://localhost:${PORT}`);
   console.log(`📊 Admin Panel: http://localhost:${PORT}/admin/`);
   console.log(`🔑 Admin Login: admin / admin123\n`);
 });

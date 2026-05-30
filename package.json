@@ -1,5 +1,5 @@
 {
-  "name": "domainstore",
+  "name": "enroothost",
   "version": "1.0.0",
   "description": "GoDaddy-style Domain & Hosting Store",
   "main": "server/index.js",

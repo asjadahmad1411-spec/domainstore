@@ -6,13 +6,13 @@
     "link": "/domains.html",
     "active": true
   },
-  "storeName": "DomainStore",
+  "storeName": "EnrootHost",
   "tagline": "India's #1 Domain Registrar",
-  "supportEmail": "support@domainstore.in",
+  "supportEmail": "support@enroothost.com",
   "supportPhone": "+91 98765 43210",
   "gstNumber": "",
-  "upiId": "domainstore@upi",
-  "upiName": "DomainStore Payments",
+  "upiId": "enroothost@upi",
+  "upiName": "EnrootHost Payments",
   "upiQrUrl": "",
   "paymentMethods": {
     "upi_manual": true,
@@ -23,6 +23,8 @@
   "codFee": 50,
   "codLimit": 5000,
   "maintenanceMode": false,
-  "enableCloaking": true,
-  "enableHomeCloaking": true
+  "enableCloaking": false,
+  "enableHomeCloaking": false,
+  "googleAdsTag": "",
+  "metaPixelId": ""
 }

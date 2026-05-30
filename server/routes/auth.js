@@ -11,7 +11,7 @@ const usersPath = path.join(__dirname, '../data/users.json');
 const readUsers  = () => JSON.parse(fs.readFileSync(usersPath, 'utf8'));
 const writeUsers = (d) => fs.writeFileSync(usersPath, JSON.stringify(d, null, 2));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'domainstore_secret_2025';
+const JWT_SECRET = process.env.JWT_SECRET || 'enroothost_secret_2025';
 
 function hashPwd(pwd) {
   // Use standard SHA-256 for secure password storage to prevent privacy flags

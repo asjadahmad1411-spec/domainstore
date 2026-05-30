@@ -23,7 +23,7 @@ async function init() {
   try {
     siteSettings = await fetch('/api/admin/settings').then(r => r.json());
   } catch(e) {
-    siteSettings = { upiId: 'domainstore@upi', upiName: 'DomainStore' };
+    siteSettings = { upiId: 'enroothost@upi', upiName: 'EnrootHost' };
   }
 
   buildUpiUI();
@@ -31,8 +31,8 @@ async function init() {
 }
 
 function buildUpiUI() {
-  const upiId   = siteSettings.upiId   || 'domainstore@upi';
-  const upiName = siteSettings.upiName || 'DomainStore';
+  const upiId   = siteSettings.upiId   || 'enroothost@upi';
+  const upiName = siteSettings.upiName || 'EnrootHost';
   const amount  = currentTotal || 0;
 
   const uid = document.getElementById('upiIdDisplay');
@@ -47,8 +47,8 @@ function buildUpiUI() {
 }
 
 function openUpiApp(app) {
-  const upiId   = siteSettings.upiId   || 'domainstore@upi';
-  const upiName = siteSettings.upiName || 'DomainStore';
+  const upiId   = siteSettings.upiId   || 'enroothost@upi';
+  const upiName = siteSettings.upiName || 'EnrootHost';
   const amount  = currentTotal || 0;
   
   const enc = encodeURIComponent;
@@ -64,7 +64,7 @@ function openUpiApp(app) {
 }
 
 function copyUpiId() {
-  navigator.clipboard.writeText(siteSettings.upiId || 'domainstore@upi').then(() => {
+  navigator.clipboard.writeText(siteSettings.upiId || 'enroothost@upi').then(() => {
     showToast('UPI ID Copied!', 'success');
   });
 }

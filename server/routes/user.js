@@ -12,7 +12,7 @@ const writeUsers = (d) => fs.writeFileSync(usersPath, JSON.stringify(d, null, 2)
 const readOrders = () => JSON.parse(fs.readFileSync(ordersPath, 'utf8'));
 const writeOrders= (d) => fs.writeFileSync(ordersPath, JSON.stringify(d, null, 2));
 
-const JWT_SECRET = process.env.JWT_SECRET || 'domainstore_secret_2025';
+const JWT_SECRET = process.env.JWT_SECRET || 'enroothost_secret_2025';
 
 function hashPwd(pwd) {
   let h = 0;
@@ -38,7 +38,7 @@ router.get('/dashboard', userAuth, (req, res) => {
   const orders = readOrders().filter(o => o.customer?.email === req.userEmail);
   const domains  = orders.flatMap(o => (o.items || []).filter(i => i.type === 'domain').map(i => ({
     ...i, orderId: o.id, status: o.status, orderDate: o.createdAt,
-    nameservers: o.nameservers || ['ns1.domainstore.in', 'ns2.domainstore.in'],
+    nameservers: o.nameservers || ['ns1.enroothost.com', 'ns2.enroothost.com'],
     autoRenew: o.autoRenew !== false, locked: o.locked !== false, privacy: o.privacy || false
   })));
   const hosting  = orders.flatMap(o => (o.items || []).filter(i => i.type === 'hosting').map(i => ({
@@ -72,7 +72,7 @@ router.get('/domains', userAuth, (req, res) => {
     status:      o.status,
     orderDate:   o.createdAt,
     expiry:      new Date(new Date(o.createdAt).setFullYear(new Date(o.createdAt).getFullYear() + 1)).toISOString(),
-    nameservers: o.nameservers || ['ns1.domainstore.in', 'ns2.domainstore.in'],
+    nameservers: o.nameservers || ['ns1.enroothost.com', 'ns2.enroothost.com'],
     autoRenew:   o.autoRenew !== false,
     locked:      o.locked !== false,
     privacy:     o.privacy || false
@@ -122,9 +122,9 @@ router.get('/hosting', userAuth, (req, res) => {
       expiry:        new Date(new Date(o.createdAt).setFullYear(new Date(o.createdAt).getFullYear() + 1)).toISOString(),
       serverIp:      `103.21.${seed % 255}.${(seed * 7) % 255}`,
       cpanelUser,
-      cpanelUrl:     `https://cpanel.domainstore.in:2083`,
-      ftpHost:       `ftp.domainstore.in`,
-      nameservers:   ['ns1.domainstore.in', 'ns2.domainstore.in'],
+      cpanelUrl:     `https://cpanel.enroothost.com:2083`,
+      ftpHost:       `ftp.enroothost.com`,
+      nameservers:   ['ns1.enroothost.com', 'ns2.enroothost.com'],
       diskUsed:      o.diskUsed || '0 MB',
       diskLimit:     i.name?.includes('Business') ? '50 GB' : i.name?.includes('Pro') ? '30 GB' : '10 GB',
       bandwidth:     'Unmetered',
@@ -143,7 +143,7 @@ router.post('/hosting/:orderId/email', userAuth, (req, res) => {
   const order  = orders.find(o => o.id === req.params.orderId && o.customer?.email === req.userEmail);
   if (!order) return res.status(404).json({ error: 'Order not found' });
   if (!order.emailAccounts) order.emailAccounts = [];
-  const domain = (order.items || []).find(i => i.type === 'domain')?.name || 'domainstore.in';
+  const domain = (order.items || []).find(i => i.type === 'domain')?.name || 'enroothost.com';
   order.emailAccounts.push({ id: Date.now().toString(), emailUser, email: `${emailUser}@${domain}`, quota: quota || '1GB', createdAt: new Date().toISOString() });
   writeOrders(orders);
   res.json({ success: true, emailAccounts: order.emailAccounts });

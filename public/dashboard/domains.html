@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>My Domains — DomainStore Dashboard</title>
+<title>My Domains — EnrootHost Dashboard</title>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/dashboard.css"/>
 <link rel="stylesheet" href="/css/responsive.css"/>
@@ -12,7 +12,7 @@
 <div class="dash-overlay" id="dashOverlay"></div>
 
 <aside class="dash-sidebar" id="dashSidebar">
-  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">DomainStore</div><div class="logo-sub">Account Dashboard</div></div></a></div>
+  <div class="dash-logo"><a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px;"><span style="font-size:1.3rem;">🌐</span><div><div class="logo-name">EnrootHost</div><div class="logo-sub">Account Dashboard</div></div></a></div>
   <div class="dash-user-pill"><div class="dash-avatar" id="dashAvatar">U</div><div class="dash-user-info"><div class="u-name" id="dashUserName">...</div><div class="u-email" id="dashUserEmail"></div></div></div>
   <nav class="dash-nav">
     <div class="dash-nav-section">Overview</div>
@@ -119,9 +119,9 @@ function renderDomains(list) {
             <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:8px;">🏷️ <strong>Custom Nameservers</strong> — Enter your hosting provider's NS records</div>
             <div class="ns-grid">
               <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 1 *</label>
-                <input type="text" class="form-control" id="ns1-${i}" value="${(d.nameservers||[])[0]||'ns1.domainstore.in'}" placeholder="ns1.example.com"/></div>
+                <input type="text" class="form-control" id="ns1-${i}" value="${(d.nameservers||[])[0]||'ns1.enroothost.com'}" placeholder="ns1.example.com"/></div>
               <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 2 *</label>
-                <input type="text" class="form-control" id="ns2-${i}" value="${(d.nameservers||[])[1]||'ns2.domainstore.in'}" placeholder="ns2.example.com"/></div>
+                <input type="text" class="form-control" id="ns2-${i}" value="${(d.nameservers||[])[1]||'ns2.enroothost.com'}" placeholder="ns2.example.com"/></div>
               <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 3 (optional)</label>
                 <input type="text" class="form-control" id="ns3-${i}" value="${(d.nameservers||[])[2]||''}" placeholder="ns3.example.com"/></div>
               <div><label style="font-size:.75rem;color:var(--text-muted);display:block;margin-bottom:4px;">NS 4 (optional)</label>
@@ -134,7 +134,7 @@ function renderDomains(list) {
           </div>
           <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:12px 14px;font-size:.8rem;">
             <div style="color:var(--text-muted);margin-bottom:6px;">📌 <strong>Current Nameservers:</strong></div>
-            ${(d.nameservers||['ns1.domainstore.in','ns2.domainstore.in']).map(n=>`<div style="font-family:monospace;color:var(--accent);padding:2px 0;">${n}</div>`).join('')}
+            ${(d.nameservers||['ns1.enroothost.com','ns2.enroothost.com']).map(n=>`<div style="font-family:monospace;color:var(--accent);padding:2px 0;">${n}</div>`).join('')}
           </div>
         </div>
 
@@ -177,8 +177,8 @@ function toggleExpand(i) {
 }
 
 function useDefaultNS(i) {
-  document.getElementById('ns1-' + i).value = 'ns1.domainstore.in';
-  document.getElementById('ns2-' + i).value = 'ns2.domainstore.in';
+  document.getElementById('ns1-' + i).value = 'ns1.enroothost.com';
+  document.getElementById('ns2-' + i).value = 'ns2.enroothost.com';
   document.getElementById('ns3-' + i).value = '';
   document.getElementById('ns4-' + i).value = '';
 }
