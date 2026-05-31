@@ -62,23 +62,19 @@
 
       <!-- Payment Methods -->
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">💳 Payment Methods</span></div>
+        <div class="panel-header"><span class="panel-title">💳 Payment Gateways</span></div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
-            <div><div style="font-weight:600;font-size:.9rem;">📲 UPI / QR Code</div><div style="font-size:.75rem;color:var(--text-muted);">Manual UTR verification</div></div>
-            <label class="toggle"><input type="checkbox" id="t-upi_manual" checked/><span class="toggle-slider"></span></label>
+            <div><div style="font-weight:600;font-size:.9rem;">PhonePe</div><div style="font-size:.75rem;color:var(--text-muted);">UPI | Credit/Debit Card | NetBanking</div></div>
+            <label class="toggle"><input type="checkbox" id="t-phonepe" checked/><span class="toggle-slider"></span></label>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
-            <div><div style="font-weight:600;font-size:.9rem;">💳 Credit/Debit Card</div><div style="font-size:.75rem;color:var(--text-muted);">Visa, Mastercard, Rupay</div></div>
-            <label class="toggle"><input type="checkbox" id="t-card" checked/><span class="toggle-slider"></span></label>
+            <div><div style="font-weight:600;font-size:.9rem;">Easebuzz</div><div style="font-size:.75rem;color:var(--text-muted);">UPI | Credit/Debit Card | NetBanking</div></div>
+            <label class="toggle"><input type="checkbox" id="t-easebuzz" checked/><span class="toggle-slider"></span></label>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
-            <div><div style="font-weight:600;font-size:.9rem;">🏦 Net Banking</div><div style="font-size:.75rem;color:var(--text-muted);">All major banks</div></div>
-            <label class="toggle"><input type="checkbox" id="t-netbanking" checked/><span class="toggle-slider"></span></label>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;">
-            <div><div style="font-weight:600;font-size:.9rem;">🚚 Cash on Delivery</div><div style="font-size:.75rem;color:var(--text-muted);">Orders up to ₹5,000 (₹50 fee)</div></div>
-            <label class="toggle"><input type="checkbox" id="t-cod" checked/><span class="toggle-slider"></span></label>
+            <div><div style="font-weight:600;font-size:.9rem;">Crypto Currency</div><div style="font-size:.75rem;color:var(--text-muted);">Accept Bitcoin, ETH, etc.</div></div>
+            <label class="toggle"><input type="checkbox" id="t-crypto"/><span class="toggle-slider"></span></label>
           </div>
         </div>
         <button class="btn btn-primary" style="margin-top:16px;" onclick="savePaymentMethods()">💾 Save Payment Settings</button>
@@ -131,34 +127,32 @@
 let currentSettings = {};
 
 async function loadSettingsPage() {
-  try {
-    currentSettings = await apiFetch('/api/admin/settings');
-    const fields = ['storeName','tagline','supportEmail','supportPhone','gstNumber','upiId','upiName','googleAdsTag','metaPixelId'];
-    fields.forEach(f => { const el = document.getElementById(f); if (el && currentSettings[f]) el.value = currentSettings[f]; });
-    const pm = currentSettings.paymentMethods || {};
-    ['upi_manual','card','netbanking','cod'].forEach(k => {
-      const el = document.getElementById('t-' + k);
-      if (el) el.checked = pm[k] !== false;
-    });
-    const cloakingEl = document.getElementById('t-cloaking');
-    if (cloakingEl) cloakingEl.checked = currentSettings.enableCloaking === true;
-    const homeCloakingEl = document.getElementById('t-homeCloaking');
-    if (homeCloakingEl) homeCloakingEl.checked = currentSettings.enableHomeCloaking === true;
+  apiFetch('/api/admin/settings').then(s => {
+    currentSettings = s;
+    const setV = (id,v) => { const e=document.getElementById(id); if(e) e.value = v||''; };
+    const setC = (id,v) => { const e=document.getElementById(id); if(e) e.checked = !!v; };
+    
+    setV('storeName', s.storeName);
+    setV('tagline', s.tagline);
+    setV('supportEmail', s.supportEmail);
+    setV('supportPhone', s.supportPhone);
+    setV('gstNumber', s.gstNumber);
+    setV('upiId', s.upiId);
+    setV('upiName', s.upiName);
+    setV('googleAdsTag', s.googleAdsTag);
+    setV('metaPixelId', s.metaPixelId);
+    
+    setC('t-cloaking', s.enableCloaking);
+    setC('t-homeCloaking', s.enableHomeCloaking);
+    
+    const pm = s.paymentMethods || {};
+    setC('t-phonepe', pm.phonepe !== false); // default true
+    setC('t-easebuzz', pm.easebuzz !== false); // default true
+    setC('t-crypto', pm.crypto);
+    
     refreshQR();
-  } catch(e) {}
-
-  // Quick stats
-  try {
-    const s = await apiFetch('/api/admin/stats');
-    document.getElementById('quickStats').innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Revenue</span><span style="font-weight:700;color:var(--accent);">₹${(s.totalRevenue||0).toLocaleString('en-IN')}</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Orders</span><span style="font-weight:700;">${s.totalOrders}</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:var(--text-muted);">Customers</span><span style="font-weight:700;">${s.totalCustomers}</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:.875rem;"><span style="color:#f59e0b);">UTR Pending</span><span style="font-weight:700;color:#f59e0b;">${s.utrPending||0}</span></div>
-      </div>`;
-  } catch(e){}
-}
+  });
+}}
 
 function refreshQR() {
   const upiId = document.getElementById('upiId')?.value || currentSettings.upiId || '';
@@ -198,9 +192,9 @@ async function saveUpiSettings() {
 
 async function savePaymentMethods() {
   const pm = {};
-  ['upi_manual','card','netbanking','cod'].forEach(k => {
+  ['phonepe','easebuzz','crypto'].forEach(k => {
     const el = document.getElementById('t-' + k);
-    pm[k] = el ? el.checked : true;
+    pm[k] = el ? el.checked : false;
   });
   try {
     await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ paymentMethods: pm }) });

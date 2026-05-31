@@ -9,6 +9,8 @@ function fmt(n) { return '₹' + (n || 0).toLocaleString('en-IN'); }
 // ── Load summary ──────────────────────────────────────────────
 function loadCheckoutSummary() {
   const cart = getCart();
+  if (window.currentCGST) cart.push({ name: 'CGST @ 9%', price: window.currentCGST, cycle: 'once' });
+  if (window.currentSGST) cart.push({ name: 'SGST @ 9%', price: window.currentSGST, cycle: 'once' });
   if (!cart.length) { location.href = '/cart.html'; return; }
 
   const items = document.getElementById('coItems');
@@ -29,18 +31,33 @@ function loadCheckoutSummary() {
   updateTotals();
 }
 
+
 function updateTotals() {
   const cart = getCart();
   const sub  = cart.reduce((s, i) => s + i.price, 0);
-  const tot  = Math.max(sub - promoDiscount, 0);
+  const discountTot = promoDiscount;
+  
+  // GST calculation (9% CGST, 9% SGST on discounted subtotal)
+  const taxable = Math.max(sub - discountTot, 0);
+  const cgst = Math.round(taxable * 0.09 * 100) / 100;
+  const sgst = Math.round(taxable * 0.09 * 100) / 100;
+  const tot  = taxable + cgst + sgst;
+  
   const set  = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('coSubtotal', fmt(sub));
-  set('coDisc', '-' + fmt(promoDiscount));
+  set('coDisc', '-' + fmt(discountTot));
+  set('coCGST', fmt(cgst));
+  set('coSGST', fmt(sgst));
   set('coTotal', fmt(tot));
+  set('coDueToday', fmt(tot)); // the large text
+  
   const dr = document.getElementById('coDiscRow');
-  if (dr) dr.style.display = promoDiscount > 0 ? 'flex' : 'none';
+  if (dr) dr.style.display = discountTot > 0 ? 'flex' : 'none';
+  
+  // Store gst in window for payload submission
+  window.currentCGST = cgst;
+  window.currentSGST = sgst;
 }
-
 // ── Promo ─────────────────────────────────────────────────────
 async function applyPromoCode() {
   const code = (document.getElementById('coPromo')?.value || '').trim().toUpperCase();
@@ -219,11 +236,36 @@ async function proceedToPayment() {
   }
 }
 
+
 // ── Init ─────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadCheckoutSummary();
 
-  // Check if user is already logged in
+  // Load payment settings dynamically
+  try {
+    const setRes = await fetch('/api/admin/settings').then(r=>r.json());
+    const pms = setRes.paymentMethods || { phonepe: true, easebuzz: true, crypto: false };
+    let pmHtml = '';
+    let hasSelected = false;
+    
+    if (pms.phonepe !== false) {
+      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'phonepe')"><div class="pm-radio"></div>PhonePe - UPI | Credit/Debit Card | NetBanking</div>`;
+      hasSelected = true;
+    }
+    if (pms.easebuzz !== false) {
+      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'easebuzz')"><div class="pm-radio"></div>Easebuzz - UPI | Credit/Debit Card | NetBanking</div>`;
+      hasSelected = true;
+    }
+    if (pms.crypto) {
+      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'crypto')"><div class="pm-radio"></div>Crypto Currency</div>`;
+      hasSelected = true;
+    }
+    if(!pmHtml) pmHtml = '<div class="pm-option selected"><div class="pm-radio"></div>Standard Gateway</div>';
+    
+    const pmList = document.getElementById('pmList');
+    if (pmList) pmList.innerHTML = pmHtml;
+  } catch(e) {}
+  // Check if user// Check if user is already logged in
   const token = localStorage.getItem('ds_user_token');
   const user  = (() => { try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch { return null; } })();
 
@@ -244,3 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+function selPM(el, method) {
+  document.querySelectorAll('.pm-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  window.selectedPaymentMethod = method;
+}

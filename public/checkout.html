@@ -5,158 +5,140 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Checkout — EnrootHost</title>
 <meta name="description" content="Complete your domain purchase securely."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>"/>
 <link rel="stylesheet" href="/css/main.css"/>
 <link rel="stylesheet" href="/css/responsive.css"/>
 <style>
-.co-wrap{padding-top:80px;min-height:100vh;padding-bottom:50px;}
-.co-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
-.co-sticky{position:sticky;top:90px;}
-.step-bar{display:flex;align-items:center;gap:6px;margin-bottom:28px;overflow-x:auto;padding-bottom:4px;}
-.step-item{display:flex;align-items:center;gap:6px;font-size:.82rem;white-space:nowrap;}
-.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;}
-.step-line{width:40px;height:2px;background:var(--border);flex-shrink:0;}
-.pay-info-box{background:linear-gradient(135deg,rgba(108,61,232,.08),rgba(0,212,255,.04));border:1px solid rgba(108,61,232,.25);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;}
-@media(max-width:860px){.co-grid{grid-template-columns:1fr;}.co-sticky{position:static;}}
-@media(max-width:480px){.co-wrap{padding-top:70px;}.step-line{width:20px;}}
+.co-wrap{max-width:1100px;margin:100px auto 60px;padding:0 20px;}
+.progress-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;font-size:.9rem;font-weight:600;overflow-x:auto;padding-bottom:10px;}
+.pb-step{display:flex;align-items:center;gap:8px;color:var(--text-muted);white-space:nowrap;}
+.pb-step.active{color:var(--accent);}
+.pb-step.completed{color:var(--green);}
+.pb-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;background:var(--border);color:var(--text);}
+.pb-step.active .pb-circle{background:var(--accent);color:#fff;}
+.pb-step.completed .pb-circle{background:var(--green);color:#fff;}
+.pb-line{flex:1;height:2px;background:var(--border);margin:0 15px;min-width:30px;}
+.pb-step.completed + .pb-line{background:var(--green);}
+.co-grid{display:grid;grid-template-columns:1fr 340px;gap:30px;align-items:start;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.cart-header{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:15px;}
+.cart-actions{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:15px;margin-top:10px;}
+.pm-title{font-size:1.25rem;font-weight:400;color:var(--text);margin-bottom:5px;}
+.pm-sub{font-size:.85rem;color:var(--text-muted);margin-bottom:20px;}
+.pm-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.pm-option{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text);}
+.pm-option:last-child{border-bottom:none;}
+.pm-option:hover{background:rgba(0,0,0,0.02);}
+.pm-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--text-muted);position:relative;}
+.pm-option.selected .pm-radio{border-color:var(--accent);}
+.pm-option.selected .pm-radio::after{content:'';position:absolute;width:10px;height:10px;background:var(--accent);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);}
+.summary-title{font-size:1.4rem;font-weight:400;color:var(--text);margin-bottom:20px;}
+.summary-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-muted);margin-bottom:10px;}
+.summary-row.totals{font-weight:600;margin-top:10px;color:var(--text);font-size:1rem;}
+.due-today{margin-top:30px;}
+.due-label{font-size:.9rem;color:var(--text-muted);margin-bottom:5px;}
+.due-amount{font-size:2rem;font-weight:800;color:var(--text);margin-bottom:20px;}
+.btn-complete{background:var(--primary);color:#fff;width:100%;border:none;padding:16px;border-radius:6px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;}
+.btn-complete:hover{background:var(--accent);}
+@media(max-width:860px){.co-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<nav class="navbar">
+<nav class="navbar" id="navbar">
   <a href="/" class="nav-logo" style="display:flex; align-items:center; gap:6px; text-decoration:none;"><span style="font-size:1.4rem;">🌱</span><span style="font-weight:900; background:linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Enroot</span><span style="font-weight:700; color:inherit;">Host</span></a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="/">Home</a></li>
-    <li><a href="/domains">Domains</a></li>
-    <li><a href="/hosting">Hosting</a></li>
-    <li><a href="/offers">🎁 Offers</a></li>
-  </ul>
   <div class="nav-actions">
-    <span style="font-size:.8rem;color:var(--text-muted);">🔒 Secure</span>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    <span style="font-size:.8rem;color:var(--text-muted);">🔒 Secure Checkout</span>
   </div>
 </nav>
 
 <div class="co-wrap">
-  <div class="container">
-    <div style="max-width:960px;margin:0 auto;">
+  <div class="progress-bar">
+    <div class="pb-step completed"><div class="pb-circle">✓</div>Product Selection</div>
+    <div class="pb-line"></div>
+    <div class="pb-step completed"><div class="pb-circle">✓</div>Configuration</div>
+    <div class="pb-line"></div>
+    <div class="pb-step active"><div class="pb-circle">3</div>Review & Checkout</div>
+    <div class="pb-line"></div>
+    <div class="pb-step"><div class="pb-circle">4</div>Done</div>
+  </div>
 
-      <!-- Steps -->
-      <div class="step-bar">
-        <div class="step-item"><div class="step-circle" style="background:var(--green);color:#fff;">✓</div><span style="color:var(--green);font-weight:600;">Cart</span></div>
-        <div class="step-line"></div>
-        <div class="step-item"><div class="step-circle" style="background:var(--primary);color:#fff;">2</div><span style="font-weight:700;">Your Details</span></div>
-        <div class="step-line"></div>
-        <div class="step-item" style="opacity:.4;"><div class="step-circle" style="background:var(--border);">3</div><span>Payment</span></div>
-        <div class="step-line"></div>
-        <div class="step-item" style="opacity:.4;"><div class="step-circle" style="background:var(--border);">4</div><span>Done</span></div>
+  <div class="co-grid">
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Cart Box -->
+      <div class="card">
+        <div class="cart-header">
+          <span>Product/Options</span>
+          <span>Price/Cycle</span>
+        </div>
+        <div id="coItems" style="margin-bottom:15px; min-height: 50px;"></div>
+        
+        <!-- Promo -->
+        <div style="margin-bottom:14px; margin-top:20px;">
+          <div style="display:flex;gap:7px;">
+            <input type="text" id="coPromo" placeholder="Promo Code" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:.85rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+            <button class="btn btn-outline" style="padding:8px 16px; font-size:.85rem;" onclick="applyPromoCode()">Apply</button>
+          </div>
+          <div id="coPromoMsg" style="font-size:.75rem;margin-top:5px;"></div>
+        </div>
+
+        <div class="cart-actions">
+          <button class="btn btn-outline" onclick="location.href='/domains'">← Continue Shopping</button>
+          <button class="btn btn-outline" onclick="localStorage.removeItem('ds_cart');location.href='/cart'">🗑 Empty Cart</button>
+        </div>
       </div>
 
-      <div class="co-grid">
-        <!-- LEFT: Form -->
-        <div>
-          <div class="card" style="margin-bottom:18px;">
-            <div class="form-section-title">👤 Your Information</div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="firstName" placeholder="Rahul" autocomplete="given-name"/></div>
-              <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lastName" placeholder="Sharma" autocomplete="family-name"/></div>
-            </div>
-            <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" placeholder="rahul@example.com" autocomplete="email" oninput="checkEmailExists(this.value)"/></div>
-            <div class="form-group"><label class="form-label">WhatsApp / Phone *</label><input type="tel" class="form-control" id="phone" placeholder="+91 98765 43210" autocomplete="tel"/></div>
-
-            <!-- Password section — hidden if already logged in -->
-            <div id="passwordSection">
-              <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                <span style="font-size:1rem;">🔐</span>
-                <div>
-                  <div style="font-size:.88rem;font-weight:700;">Create Your Account</div>
-                  <div style="font-size:.72rem;color:var(--text-muted);">Track orders, manage domains — all in one place</div>
-                </div>
-              </div>
-              <div class="form-group" style="position:relative;">
-                <label class="form-label">Password *</label>
-                <div style="position:relative;">
-                  <input type="password" class="form-control" id="password" placeholder="Min 6 characters"
-                    oninput="checkPwdStrength(this.value)" autocomplete="new-password"
-                    style="padding-right:44px;"/>
-                  <button type="button" onclick="togglePwd('password','eyeBtn1')" id="eyeBtn1"
-                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted);">👁️</button>
-                </div>
-                <!-- Strength bar -->
-                <div style="margin-top:7px;display:flex;gap:4px;align-items:center;" id="strengthWrap">
-                  <div style="flex:1;display:flex;gap:3px;">
-                    <div id="sb1" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
-                    <div id="sb2" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
-                    <div id="sb3" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
-                    <div id="sb4" style="height:4px;flex:1;border-radius:3px;background:var(--border);transition:background .3s;"></div>
-                  </div>
-                  <span id="strengthLabel" style="font-size:.68rem;color:var(--text-muted);white-space:nowrap;min-width:40px;"></span>
-                </div>
-              </div>
-              <div class="form-group" style="position:relative;">
-                <label class="form-label">Confirm Password *</label>
-                <div style="position:relative;">
-                  <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter password"
-                    oninput="checkPwdMatch()" autocomplete="new-password"
-                    style="padding-right:44px;"/>
-                  <button type="button" onclick="togglePwd('confirmPassword','eyeBtn2')" id="eyeBtn2"
-                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-muted);">👁️</button>
-                </div>
-                <div id="pwdMatchMsg" style="font-size:.72rem;margin-top:5px;"></div>
-              </div>
-              <div id="emailCheckMsg" style="font-size:.75rem;margin-top:-10px;margin-bottom:8px;"></div>
-            </div>
-
-          </div>
-
-          <!-- Payment Method Info -->
-          <div class="card">
-            <div class="form-section-title">💳 Payment Method</div>
-            <div class="pay-info-box">
-              <span style="font-size:2rem;">📲</span>
-              <div style="flex:1;">
-                <div style="font-weight:700;font-size:.95rem;">UPI Payment (India)</div>
-                <div style="font-size:.78rem;color:var(--text-muted);margin-top:3px;">GPay, PhonePe, Paytm, BHIM or any UPI app</div>
-                <div style="font-size:.72rem;color:var(--green);margin-top:4px;">✅ Instant • No extra charges • 100% secure</div>
-              </div>
-              <div style="font-size:1.4rem;">🇮🇳</div>
-            </div>
-            <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:.8rem;color:#f59e0b;">
-              ⚡ After clicking "Proceed to Pay", you'll be taken to the UPI payment screen with QR code and payment links.
-            </div>
-          </div>
+      <!-- Your Details -->
+      <div class="card">
+        <div class="pm-title">👤 Your Details</div>
+        <div class="pm-sub">Enter your details to create an account.</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="firstName"/></div>
+          <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lastName"/></div>
         </div>
-
-        <!-- RIGHT: Summary -->
-        <div class="co-sticky">
-          <div class="card">
-            <h3 style="margin-bottom:14px;font-size:1rem;">🧾 Order Summary</h3>
-            <div id="coItems" style="margin-bottom:12px;"></div>
-            <hr style="border:none;border-top:1px solid var(--border);margin:10px 0;"/>
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.88rem;"><span style="color:var(--text-muted);">Subtotal</span><span id="coSubtotal">₹0</span></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.88rem;" id="coDiscRow"><span style="color:var(--green);">Discount</span><span id="coDisc" style="color:var(--green);">-₹0</span></div>
-            <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:900;margin:12px 0 16px;">
-              <span>Total</span><span id="coTotal" style="color:var(--accent);">₹0</span>
-            </div>
-
-            <!-- Promo -->
-            <div style="margin-bottom:14px;">
-              <div style="font-size:.78rem;font-weight:600;color:var(--text-muted);margin-bottom:5px;">🎟️ Promo Code</div>
-              <div style="display:flex;gap:7px;">
-                <input type="text" id="coPromo" placeholder="Enter code" style="flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:.82rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
-                <button class="btn btn-outline btn-sm" onclick="applyPromoCode()">Apply</button>
-              </div>
-              <div id="coPromoMsg" style="font-size:.75rem;margin-top:5px;"></div>
-            </div>
-
-            <!-- CTA -->
-            <button class="btn btn-primary" id="proceedBtn" style="width:100%;justify-content:center;font-size:1rem;padding:14px;" onclick="proceedToPayment()">
-              📲 Proceed to Pay
-            </button>
-            <p style="font-size:.68rem;text-align:center;margin-top:7px;color:var(--text-muted);">By proceeding you agree to our Terms of Service</p>
+        <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" oninput="checkEmailExists(this.value)"/></div>
+        <div class="form-group"><label class="form-label">Phone Number *</label><input type="tel" class="form-control" id="phone"/></div>
+        
+        <div id="passwordSection">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Password *</label><input type="password" class="form-control" id="password"/></div>
+            <div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" class="form-control" id="confirmPassword"/></div>
           </div>
+          <div id="emailCheckMsg" style="font-size:.75rem;margin-top:-5px;margin-bottom:8px;"></div>
         </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="card">
+        <div class="pm-title">Payment Method</div>
+        <div class="pm-sub">Please choose your preferred method of payment.</div>
+        <div class="pm-list" id="pmList">
+          <!-- Injected via JS -->
+          <div class="pm-option selected"><div class="pm-radio"></div>Loading...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Summary -->
+    <div>
+      <div class="card" style="position: sticky; top: 90px;">
+        <div class="summary-title">Order Summary</div>
+        <div class="summary-row"><span>Subtotal</span><span id="coSubtotal">₹0</span></div>
+        <div class="summary-row" id="coDiscRow" style="display:none;color:var(--green);"><span>Discount</span><span id="coDisc">-₹0</span></div>
+        <div class="summary-row"><span>CGST @ 9.00%</span><span id="coCGST">₹0</span></div>
+        <div class="summary-row"><span>SGST @ 9.00%</span><span id="coSGST">₹0</span></div>
+        <div class="summary-row totals"><span>Totals</span><span id="coTotal">₹0</span></div>
+        
+        <div class="due-today">
+          <div class="due-label">Total Due Today</div>
+          <div class="due-amount" id="coDueToday">₹0</div>
+          <button class="btn-complete" id="proceedBtn" onclick="proceedToPayment()">Complete Order</button>
+        </div>
+        <p style="font-size:.7rem;text-align:center;margin-top:15px;color:var(--text-muted);">By proceeding you agree to our Terms of Service</p>
       </div>
     </div>
+
   </div>
 </div>
 

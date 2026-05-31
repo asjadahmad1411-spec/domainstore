@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Checkout Demo</title>
+<link rel="stylesheet" href="/css/main.css">
+<style>
+body { background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+.co-wrap { max-width: 1100px; margin: 60px auto; padding: 0 20px; }
+
+/* Progress Bar */
+.progress-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; font-size: 0.9rem; font-weight: 600; overflow-x: auto; padding-bottom: 10px; }
+.pb-step { display: flex; align-items: center; gap: 8px; color: #94a3b8; }
+.pb-step.active { color: #0ea5e9; }
+.pb-step.completed { color: #84cc16; }
+.pb-circle { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background: #e2e8f0; color: #fff; }
+.pb-step.active .pb-circle { background: #0ea5e9; }
+.pb-step.completed .pb-circle { background: #84cc16; }
+.pb-line { flex: 1; height: 2px; background: #e2e8f0; margin: 0 15px; min-width: 30px; }
+.pb-step.completed + .pb-line { background: #84cc16; }
+
+/* Grid Layout */
+.co-grid { display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+/* Left Side - Cart Table */
+.cart-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: #64748b; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+.cart-item { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.cart-item-title { font-weight: 700; color: #0f172a; font-size: 1.05rem; }
+.cart-item-domain { color: #0ea5e9; font-size: 0.85rem; margin-top: 4px; }
+.cart-item-price { font-weight: 700; color: #0f172a; font-size: 0.95rem; text-align: right; }
+.cart-item-cycle { color: #94a3b8; font-size: 0.75rem; text-align: right; margin-top: 4px; }
+.cart-actions { display: flex; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 10px; }
+.btn-outline { border: 1px solid #e2e8f0; background: #fff; color: #334155; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+.btn-outline:hover { background: #f8fafc; }
+
+/* Payment Methods */
+.pm-title { font-size: 1.25rem; font-weight: 400; color: #334155; margin-bottom: 5px; }
+.pm-sub { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+.pm-list { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+.pm-option { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #e2e8f0; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #1e293b; }
+.pm-option:last-child { border-bottom: none; }
+.pm-option:hover { background: #f8fafc; }
+.pm-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #cbd5e1; position: relative; }
+.pm-option.selected .pm-radio { border-color: #0ea5e9; }
+.pm-option.selected .pm-radio::after { content: ''; position: absolute; width: 10px; height: 10px; background: #0ea5e9; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+/* Right Side - Summary */
+.summary-title { font-size: 1.4rem; font-weight: 400; color: #334155; margin-bottom: 20px; }
+.summary-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #475569; margin-bottom: 10px; }
+.summary-row.totals { font-weight: 600; margin-top: 10px; }
+.due-today { margin-top: 30px; }
+.due-label { font-size: 0.9rem; color: #64748b; margin-bottom: 5px; }
+.due-amount { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 20px; }
+.btn-complete { background: #8b5cf6; color: #fff; width: 100%; border: none; padding: 16px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-complete:hover { background: #7c3aed; }
+
+</style>
+</head>
+<body>
+
+<div class="co-wrap">
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="pb-step completed"><div class="pb-circle">1</div>Product Selection</div>
+    <div class="pb-line"></div>
+    <div class="pb-step completed"><div class="pb-circle">2</div>Product Configuration</div>
+    <div class="pb-line"></div>
+    <div class="pb-step active"><div class="pb-circle">3</div>Review & Checkout</div>
+    <div class="pb-line"></div>
+    <div class="pb-step"><div class="pb-circle">4</div>Proceed to Checkout</div>
+  </div>
+
+  <div class="co-grid">
+    <!-- LEFT -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Cart Box -->
+      <div class="card">
+        <div class="cart-header">
+          <span>Product/Options</span>
+          <span>Price/Cycle</span>
+        </div>
+        <div class="cart-item">
+          <div>
+            <div class="cart-item-title">Domain Registration</div>
+            <div class="cart-item-domain">uygyejgu.com</div>
+          </div>
+          <div>
+            <div class="cart-item-price">899.00 INR / 1 Year</div>
+            <div class="cart-item-cycle">Renewal 1,199.00/1yr</div>
+          </div>
+        </div>
+        <div class="cart-actions">
+          <button class="btn-outline">← Continue Shopping</button>
+          <button class="btn-outline">🗑 Empty Cart</button>
+        </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="card">
+        <div class="pm-title">Payment Method</div>
+        <div class="pm-sub">Please choose your preferred method of payment.</div>
+        <div class="pm-list">
+          <div class="pm-option" onclick="sel(this)">
+            <div class="pm-radio"></div>
+            PhonePe - UPI | Credit/Debit Card | NetBanking
+          </div>
+          <div class="pm-option selected" onclick="sel(this)">
+            <div class="pm-radio"></div>
+            Easebuzz - UPI | Credit/Debit Card | NetBanking
+          </div>
+          <div class="pm-option" onclick="sel(this)">
+            <div class="pm-radio"></div>
+            Crypto Currency
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card" style="position: sticky; top: 20px;">
+        <div class="summary-title">Order Summary</div>
+        <div class="summary-row"><span>Subtotal</span><span>899.00 INR</span></div>
+        <div class="summary-row"><span>CGST @ 9.00%</span><span>80.91 INR</span></div>
+        <div class="summary-row"><span>SGST @ 9.00%</span><span>80.91 INR</span></div>
+        <div class="summary-row totals"><span>Totals</span><span>1,060.82 INR Annually</span></div>
+        
+        <div class="due-today">
+          <div class="due-label">Total Due Today</div>
+          <div class="due-amount">1,060.82 INR</div>
+          <button class="btn-complete">Complete Order</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function sel(el) {
+  document.querySelectorAll('.pm-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>
