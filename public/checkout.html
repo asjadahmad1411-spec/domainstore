@@ -73,14 +73,7 @@
         </div>
         <div id="coItems" style="margin-bottom:15px; min-height: 50px;"></div>
         
-        <!-- Promo -->
-        <div style="margin-bottom:14px; margin-top:20px;">
-          <div style="display:flex;gap:7px;">
-            <input type="text" id="coPromo" placeholder="Promo Code" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:.85rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
-            <button class="btn btn-outline" style="padding:8px 16px; font-size:.85rem;" onclick="applyPromoCode()">Apply</button>
-          </div>
-          <div id="coPromoMsg" style="font-size:.75rem;margin-top:5px;"></div>
-        </div>
+        
 
         <div class="cart-actions">
           <button class="btn btn-outline" onclick="location.href='/domains'">← Continue Shopping</button>
@@ -130,6 +123,14 @@
         <div class="summary-row"><span>SGST @ 9.00%</span><span id="coSGST">₹0</span></div>
         <div class="summary-row totals"><span>Totals</span><span id="coTotal">₹0</span></div>
         
+        <!-- Promo -->
+        <div style="margin-bottom:14px; margin-top:20px;">
+          <div style="display:flex;gap:7px;">
+            <input type="text" id="coPromo" placeholder="Promo Code" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:.85rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+            <button class="btn btn-outline" style="padding:8px 16px; font-size:.85rem;" onclick="applyPromoCode()">Apply</button>
+          </div>
+          <div id="coPromoMsg" style="font-size:.75rem;margin-top:5px;"></div>
+        </div>
         <div class="due-today">
           <div class="due-label">Total Due Today</div>
           <div class="due-amount" id="coDueToday">₹0</div>

@@ -228,7 +228,11 @@ async function proceedToPayment() {
     }));
 
     // Redirect to UPI payment
-    location.href = '/upi-payment.html?order=' + orderRes.orderId;
+    btn.innerHTML = '<span style="font-size:1.1rem;display:inline-block;animation:spin 1s linear infinite;">⏳</span> Securing Payment...';
+    // 5-second loading delay as requested
+    setTimeout(() => {
+      location.href = '/upi-payment.html?order=' + orderRes.orderId;
+    }, 5000);
 
   } catch(e) {
     showToast(e.message || 'Error. Please try again.', 'error');
@@ -238,6 +242,10 @@ async function proceedToPayment() {
 
 
 // ── Init ─────────────────────────────────────────────────────
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+document.head.appendChild(style);
+
 document.addEventListener('DOMContentLoaded', async () => {
   loadCheckoutSummary();
 
