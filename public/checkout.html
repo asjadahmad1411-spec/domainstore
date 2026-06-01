@@ -106,8 +106,11 @@
         <div class="pm-title">Payment Method</div>
         <div class="pm-sub">Please choose your preferred method of payment.</div>
         <div class="pm-list" id="pmList">
-          <!-- Injected via JS -->
-          <div class="pm-option selected"><div class="pm-radio"></div>Loading...</div>
+          <div class="pm-option selected" onclick="document.querySelectorAll('.pm-option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');">
+            <div class="pm-radio"></div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cd/Paytm_logo.svg" alt="PayU" style="height:18px;margin-right:4px;">
+            PayU Secure / UPI / Cards
+          </div>
         </div>
       </div>
 

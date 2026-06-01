@@ -14,11 +14,15 @@ function loadCheckoutSummary() {
   if (!cart.length) { location.href = '/cart.html'; return; }
 
   const items = document.getElementById('coItems');
-  if (items) items.innerHTML = cart.map(i => `
+  if (items) items.innerHTML = cart.map(i => {
+    const itemTotal = (i.price || 0) * (i.years || 1);
+    const yearText = i.type === 'domain' ? ` (${i.years || 1} Year${(i.years || 1) > 1 ? 's' : ''})` : '';
+    return `
     <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:7px;gap:8px;">
-      <span style="color:var(--text-muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name}</span>
-      <span style="font-weight:700;white-space:nowrap;">${fmt(i.price)}</span>
-    </div>`).join('');
+      <span style="color:var(--text-muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name}${yearText}</span>
+      <span style="font-weight:700;white-space:nowrap;">${fmt(itemTotal)}</span>
+    </div>`;
+  }).join('');
 
   const sd = parseInt(sessionStorage.getItem('checkout_discount') || '0');
   const sp = sessionStorage.getItem('checkout_promo') || '';
@@ -31,10 +35,9 @@ function loadCheckoutSummary() {
   updateTotals();
 }
 
-
 function updateTotals() {
   const cart = getCart();
-  const sub  = cart.reduce((s, i) => s + i.price, 0);
+  const sub  = cart.reduce((s, i) => s + (i.price * (i.years || 1)), 0);
   const discountTot = promoDiscount;
   
   // GST calculation (9% CGST, 9% SGST on discounted subtotal)
@@ -63,7 +66,7 @@ async function applyPromoCode() {
   const code = (document.getElementById('coPromo')?.value || '').trim().toUpperCase();
   const msg  = document.getElementById('coPromoMsg');
   if (!code) return;
-  const sub = getCart().reduce((s, i) => s + i.price, 0);
+  const sub = getCart().reduce((s, i) => s + (i.price * (i.years || 1)), 0);
   try {
     const res = await fetch('/api/admin/promos/validate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -139,7 +142,6 @@ function checkEmailExists(email) {
       }).then(r => r.json());
       if (res.exists) {
         msg.innerHTML = `<span style="color:#f59e0b;">⚠️ Account already exists with this email. <a href="/login.html" style="color:var(--accent);text-decoration:underline;">Login instead</a> or use different email.</span>`;
-        // Hide password section since they already have an account
         const ps = document.getElementById('passwordSection');
         if (ps) ps.style.opacity = '.5';
       } else {
@@ -160,25 +162,29 @@ async function proceedToPayment() {
   const password  = document.getElementById('password')?.value         || '';
   const confirmPw = document.getElementById('confirmPassword')?.value  || '';
 
-  // Validate basic fields
   if (!firstName || !lastName) return showToast('Please enter your full name', 'error');
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Please enter a valid email', 'error');
   if (!phone || phone.replace(/\D/g,'').length < 10) return showToast('Please enter a valid phone number', 'error');
 
-  // Validate password (only if not logged in)
   if (!isLoggedIn) {
     if (!password || password.length < 6) return showToast('Password must be at least 6 characters', 'error');
     if (password !== confirmPw) return showToast('Passwords do not match', 'error');
   }
 
-  const cart = getCart();
+  let cart = getCart();
   if (!cart.length) return showToast('Your cart is empty', 'error');
+  
+  // Calculate final total correctly with years
+  const sub  = cart.reduce((s, i) => s + (i.price * (i.years || 1)), 0);
+  const taxable = Math.max(sub - promoDiscount, 0);
+  const cgst = Math.round(taxable * 0.09 * 100) / 100;
+  const sgst = Math.round(taxable * 0.09 * 100) / 100;
+  const finalTotal = taxable + cgst + sgst;
 
   const btn = document.getElementById('proceedBtn');
   btn.textContent = '⏳ Creating order...'; btn.disabled = true;
 
   try {
-    // ── Step 1: Auto-create account (if not logged in) ──────
     let authToken = localStorage.getItem('ds_user_token');
     let userData  = null;
 
@@ -192,111 +198,107 @@ async function proceedToPayment() {
       }).then(r => r.json());
 
       if (regRes.token) {
-        // New account created
         authToken = regRes.token;
         userData  = regRes.user;
         localStorage.setItem('ds_user_token', authToken);
         localStorage.setItem('ds_user', JSON.stringify(userData));
         showToast('✅ Account created!', 'success');
-      } else if (regRes.error?.includes('already')) {
-        // Email already exists — try to use without login (still place order)
-        showToast('ℹ️ Existing email — placing order as guest', 'success');
-      } else if (regRes.error) {
-        throw new Error(regRes.error);
+      } else if (regRes.error && regRes.error.includes('already exists')) {
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        }).then(r => r.json());
+        if (loginRes.token) {
+          authToken = loginRes.token;
+          userData  = loginRes.user;
+          localStorage.setItem('ds_user_token', authToken);
+          localStorage.setItem('ds_user', JSON.stringify(userData));
+        } else {
+          throw new Error('Email exists. Incorrect password.');
+        }
+      } else {
+        throw new Error(regRes.error || 'Registration failed');
       }
+    } else {
+      userData = JSON.parse(localStorage.getItem('ds_user') || '{}');
     }
 
-    // ── Step 2: Place order ─────────────────────────────────
-    btn.textContent = '📦 Placing order...';
-    const orderRes = await fetch('/api/orders', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        customer: { name: `${firstName} ${lastName}`, email, phone },
-        items: cart, promoCode, paymentMethod: 'upi_manual', codFee: 0
-      })
+    btn.textContent = '💳 Processing order...';
+    const methodEl = document.querySelector('input[name="paymentMethod"]:checked');
+    const paymentMethod = methodEl ? methodEl.value : 'upi';
+
+    // Store order total explicitly for UPI page to use
+    const orderPayload = {
+      items: cart,
+      total: finalTotal, // using dynamically calculated final total
+      discount: promoDiscount,
+      promoCode: promoCode,
+      paymentMethod,
+      customer: {
+        name: userData.name, email: userData.email, phone: userData.phone
+      }
+    };
+
+    const res = await fetch('/api/orders/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify(orderPayload)
     }).then(r => r.json());
 
-    if (!orderRes.success) throw new Error(orderRes.error || 'Order creation failed');
+    if (res.success) {
+      localStorage.removeItem('ds_cart'); // clear cart
+      sessionStorage.setItem('pendingOrder', JSON.stringify({ orderId: res.orderId, total: finalTotal }));
+      
+      btn.innerHTML = `<span class="spinner"></span> Redirecting to Payment Gateway...`;
+      
+      // Ads tracking logic
+      if (window.gtag && window.googleAdsTag) {
+        window.gtag('event', 'begin_checkout', { 'value': finalTotal, 'currency': 'INR' });
+      }
+      if (window.fbq) {
+        window.fbq('track', 'InitiateCheckout');
+      }
 
-    // Clear cart + save session data
-    localStorage.removeItem('ds_cart');
-    sessionStorage.removeItem('checkout_discount');
-    sessionStorage.removeItem('checkout_promo');
-    sessionStorage.setItem('pendingOrder', JSON.stringify({
-      orderId: orderRes.orderId, total: orderRes.total, email,
-      name: `${firstName} ${lastName}`
-    }));
-
-    // Redirect to UPI payment
-    btn.innerHTML = '<span style="font-size:1.1rem;display:inline-block;animation:spin 1s linear infinite;">⏳</span> Securing Payment...';
-    // 5-second loading delay as requested
-    setTimeout(() => {
-      location.href = '/upi-payment.html?order=' + orderRes.orderId;
-    }, 5000);
-
-  } catch(e) {
-    showToast(e.message || 'Error. Please try again.', 'error');
-    btn.textContent = '📲 Proceed to Pay'; btn.disabled = false;
+      setTimeout(() => {
+        location.href = `/upi-payment.html?order=${res.orderId}`;
+      }, 5000); // Wait 5 seconds so they see the loading indicator and notice "Redirecting..."
+      
+    } else {
+      throw new Error(res.error || 'Order creation failed');
+    }
+  } catch (err) {
+    btn.textContent = 'Complete Order'; btn.disabled = false;
+    showToast(err.message, 'error');
   }
 }
 
-
-// ── Init ─────────────────────────────────────────────────────
-const style = document.createElement('style');
-style.textContent = '@keyframes spin { 100% { transform: rotate(360deg); } }';
-document.head.appendChild(style);
-
-document.addEventListener('DOMContentLoaded', async () => {
-  loadCheckoutSummary();
-
-  // Load payment settings dynamically
-  try {
-    const setRes = await fetch('/api/admin/settings').then(r=>r.json());
-    const pms = setRes.paymentMethods || { phonepe: true, easebuzz: true, crypto: false };
-    let pmHtml = '';
-    let hasSelected = false;
-    
-    if (pms.phonepe !== false) {
-      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'phonepe')"><div class="pm-radio"></div>PhonePe - UPI | Credit/Debit Card | NetBanking</div>`;
-      hasSelected = true;
-    }
-    if (pms.easebuzz !== false) {
-      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'easebuzz')"><div class="pm-radio"></div>Easebuzz - UPI | Credit/Debit Card | NetBanking</div>`;
-      hasSelected = true;
-    }
-    if (pms.crypto) {
-      pmHtml += `<div class="pm-option ${!hasSelected ? 'selected' : ''}" onclick="selPM(this, 'crypto')"><div class="pm-radio"></div>Crypto Currency</div>`;
-      hasSelected = true;
-    }
-    if(!pmHtml) pmHtml = '<div class="pm-option selected"><div class="pm-radio"></div>Standard Gateway</div>';
-    
-    const pmList = document.getElementById('pmList');
-    if (pmList) pmList.innerHTML = pmHtml;
-  } catch(e) {}
-  // Check if user// Check if user is already logged in
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('ds_user_token');
   const user  = (() => { try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch { return null; } })();
-
+  
   if (token && user) {
     isLoggedIn = true;
-    // Pre-fill fields
-    const nm = (user.name || '').split(' ');
-    const fi = document.getElementById('firstName'); if (fi && nm[0]) fi.value = nm[0];
-    const li = document.getElementById('lastName');  if (li && nm[1]) li.value = nm.slice(1).join(' ');
-    const em = document.getElementById('email');     if (em) em.value = user.email || '';
-    const ph = document.getElementById('phone');     if (ph) ph.value = user.phone || '';
-    // Hide password section — already logged in
-    const ps = document.getElementById('passwordSection');
-    if (ps) {
-      ps.innerHTML = `<div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.8rem;color:#22c55e;">
-        ✅ Logged in as <strong>${user.name || user.email}</strong> — <a href="/dashboard/" style="color:var(--accent);">My Account</a>
-      </div>`;
+    document.getElementById('email').value = user.email || '';
+    document.getElementById('phone').value = user.phone || '';
+    if (user.name) {
+      const parts = user.name.split(' ');
+      document.getElementById('firstName').value = parts[0] || '';
+      document.getElementById('lastName').value  = parts.slice(1).join(' ') || '';
+    }
+    const ac = document.getElementById('accountCreationBlock');
+    if (ac) {
+      ac.innerHTML = `
+        <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:12px; border-radius:6px; display:flex; align-items:center; gap:10px;">
+          <div style="width:32px;height:32px;background:var(--brand);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;">✓</div>
+          <div>
+            <div style="font-weight:600;font-size:.9rem;color:#065f46;">Logged in as ${user.name}</div>
+            <div style="font-size:.75rem;color:#047857;">Your order will be added to your account.</div>
+          </div>
+        </div>
+      `;
     }
   }
-});
 
-function selPM(el, method) {
-  document.querySelectorAll('.pm-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  window.selectedPaymentMethod = method;
-}
+  loadCheckoutSummary();
+});
