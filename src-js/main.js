@@ -18,11 +18,6 @@ function addToCart(item) {
   showToast(`✅ ${item.name} added to cart!`, 'success');
 }
 
-window.searchDomain = function() {
-    const v = (document.getElementById('heroInput') || {}).value || '';
-    location.href = v.trim() ? `/domains.html?q=${encodeURIComponent(v.trim())}` : '/domains.html';
-  };
-
 // ── Toast ─────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
   let t = document.getElementById('toast');
@@ -182,7 +177,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (grid) loadHomePlans(grid);
 
   // ── Hero search ─────────────────────────────────────────
-  
+  const performSearch = () => {
+    const v = (document.getElementById('heroInput') || {}).value || '';
+    location.href = v.trim() ? `/domains.html?q=${encodeURIComponent(v.trim())}` : '/domains.html';
+  };
+  const heroBtn = document.querySelector('#heroSearch button');
+  if (heroBtn) heroBtn.addEventListener('click', performSearch);
+  const heroInput = document.getElementById('heroInput');
+  if (heroInput) {
+    heroInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') performSearch();
+    });
+  }
 
   // ── Active nav link highlight ───────────────────────────
   const path = location.pathname;
