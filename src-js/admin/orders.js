@@ -1,6 +1,17 @@
 let allOrders = [];
 let editingOrderId = null;
 
+// Indian IST time (AM/PM)
+function fmtIST(isoStr) {
+  if (!isoStr) return '-';
+  return new Date(isoStr).toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+    hour12: true
+  });
+}
+
 async function loadOrders() {
   try {
     allOrders = await apiFetch('/api/orders');
@@ -27,20 +38,22 @@ function renderOrders() {
     return;
   }
 
-  const payLabels = { upi_manual:'📲 UPI', card:'💳 Card', netbanking:'🏦 NetBanking', cod:'🚚 COD' };
+  const payLabels = { upi_manual:'📲 UPI', upi:'📲 UPI', card:'💳 Card', netbanking:'🏦 NetBanking', cod:'🚚 COD' };
 
   tbody.innerHTML = filtered.map(o => {
     const isUtrPending = o.status === 'UTR Pending';
-    const activateBtn  = (isUtrPending || o.status === 'Pending')
-      ? `<button class="btn btn-sm" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);" onclick="activateOrder('${o.id}')">✅ Activate</button>`
+    const isPending    = o.status === 'Pending';
+    const canVerify    = isUtrPending || isPending;
+    const activateBtn  = canVerify
+      ? `<button class="btn btn-sm" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);" onclick="verifyOrder('${o.id}')">✅ Verify &amp; Activate</button>`
       : '';
     const utrCell = o.utr
       ? `<div style="font-family:monospace;font-size:.78rem;color:var(--accent);">${o.utr}</div>
-         <div style="font-size:.68rem;color:${o.utrVerified?'#22c55e':'#f59e0b'};">${o.utrVerified?'✅ Verified':'⏳ Pending'}</div>`
+         <div style="font-size:.68rem;color:${o.utrVerified?'#22c55e':'#f59e0b'}">${o.utrVerified?'✅ Verified':'⏳ Pending'}</div>`
       : '<span style="color:var(--text-muted);font-size:.78rem;">-</span>';
 
     return `
-    <tr style="${isUtrPending ? 'background:rgba(245,158,11,.04);border-left:3px solid #f59e0b;' : ''}">
+    <tr style="${isUtrPending ? 'background:rgba(245,158,11,.04);border-left:3px solid #f59e0b;' : isPending ? 'background:rgba(239,68,68,.04);border-left:3px solid #ef4444;' : ''}">
       <td style="font-family:monospace;color:var(--accent);font-weight:700;font-size:0.78rem;">${o.id}</td>
       <td>${o.customer?.name||'-'}<br/><span style="font-size:0.74rem;color:var(--text-muted);">${o.customer?.email||''}</span></td>
       <td style="font-size:0.82rem;">${(o.items||[]).map(i=>`<div>${i.type==='domain'?'🌐':'⚡'} ${i.name}</div>`).join('')||'-'}</td>
@@ -48,7 +61,7 @@ function renderOrders() {
       <td style="font-size:0.82rem;">${payLabels[o.paymentMethod]||o.paymentMethod||'-'}</td>
       <td>${utrCell}</td>
       <td><span class="status status-${(o.status||'pending').toLowerCase().replace(' ','-')}">${o.status||'Pending'}</span></td>
-      <td style="color:var(--text-muted);font-size:0.78rem;">${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+      <td style="color:var(--text-muted);font-size:0.78rem;">${fmtIST(o.createdAt)}</td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           ${activateBtn}
@@ -60,15 +73,18 @@ function renderOrders() {
   }).join('');
 }
 
-// Admin manually activates after checking bank
-async function activateOrder(orderId) {
-  if (!confirm('✅ Confirm payment received in bank?\n\nClick OK to ACTIVATE this order.')) return;
+// Admin verifies payment and activates order
+async function verifyOrder(orderId) {
+  if (!confirm('✅ Confirm payment received in bank?\n\nThis will ACTIVATE the order.')) return;
   try {
     await apiFetch(`/api/admin/activate/${orderId}`, { method: 'POST', body: JSON.stringify({}) });
-    showToast('✅ Order Activated! Customer domain/hosting is now active.', 'success');
+    showToast('✅ Payment verified! Order is now Active.', 'success');
     loadOrders();
   } catch (e) { showToast('Failed to activate: ' + e.message, 'error'); }
 }
+
+// Keep old name for compatibility
+async function activateOrder(orderId) { return verifyOrder(orderId); }
 
 function openStatusModal(id, currentStatus) {
   editingOrderId = id;

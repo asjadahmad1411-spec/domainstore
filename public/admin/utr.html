@@ -27,7 +27,7 @@
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-left"><h2>Payment Verification</h2><p>Verify manual payments submitted by customers</p></div>
+    <div class="topbar-left"><h2>Payment Verification</h2><p>New orders appear live every 10 seconds</p></div>
     <div class="topbar-right">
       <span id="pendingBadge" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#f59e0b;padding:5px 14px;border-radius:50px;font-size:.8rem;font-weight:700;">Loading...</span>
       <span class="admin-badge">👤 Admin</span>
@@ -54,19 +54,22 @@
 
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title">🏦 Pending Payments</span>
-        <button class="btn btn-outline btn-sm" onclick="loadUTROrders()">🔄 Refresh</button>
+        <span class="panel-title">🔴 Pending Payments — Live</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="lastRefresh" style="font-size:.72rem;color:var(--text-muted);">Loading...</span>
+          <button class="btn btn-outline btn-sm" onclick="loadUTROrders()">🔄 Refresh</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Order ID</th>
+              <th>Order ID / Status</th>
               <th>Customer</th>
               <th>Amount</th>
-              <th>Info</th>
-              <th>Submitted</th>
+              <th>Date &amp; Time (IST)</th>
               <th>Items</th>
+              <th>Payment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -84,7 +87,7 @@
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Info</th><th>Verified At</th></tr></thead>
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Items</th><th>Verified At (IST)</th></tr></thead>
           <tbody id="verifiedBody"></tbody>
         </table>
       </div>
