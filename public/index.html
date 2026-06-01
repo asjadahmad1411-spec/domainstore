@@ -218,6 +218,18 @@ async function loadHomeTldPills() {
   }
 }
 document.addEventListener('DOMContentLoaded', loadHomeTldPills);
+
+// ── Hero search — defined here so obfuscation never breaks it ──
+function searchDomain() {
+  const v = (document.getElementById('heroInput') || {}).value || '';
+  location.href = v.trim() ? '/domains.html?q=' + encodeURIComponent(v.trim()) : '/domains.html';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const inp = document.getElementById('heroInput');
+  if (inp) {
+    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') searchDomain(); });
+  }
+});
 </script>
 </body>
 </html>

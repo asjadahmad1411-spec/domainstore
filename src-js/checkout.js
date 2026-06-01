@@ -155,18 +155,28 @@ function checkEmailExists(email) {
 
 // ── Main: Proceed to Pay ──────────────────────────────────────
 async function proceedToPayment() {
-  const firstName = document.getElementById('firstName')?.value.trim() || '';
-  const lastName  = document.getElementById('lastName')?.value.trim()  || '';
-  const email     = document.getElementById('email')?.value.trim()     || '';
-  const phone     = document.getElementById('phone')?.value.trim()     || '';
+  // If logged in, read from localStorage — don't validate form fields
+  let firstName, lastName, email, phone;
   const password  = document.getElementById('password')?.value         || '';
   const confirmPw = document.getElementById('confirmPassword')?.value  || '';
 
-  if (!firstName || !lastName) return showToast('Please enter your full name', 'error');
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Please enter a valid email', 'error');
-  if (!phone || phone.replace(/\D/g,'').length < 10) return showToast('Please enter a valid phone number', 'error');
+  if (isLoggedIn) {
+    const user = (() => { try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch { return null; } })();
+    if (!user) return showToast('Session expired. Please login again.', 'error');
+    const parts = (user.name || '').split(' ');
+    firstName = parts[0] || 'Customer';
+    lastName  = parts.slice(1).join(' ') || '.';
+    email     = user.email;
+    phone     = user.phone;
+  } else {
+    firstName = document.getElementById('firstName')?.value.trim() || '';
+    lastName  = document.getElementById('lastName')?.value.trim()  || '';
+    email     = document.getElementById('email')?.value.trim()     || '';
+    phone     = document.getElementById('phone')?.value.trim()     || '';
 
-  if (!isLoggedIn) {
+    if (!firstName || !lastName) return showToast('Please enter your full name', 'error');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Please enter a valid email', 'error');
+    if (!phone || phone.replace(/\D/g,'').length < 10) return showToast('Please enter a valid phone number', 'error');
     if (!password || password.length < 6) return showToast('Password must be at least 6 characters', 'error');
     if (password !== confirmPw) return showToast('Passwords do not match', 'error');
   }
