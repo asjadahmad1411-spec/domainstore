@@ -239,7 +239,7 @@ async function proceedToPayment() {
       }
     };
 
-    const res = await fetch('/api/orders/create', {
+    const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
       body: JSON.stringify(orderPayload)
