@@ -220,11 +220,7 @@ router.get('/check', async (req, res) => {
   if (!clean || clean.length < 2) return res.status(400).json({ error: 'Domain name too short or invalid' });
 
   // Determine which TLDs to search
-  const tldsToSearch = forcedExts
-    ? tldData.filter(t => forcedExts.includes(t.extension))
-            .concat(forcedExts.filter(e => !tldData.find(t => t.extension === e))
-              .map(e => ({ extension: e, price: null, renewPrice: null, popular: false })))
-    : tldData;
+  const tldsToSearch = tldData; // Always search all TLDs as per user request
 
   // Run availability checks in parallel
   const results = await Promise.all(

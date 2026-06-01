@@ -18,6 +18,11 @@ function addToCart(item) {
   showToast(`✅ ${item.name} added to cart!`, 'success');
 }
 
+window.searchDomain = function() {
+    const v = (document.getElementById('heroInput') || {}).value || '';
+    location.href = v.trim() ? `/domains.html?q=${encodeURIComponent(v.trim())}` : '/domains.html';
+  };
+
 // ── Toast ─────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
   let t = document.getElementById('toast');
@@ -177,10 +182,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (grid) loadHomePlans(grid);
 
   // ── Hero search ─────────────────────────────────────────
-  window.searchDomain = function() {
-    const v = (document.getElementById('heroInput') || {}).value || '';
-    location.href = v.trim() ? `/domains.html?q=${encodeURIComponent(v.trim())}` : '/domains.html';
-  };
+  
 
   // ── Active nav link highlight ───────────────────────────
   const path = location.pathname;
