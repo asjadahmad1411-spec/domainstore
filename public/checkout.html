@@ -29,7 +29,7 @@
 .pm-option{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--border);cursor:pointer;font-size:.9rem;font-weight:600;color:var(--text);}
 .pm-option:last-child{border-bottom:none;}
 .pm-option:hover{background:rgba(0,0,0,0.02);}
-.pm-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--text-muted);position:relative;}
+.pm-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--text-muted);position:relative;flex-shrink:0;}
 .pm-option.selected .pm-radio{border-color:var(--accent);}
 .pm-option.selected .pm-radio::after{content:'';position:absolute;width:10px;height:10px;background:var(--accent);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);}
 .summary-title{font-size:1.4rem;font-weight:400;color:var(--text);margin-bottom:20px;}
@@ -40,12 +40,14 @@
 .due-amount{font-size:2rem;font-weight:800;color:var(--text);margin-bottom:20px;}
 .btn-complete{background:var(--primary);color:#fff;width:100%;border:none;padding:16px;border-radius:6px;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;}
 .btn-complete:hover{background:var(--accent);}
+.logged-in-box{background:#ecfdf5;border:1px solid #a7f3d0;padding:14px 16px;border-radius:8px;display:flex;align-items:center;gap:12px;}
+.logged-in-avatar{width:36px;height:36px;background:#10b981;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0;}
 @media(max-width:860px){.co-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <nav class="navbar" id="navbar">
-  <a href="/" class="nav-logo" style="display:flex; align-items:center; gap:6px; text-decoration:none;"><span style="font-size:1.4rem;">🌱</span><span style="font-weight:900; background:linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Enroot</span><span style="font-weight:700; color:inherit;">Host</span></a>
+  <a href="/" class="nav-logo" style="display:flex;align-items:center;gap:6px;text-decoration:none;"><span style="font-size:1.4rem;">🌱</span><span style="font-weight:900;background:linear-gradient(135deg,#10b981,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Enroot</span><span style="font-weight:700;color:inherit;">Host</span></a>
   <div class="nav-actions">
     <span style="font-size:.8rem;color:var(--text-muted);">🔒 Secure Checkout</span>
   </div>
@@ -57,96 +59,334 @@
     <div class="pb-line"></div>
     <div class="pb-step completed"><div class="pb-circle">✓</div>Configuration</div>
     <div class="pb-line"></div>
-    <div class="pb-step active"><div class="pb-circle">3</div>Review & Checkout</div>
+    <div class="pb-step active"><div class="pb-circle">3</div>Review &amp; Checkout</div>
     <div class="pb-line"></div>
     <div class="pb-step"><div class="pb-circle">4</div>Done</div>
   </div>
 
   <div class="co-grid">
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      
-      <!-- Cart Box -->
-      <div class="card">
-        <div class="cart-header">
-          <span>Product/Options</span>
-          <span>Price/Cycle</span>
-        </div>
-        <div id="coItems" style="margin-bottom:15px; min-height: 50px;"></div>
-        
-        
+    <div style="display:flex;flex-direction:column;gap:20px;">
 
+      <!-- Cart Items -->
+      <div class="card">
+        <div class="cart-header"><span>Product/Options</span><span>Price/Cycle</span></div>
+        <div id="coItems" style="margin-bottom:15px;min-height:50px;"></div>
         <div class="cart-actions">
-          <button class="btn btn-outline" onclick="location.href='/domains'">← Continue Shopping</button>
-          <button class="btn btn-outline" onclick="localStorage.removeItem('ds_cart');location.href='/cart'">🗑 Empty Cart</button>
+          <button class="btn btn-outline" onclick="location.href='/domains.html'">← Continue Shopping</button>
+          <button class="btn btn-outline" onclick="localStorage.removeItem('ds_cart');location.href='/cart.html'">🗑 Empty Cart</button>
         </div>
       </div>
 
-      <!-- Your Details -->
-      <div class="card" id="accountCreationBlock">
+      <!-- Your Details — shown only when NOT logged in -->
+      <div class="card" id="detailsBlock">
         <div class="pm-title">👤 Your Details</div>
-        <div class="pm-sub">Enter your details to create an account.</div>
+        <div class="pm-sub">Enter your details to create an account &amp; place your order.</div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">First Name *</label><input type="text" class="form-control" id="firstName"/></div>
           <div class="form-group"><label class="form-label">Last Name *</label><input type="text" class="form-control" id="lastName"/></div>
         </div>
-        <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email" oninput="checkEmailExists(this.value)"/></div>
+        <div class="form-group"><label class="form-label">Email Address *</label><input type="email" class="form-control" id="email"/></div>
         <div class="form-group"><label class="form-label">Phone Number *</label><input type="tel" class="form-control" id="phone"/></div>
-        
-        <div id="passwordSection">
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Password *</label><input type="password" class="form-control" id="password"/></div>
-            <div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" class="form-control" id="confirmPassword"/></div>
-          </div>
-          <div id="emailCheckMsg" style="font-size:.75rem;margin-top:-5px;margin-bottom:8px;"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Password *</label><input type="password" class="form-control" id="password"/></div>
+          <div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" class="form-control" id="confirmPassword"/></div>
         </div>
       </div>
 
-      <!-- Payment Methods -->
+      <!-- Logged-in box — shown only when logged in -->
+      <div class="card" id="loggedInBlock" style="display:none;">
+        <div class="logged-in-box">
+          <div class="logged-in-avatar" id="userAvatar">U</div>
+          <div>
+            <div style="font-weight:700;font-size:.95rem;color:#065f46;" id="loggedInName">User</div>
+            <div style="font-size:.78rem;color:#047857;" id="loggedInEmail">—</div>
+          </div>
+          <div style="margin-left:auto;"><a href="/login.html" style="font-size:.78rem;color:var(--accent);">Not you? Switch</a></div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
       <div class="card">
         <div class="pm-title">Payment Method</div>
-        <div class="pm-sub">Please choose your preferred method of payment.</div>
+        <div class="pm-sub">Choose your preferred payment method.</div>
         <div class="pm-list" id="pmList">
-          <div class="pm-option selected" onclick="document.querySelectorAll('.pm-option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');">
+          <div class="pm-option selected">
             <div class="pm-radio"></div>
             💳 PayU Secure / UPI / Cards
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- RIGHT: Summary -->
     <div>
-      <div class="card" style="position: sticky; top: 90px;">
+      <div class="card" style="position:sticky;top:90px;">
         <div class="summary-title">Order Summary</div>
+        <div id="coItems2" style="margin-bottom:14px;"></div>
         <div class="summary-row"><span>Subtotal</span><span id="coSubtotal">₹0</span></div>
         <div class="summary-row" id="coDiscRow" style="display:none;color:var(--green);"><span>Discount</span><span id="coDisc">-₹0</span></div>
         <div class="summary-row"><span>CGST @ 9.00%</span><span id="coCGST">₹0</span></div>
         <div class="summary-row"><span>SGST @ 9.00%</span><span id="coSGST">₹0</span></div>
-        <div class="summary-row totals"><span>Totals</span><span id="coTotal">₹0</span></div>
-        
+        <div class="summary-row totals"><span>Total</span><span id="coTotal">₹0</span></div>
         <!-- Promo -->
-        <div style="margin-bottom:14px; margin-top:20px;">
+        <div style="margin:16px 0;">
           <div style="display:flex;gap:7px;">
             <input type="text" id="coPromo" placeholder="Promo Code" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:.85rem;outline:none;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
-            <button class="btn btn-outline" style="padding:8px 16px; font-size:.85rem;" onclick="applyPromoCode()">Apply</button>
+            <button class="btn btn-outline" style="padding:8px 16px;font-size:.85rem;" onclick="applyCoPromo()">Apply</button>
           </div>
           <div id="coPromoMsg" style="font-size:.75rem;margin-top:5px;"></div>
         </div>
         <div class="due-today">
           <div class="due-label">Total Due Today</div>
           <div class="due-amount" id="coDueToday">₹0</div>
-          <button class="btn-complete" id="proceedBtn" onclick="proceedToPayment()">Complete Order</button>
+          <button class="btn-complete" id="proceedBtn" onclick="doCheckout()">Complete Order</button>
         </div>
         <p style="font-size:.7rem;text-align:center;margin-top:15px;color:var(--text-muted);">By proceeding you agree to our Terms of Service</p>
       </div>
     </div>
-
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 <script src="/js/main.js"></script>
-<script src="/js/checkout.js"></script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     INLINE CHECKOUT LOGIC — NOT OBFUSCATED, ALWAYS WORKS
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  // ── State ──────────────────────────────────────────────────
+  var coPromoDiscount = 0;
+  var coPromoCode = '';
+
+  // ── Toast ──────────────────────────────────────────────────
+  function toast(msg, type) {
+    var t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'toast ' + (type || 'success') + ' show';
+    clearTimeout(t._t);
+    t._t = setTimeout(function() { t.classList.remove('show'); }, 3500);
+  }
+
+  // ── Format currency ────────────────────────────────────────
+  function fmt(n) { return '₹' + (n || 0).toLocaleString('en-IN'); }
+
+  // ── Get cart (works with getCart from main.js) ─────────────
+  function cart() {
+    try { return JSON.parse(localStorage.getItem('ds_cart') || '[]'); } catch(e) { return []; }
+  }
+
+  // ── Get logged-in user ─────────────────────────────────────
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem('ds_user') || 'null'); } catch(e) { return null; }
+  }
+  function getToken() { return localStorage.getItem('ds_user_token') || ''; }
+
+  // ── Render order items ─────────────────────────────────────
+  function renderItems() {
+    var items = cart();
+    if (!items.length) { location.href = '/cart.html'; return; }
+
+    var html = items.map(function(i) {
+      var total = (i.price || 0) * (i.years || 1);
+      var yStr = i.type === 'domain' ? ' (' + (i.years || 1) + ' Yr' + ((i.years || 1) > 1 ? 's' : '') + ')' : '';
+      return '<div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:7px;gap:8px;">'
+        + '<span style="color:var(--text-muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + i.name + yStr + '</span>'
+        + '<span style="font-weight:700;white-space:nowrap;">' + fmt(total) + '</span>'
+        + '</div>';
+    }).join('');
+
+    var el1 = document.getElementById('coItems');
+    var el2 = document.getElementById('coItems2');
+    if (el1) el1.innerHTML = html;
+    if (el2) el2.innerHTML = html;
+    updateTotals();
+  }
+
+  // ── Update totals ──────────────────────────────────────────
+  function updateTotals() {
+    var items = cart();
+    var sub = items.reduce(function(s, i) { return s + ((i.price || 0) * (i.years || 1)); }, 0);
+    var taxable = Math.max(sub - coPromoDiscount, 0);
+    var cgst = Math.round(taxable * 0.09 * 100) / 100;
+    var sgst = Math.round(taxable * 0.09 * 100) / 100;
+    var tot = taxable + cgst + sgst;
+
+    function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+    set('coSubtotal', fmt(sub));
+    set('coDisc', '-' + fmt(coPromoDiscount));
+    set('coCGST', fmt(cgst));
+    set('coSGST', fmt(sgst));
+    set('coTotal', fmt(tot));
+    set('coDueToday', fmt(tot));
+
+    var dr = document.getElementById('coDiscRow');
+    if (dr) dr.style.display = coPromoDiscount > 0 ? 'flex' : 'none';
+
+    window._coFinalTotal = tot;
+    window._coCgst = cgst;
+    window._coSgst = sgst;
+  }
+
+  // ── Apply promo ────────────────────────────────────────────
+  window.applyCoPromo = async function() {
+    var code = (document.getElementById('coPromo').value || '').trim().toUpperCase();
+    var msg = document.getElementById('coPromoMsg');
+    if (!code) return;
+    var items = cart();
+    var sub = items.reduce(function(s, i) { return s + ((i.price || 0) * (i.years || 1)); }, 0);
+    try {
+      var res = await fetch('/api/admin/promos/validate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code, total: sub })
+      }).then(function(r) { return r.json(); });
+      if (res.valid) {
+        coPromoDiscount = res.discount; coPromoCode = code;
+        if (msg) msg.innerHTML = '<span style="color:var(--green);">✅ Saving ' + fmt(res.discount) + '!</span>';
+        updateTotals(); toast('🎉 Promo applied!', 'success');
+      } else {
+        coPromoDiscount = 0; coPromoCode = '';
+        if (msg) msg.innerHTML = '<span style="color:#ef4444;">❌ ' + (res.error || 'Invalid code') + '</span>';
+        updateTotals();
+      }
+    } catch(e) { if (msg) msg.innerHTML = '<span style="color:#ef4444;">❌ Error validating promo</span>'; }
+  };
+
+  // ── MAIN CHECKOUT ──────────────────────────────────────────
+  window.doCheckout = async function() {
+    var btn = document.getElementById('proceedBtn');
+    var items = cart();
+    if (!items.length) { toast('Your cart is empty!', 'error'); return; }
+
+    var user = getUser();
+    var token = getToken();
+    var firstName, lastName, email, phone;
+
+    if (user && token) {
+      // ── LOGGED IN: skip form validation ──────────────────
+      var parts = (user.name || 'Customer').split(' ');
+      firstName = parts[0] || 'Customer';
+      lastName  = parts.slice(1).join(' ') || '.';
+      email     = user.email;
+      phone     = user.phone;
+    } else {
+      // ── NOT LOGGED IN: validate form fields ──────────────
+      firstName = (document.getElementById('firstName').value || '').trim();
+      lastName  = (document.getElementById('lastName').value || '').trim();
+      email     = (document.getElementById('email').value || '').trim();
+      phone     = (document.getElementById('phone').value || '').trim();
+      var pass  = document.getElementById('password').value || '';
+      var pass2 = document.getElementById('confirmPassword').value || '';
+
+      if (!firstName || !lastName) { toast('Please enter your full name', 'error'); return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('Please enter a valid email', 'error'); return; }
+      if (!phone || phone.replace(/\D/g,'').length < 10) { toast('Please enter a valid phone number', 'error'); return; }
+      if (!pass || pass.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+      if (pass !== pass2) { toast('Passwords do not match', 'error'); return; }
+
+      // Try register
+      btn.textContent = '🔐 Creating account...'; btn.disabled = true;
+      try {
+        var regRes = await fetch('/api/auth/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: firstName + ' ' + lastName, email: email, phone: phone, password: pass })
+        }).then(function(r) { return r.json(); });
+
+        if (regRes.token) {
+          token = regRes.token; user = regRes.user;
+          localStorage.setItem('ds_user_token', token);
+          localStorage.setItem('ds_user', JSON.stringify(user));
+          toast('✅ Account created!', 'success');
+        } else if (regRes.error && regRes.error.toLowerCase().includes('exists')) {
+          // existing user — try login
+          var lgRes = await fetch('/api/auth/login', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: pass })
+          }).then(function(r) { return r.json(); });
+          if (lgRes.token) {
+            token = lgRes.token; user = lgRes.user;
+            localStorage.setItem('ds_user_token', token);
+            localStorage.setItem('ds_user', JSON.stringify(user));
+          } else {
+            toast('Email already exists. Wrong password?', 'error');
+            btn.textContent = 'Complete Order'; btn.disabled = false; return;
+          }
+        } else {
+          toast(regRes.error || 'Registration failed', 'error');
+          btn.textContent = 'Complete Order'; btn.disabled = false; return;
+        }
+      } catch(err) {
+        toast('Network error. Please try again.', 'error');
+        btn.textContent = 'Complete Order'; btn.disabled = false; return;
+      }
+    }
+
+    // ── Place Order ─────────────────────────────────────────
+    btn.textContent = '💳 Placing order...'; btn.disabled = true;
+    var finalTotal = window._coFinalTotal || 0;
+
+    try {
+      var orderRes = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          customer: { name: (user && user.name) || firstName + ' ' + lastName, email: email, phone: phone },
+          items: items,
+          total: finalTotal,
+          discount: coPromoDiscount,
+          promoCode: coPromoCode,
+          paymentMethod: 'upi'
+        })
+      }).then(function(r) { return r.json(); });
+
+      if (orderRes.success) {
+        localStorage.removeItem('ds_cart');
+        sessionStorage.setItem('pendingOrder', JSON.stringify({ orderId: orderRes.orderId, total: finalTotal }));
+        btn.innerHTML = '<span class="spinner"></span> Redirecting to Payment...';
+        setTimeout(function() { location.href = '/upi-payment.html?order=' + orderRes.orderId; }, 5000);
+      } else {
+        toast(orderRes.error || 'Order failed. Please try again.', 'error');
+        btn.textContent = 'Complete Order'; btn.disabled = false;
+      }
+    } catch(err) {
+      toast('Network error placing order.', 'error');
+      btn.textContent = 'Complete Order'; btn.disabled = false;
+    }
+  };
+
+  // ── INIT ───────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    var user = getUser();
+    var token = getToken();
+
+    if (user && token) {
+      // Show logged-in box, hide guest form
+      document.getElementById('detailsBlock').style.display = 'none';
+      var lb = document.getElementById('loggedInBlock');
+      if (lb) lb.style.display = 'block';
+      var av = document.getElementById('userAvatar');
+      var nm = document.getElementById('loggedInName');
+      var em = document.getElementById('loggedInEmail');
+      if (av) av.textContent = (user.name || 'U')[0].toUpperCase();
+      if (nm) nm.textContent = user.name || 'User';
+      if (em) em.textContent = user.email || '';
+    }
+
+    // Load promo from session if any
+    var sd = parseInt(sessionStorage.getItem('checkout_discount') || '0');
+    var sp = sessionStorage.getItem('checkout_promo') || '';
+    if (sd > 0 && sp) {
+      coPromoDiscount = sd; coPromoCode = sp;
+      var inp = document.getElementById('coPromo');
+      if (inp) inp.value = sp;
+      var msg = document.getElementById('coPromoMsg');
+      if (msg) msg.innerHTML = '<span style="color:var(--green);">✅ ' + fmt(sd) + ' saved!</span>';
+    }
+
+    renderItems();
+  });
+})();
+</script>
 </body>
 </html>
