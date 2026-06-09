@@ -14,6 +14,43 @@ function addToCart(item) {
   const cart = getCart();
   if (cart.find(i => i.id === item.id)) { showToast(`${item.name} already in cart!`, 'error'); return; }
   cart.push(item);
+
+  // ── Auto-add domain add-ons when a domain is added ──────────
+  if (item.type === 'domain') {
+    // Domain Privacy Protection
+    const privacyId = 'addon-privacy-' + item.id;
+    if (!cart.find(i => i.id === privacyId)) {
+      cart.push({
+        id: privacyId,
+        type: 'addon',
+        addonFor: item.id,
+        name: 'Domain Privacy Protection',
+        subName: 'Hides your personal info from WHOIS',
+        price: 299,
+        years: item.years || 1,
+        period: 'year',
+        icon: '🔒',
+        isAddon: true
+      });
+    }
+    // 1 Month Shared Hosting
+    const hostingId = 'addon-hosting-' + item.id;
+    if (!cart.find(i => i.id === hostingId)) {
+      cart.push({
+        id: hostingId,
+        type: 'addon',
+        addonFor: item.id,
+        name: '1 Month Shared Hosting',
+        subName: 'NVMe SSD · Free SSL · 99.9% Uptime',
+        price: 99,
+        years: 1,
+        period: 'month',
+        icon: '⚡',
+        isAddon: true
+      });
+    }
+  }
+
   saveCart(cart);
   showToast(`✅ ${item.name} added to cart!`, 'success');
 }
