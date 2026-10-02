@@ -114,7 +114,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       window.gtag = function(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', s.googleAdsTag);
-      window.googleAdsTag = s.googleAdsTag; // Save for checkout
+      window.googleAdsTag = s.googleAdsTag;
+      window.googleAdsConversionLabel = s.googleAdsConversionLabel || '';
     }
     if (s.metaPixelId) {
       !function(f,b,e,v,n,t,p){if(f.fbq)return;n=f.fbq=function(){n.callMethod?

@@ -172,10 +172,19 @@ function startOrderPolling() {
         clearInterval(verifyTimer);
         showView('viewSuccess');
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        // Fire Ads Conversions
+        // Fire Google Ads Purchase Conversion
         if (window.gtag && window.googleAdsTag) {
-          window.gtag('event', 'conversion', { 'send_to': window.googleAdsTag, 'value': currentTotal, 'currency': 'INR', 'transaction_id': currentOrderId });
+          const sendTo = window.googleAdsConversionLabel
+            ? `${window.googleAdsTag}/${window.googleAdsConversionLabel}`
+            : window.googleAdsTag;
+          window.gtag('event', 'conversion', {
+            'send_to': sendTo,
+            'value': currentTotal,
+            'currency': 'INR',
+            'transaction_id': currentOrderId
+          });
         }
+        // Fire Meta Pixel Purchase
         if (window.fbq) {
           window.fbq('track', 'Purchase', { value: currentTotal, currency: 'INR' });
         }

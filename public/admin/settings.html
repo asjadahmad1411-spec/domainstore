@@ -97,15 +97,38 @@
 
       <!-- Ads & Tracking -->
       <div class="panel" style="border-color:rgba(16,185,129,.3);">
-        <div class="panel-header"><span class="panel-title">📈 Ads & Tracking</span></div>
-        <div class="form-group">
-          <label class="form-label">Google Ads Tag (AW-XXXXX)</label>
-          <input type="text" class="form-control" id="googleAdsTag" placeholder="e.g. AW-123456789"/>
+        <div class="panel-header"><span class="panel-title">📈 Ads &amp; Tracking</span></div>
+
+        <!-- Google Ads -->
+        <div style="background:rgba(66,133,244,.06);border:1px solid rgba(66,133,244,.2);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-weight:700;margin-bottom:10px;font-size:.88rem;">🔵 Google Ads</div>
+          <div class="form-group">
+            <label class="form-label">Google Ads Tag ID <span style="color:var(--text-muted);font-weight:400;">(Measurement ID)</span></label>
+            <input type="text" class="form-control" id="googleAdsTag" placeholder="e.g. AW-123456789"/>
+            <div style="font-size:.73rem;color:var(--text-muted);margin-top:4px;">Google Ads → Goals → Conversions → select conversion → Tag setup → Tag ID</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Google Ads Conversion Label <span style="color:var(--text-muted);font-weight:400;">(for Purchase event)</span></label>
+            <input type="text" class="form-control" id="googleAdsConversionLabel" placeholder="e.g. AbCdEfGhIjKlMnOp"/>
+            <div style="font-size:.73rem;color:var(--text-muted);margin-top:4px;">Google Ads → Goals → Conversions → select conversion → Tag setup → Conversion label</div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Meta (Facebook) Pixel ID</label>
-          <input type="text" class="form-control" id="metaPixelId" placeholder="e.g. 9876543210"/>
+
+        <!-- Meta Pixel -->
+        <div style="background:rgba(24,119,242,.06);border:1px solid rgba(24,119,242,.2);border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="font-weight:700;margin-bottom:10px;font-size:.88rem;">🔷 Meta (Facebook) Pixel</div>
+          <div class="form-group">
+            <label class="form-label">Meta Pixel ID</label>
+            <input type="text" class="form-control" id="metaPixelId" placeholder="e.g. 9876543210"/>
+            <div style="font-size:.73rem;color:var(--text-muted);margin-top:4px;">Meta Business Manager → Events Manager → Pixels → your pixel ID</div>
+          </div>
         </div>
+
+        <!-- How it fires -->
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;">
+          ⚡ <strong>Auto Events:</strong> PageView (all pages) → InitiateCheckout (order placed) → <strong>Purchase/Conversion</strong> (payment verified ✅)
+        </div>
+
         <button class="btn btn-primary" onclick="saveTrackingSettings()">💾 Save Tracking Setup</button>
       </div>
 
@@ -141,6 +164,7 @@ async function loadSettingsPage() {
     setV('upiId', s.upiId);
     setV('upiName', s.upiName);
     setV('googleAdsTag', s.googleAdsTag);
+    setV('googleAdsConversionLabel', s.googleAdsConversionLabel);
     setV('metaPixelId', s.metaPixelId);
     
     setC('t-cloaking', s.enableCloaking);
@@ -214,12 +238,13 @@ async function saveSecuritySettings() {
 
 async function saveTrackingSettings() {
   const data = {
-    googleAdsTag: document.getElementById('googleAdsTag')?.value.trim(),
-    metaPixelId:  document.getElementById('metaPixelId')?.value.trim()
+    googleAdsTag:              document.getElementById('googleAdsTag')?.value.trim(),
+    googleAdsConversionLabel:  document.getElementById('googleAdsConversionLabel')?.value.trim(),
+    metaPixelId:               document.getElementById('metaPixelId')?.value.trim()
   };
   try {
     await apiFetch('/api/admin/settings', { method: 'PUT', body: JSON.stringify(data) });
-    showToast('Tracking setup saved!', 'success');
+    showToast('✅ Tracking setup saved! Ads will now track conversions.', 'success');
   } catch(e) { showToast('Failed to save tracking settings', 'error'); }
 }
 

@@ -26,5 +26,6 @@
   "enableCloaking": false,
   "enableHomeCloaking": false,
   "googleAdsTag": "",
+  "googleAdsConversionLabel": "",
   "metaPixelId": ""
 }
