@@ -4,7 +4,7 @@
   "description": "GoDaddy-style Domain & Hosting Store",
   "main": "server/index.js",
   "scripts": {
-    "build": "node server/obfuscate.js",
+    "build": "node server/obfuscate.js && node inject_tags.js",
     "start": "npm run build && node server/index.js",
     "dev": "npm run build && nodemon --ignore public/js/ server/index.js"
   },
