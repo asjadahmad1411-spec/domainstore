@@ -22,6 +22,18 @@ async function init() {
 
   try {
     siteSettings = await fetch('/api/admin/settings').then(r => r.json());
+    
+    // Inject Tracking Tags on this page so Tag Assistant works
+    if (siteSettings.googleAdsTag) {
+      const g = document.createElement('script'); g.async = true; g.src = `https://www.googletagmanager.com/gtag/js?id=${siteSettings.googleAdsTag}`;
+      document.head.appendChild(g);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', siteSettings.googleAdsTag);
+      window.googleAdsTag = siteSettings.googleAdsTag;
+      window.googleAdsConversionLabel = siteSettings.googleAdsConversionLabel || '';
+    }
   } catch(e) {
     siteSettings = { upiId: 'enroothost@upi', upiName: 'EnrootHost' };
   }
