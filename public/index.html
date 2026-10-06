@@ -35,6 +35,12 @@
 <!-- End Google Tag -->
 </head>
 <body>
+<!-- Top Special Offer Banner -->
+<div class="top-promo-bar" style="background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6); color: #ffffff; text-align: center; padding: 9px 16px; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; z-index: 1000; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+  <span>🔥 <b>LIMITED TIME OFFER:</b> Get .COM, .IN & .NET Domains at <b>₹299/yr</b> + NVMe Web Hosting @ <b>₹99/mo</b>!</span>
+  <a href="/offers" style="background: #ffffff; color: #064e3b; padding: 4px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 800; text-decoration: none; display: inline-block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Claim Offer 🚀</a>
+</div>
+
 <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
   <a href="/" class="nav-logo" style="display:flex; align-items:center; gap:6px; text-decoration:none;"><span style="font-size:1.4rem;">🌱</span><span style="font-weight:900; background:linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Enroot</span><span style="font-weight:700; color:inherit;">Host</span></a>
   <ul class="nav-links" id="navLinks">
@@ -59,15 +65,31 @@
   <div class="hero-bg"></div>
   <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <div class="hero-eyebrow">✨ India's #1 Domain Registrar</div>
-    <h1>Find Your Perfect<br/><span class="grad">Domain Name</span></h1>
-    <p>Search from 500M+ domain names. Get hosting, SSL & email — all in one place starting at ₹99/mo.</p>
+    <div class="hero-eyebrow">✨ India's #1 Trusted Domain &amp; Hosting Provider</div>
+    <h1>Find Your Perfect<br/><span class="grad">Domain &amp; Hosting</span></h1>
+    <p>Search from 500M+ domain names. Get NVMe hosting, Free SSL &amp; email — starting at ₹99/mo.</p>
+
+    <!-- Trust Badges -->
+    <div class="hero-trust-badges" style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:14px 0 20px; font-size:0.86rem; font-weight:600; color:rgba(255,255,255,0.85);">
+      <span>⚡ 2-Min Instant Setup</span>
+      <span>🛡️ 30-Day Money Back</span>
+      <span>🔒 Free SSL &amp; Privacy</span>
+      <span>💳 UPI / Paytm / Cards</span>
+    </div>
+
     <div class="search-box" id="heroSearch">
       <span>🔍</span>
-      <input type="text" id="heroInput" placeholder="Search your domain name..." onkeydown="if(event.key==='Enter')searchDomain()"/>
+      <input type="text" id="heroInput" placeholder="Search your domain name (e.g. mybusiness.com)..." onkeydown="if(event.key==='Enter')searchDomain()"/>
       <button class="btn btn-primary" onclick="searchDomain()">Search Domain</button>
     </div>
-    <div class="tld-pills" id="homeTldPills">
+
+    <!-- Quick Offer Direct Action Buttons -->
+    <div class="hero-quick-offers" style="display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
+      <a href="/domains" class="btn btn-outline btn-sm" style="border-color:#10b981; color:#10b981; font-weight:700; background:rgba(16,185,129,0.1);">🌐 .COM &amp; .IN Domains @ ₹299</a>
+      <a href="/hosting" class="btn btn-outline btn-sm" style="border-color:#3b82f6; color:#3b82f6; font-weight:700; background:rgba(59,130,246,0.1);">⚡ Web Hosting @ ₹99/mo</a>
+    </div>
+
+    <div class="tld-pills" id="homeTldPills" style="margin-top:20px;">
       <!-- Loaded dynamically from admin pricing -->
       <div class="tld-pill" style="opacity:.4;"><span>…</span></div>
     </div>
@@ -221,11 +243,11 @@ async function loadHomeTldPills() {
   } catch(e) {
     // Fallback to defaults if API fails
     document.getElementById('homeTldPills').innerHTML = `
-      <div class="tld-pill">.com <span>\u20b9799</span></div>
-      <div class="tld-pill">.in <span>\u20b9399</span></div>
-      <div class="tld-pill">.tech <span>\u20b9299</span></div>
+      <div class="tld-pill">.com <span>\u20b9299</span></div>
+      <div class="tld-pill">.in <span>\u20b9299</span></div>
+      <div class="tld-pill">.net <span>\u20b9299</span></div>
+      <div class="tld-pill">.tech <span>\u20b9199</span></div>
       <div class="tld-pill">.store <span>\u20b9199</span></div>
-      <div class="tld-pill">.io <span>\u20b93,499</span></div>
       <div class="tld-pill">.online <span>\u20b9149</span></div>`;
   }
 }
@@ -243,6 +265,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
+<!-- Floating WhatsApp Support Button (Bottom Left) -->
+<a href="https://wa.me/?text=Hi%20EnrootHost,%20I%20have%20a%20question%20about%20domain%20and%20hosting" target="_blank" class="whatsapp-float" style="position:fixed; width:56px; height:56px; bottom:20px; left:20px; background-color:#25d366; color:#fff; border-radius:50px; text-align:center; box-shadow: 2px 4px 14px rgba(0,0,0,0.3); z-index:99999; display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.3s ease;" title="Chat on WhatsApp" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="fill:#fff; stroke:none;">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 2a10 10 0 0 0-8.58 15.1L2 22l5.05-1.32A10 10 0 1 0 12 2zm0 18a7.96 7.96 0 0 1-4.08-1.12l-.29-.17-3.03.79.81-2.95-.19-.3A7.96 7.96 0 1 1 12 20z"/>
+  </svg>
+</a>
 
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
