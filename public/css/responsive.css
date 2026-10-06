@@ -34,8 +34,6 @@ body.light-mode .cart-btn { background: rgba(108,61,232,.08) !important; color: 
   .hero-quick-offers { flex-direction: column !important; gap: 8px !important; width: 100% !important; max-width: 300px !important; margin: 14px auto 0 !important; }
   .hero-quick-offers .btn { width: 100% !important; justify-content: center !important; font-size: 0.82rem !important; padding: 9px 14px !important; }
 
-  .whatsapp-float { width: 48px !important; height: 48px !important; bottom: 16px !important; left: 14px !important; }
-  .whatsapp-float svg { width: 26px !important; height: 26px !important; }
 }
 
 /* ── SEARCH BOX ─────────────────────────────────────────────── */
