@@ -71,6 +71,16 @@ const p = JSON.parse(sessionStorage.getItem('lastOrder')||'{}');
 if(p.orderId) document.getElementById('confOrderId').textContent = p.orderId;
 if(p.email) document.getElementById('confEmail').textContent = p.email;
 if(p.total !== undefined) document.getElementById('confTotal').textContent = '₹' + p.total.toLocaleString('en-IN');
+
+// Fire Google Ads Purchase Conversion Event
+if (window.gtag && window.googleAdsTag && window.googleAdsConversionLabel) {
+  gtag('event', 'conversion', {
+    'send_to': window.googleAdsTag + '/' + window.googleAdsConversionLabel,
+    'value': p.total || 299.0,
+    'currency': 'INR',
+    'transaction_id': p.orderId || ''
+  });
+}
 </script>
 
 <!--Start of Tawk.to Script-->
